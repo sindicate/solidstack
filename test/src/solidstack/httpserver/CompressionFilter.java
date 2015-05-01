@@ -16,30 +16,37 @@
 
 package solidstack.httpserver;
 
+
 public class CompressionFilter implements Filter
 {
-	public void call( RequestContext context, FilterChain chain )
+	public HttpResponse call( RequestContext context, FilterChain chain )
 	{
-		context.getResponse().setHeader( "Content-Encoding", "gzip" );
-		GZipResponse gzipResponse = new GZipResponse( context.getResponse() );
-		try
+		final HttpResponse response = chain.call( context );
+		return new HttpResponse()
 		{
-			chain.call( new RequestContext( context.getRequest(), gzipResponse, context.applicationContext ) );
-			gzipResponse.finish();
-		}
-		catch( FatalSocketException e )
-		{
-			throw e;
-		}
-		catch( RuntimeException e )
-		{
-			gzipResponse.finish();
-			throw e;
-		}
-		catch( Error e )
-		{
-			gzipResponse.finish();
-			throw e;
-		}
+			@Override
+			public void write( ResponseOutputStream out )
+			{
+				out.setHeader( "Content-Encoding", "gzip" );
+				out = new GZipResponseOutputStream( out );
+				response.write( out );
+				out.close();
+			}
+		};
+
+//		catch( FatalSocketException e )
+//		{
+//			throw e;
+//		}
+//		catch( RuntimeException e )
+//		{
+//			gzipResponse.finish();
+//			throw e;
+//		}
+//		catch( Error e )
+//		{
+//			gzipResponse.finish();
+//			throw e;
+//		}
 	}
 }

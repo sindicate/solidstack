@@ -22,14 +22,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import solidstack.httpserver.HttpException;
+import solidstack.httpserver.HttpResponse;
 import solidstack.httpserver.RequestContext;
+import solidstack.httpserver.ResponseOutputStream;
 import solidstack.httpserver.Servlet;
 import solidstack.lang.Assert;
 
 
 public class TableRecordCountServlet implements Servlet
 {
-	public void call( RequestContext context )
+	public HttpResponse call( RequestContext context )
 	{
 		boolean complete = false;
 		try
@@ -47,8 +49,16 @@ public class TableRecordCountServlet implements Servlet
 					final ResultSet result1 = statement.executeQuery( "SELECT COUNT(*) FROM " + table );
 					Assert.isTrue( result1.next() );
 					final Object object = result1.getObject( 1 );
-					context.getResponse().getWriter().write( object );
+					HttpResponse response = new HttpResponse()
+					{
+						@Override
+						public void write( ResponseOutputStream out )
+						{
+							out.write( object.toString().getBytes() );
+						}
+					};
 					complete = true;
+					return response;
 				}
 				finally
 				{
@@ -68,7 +78,16 @@ public class TableRecordCountServlet implements Servlet
 		finally
 		{
 			if( !complete )
-				context.getResponse().getWriter().write( "#ERROR#" );
+			{
+				return new HttpResponse()
+				{
+					@Override
+					public void write( ResponseOutputStream out )
+					{
+						out.write( "#ERROR#".getBytes() ); // TODO Make constant
+					}
+				};
+			}
 		}
 
 //		try

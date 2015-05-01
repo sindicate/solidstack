@@ -21,17 +21,14 @@ import java.util.Map;
 public class RequestContext
 {
 	protected Request request;
-	protected Response reponse;
 	protected Session session;
 	protected ApplicationContext applicationContext;
 	protected Map< String, Object > args;
-	protected boolean async;
 
 	// TODO Parameter order
-	public RequestContext( Request request, Response response, ApplicationContext applicationContext )
+	public RequestContext( Request request, ApplicationContext applicationContext )
 	{
 		this.request = request;
-		this.reponse = response;
 		this.applicationContext = applicationContext;
 	}
 
@@ -43,7 +40,6 @@ public class RequestContext
 		this.request.parameters = parent.getRequest().getParameters();
 
 		this.session = parent.getSession();
-		this.reponse = parent.getResponse();
 		this.applicationContext = parent.getApplication();
 		this.args = args;
 	}
@@ -51,11 +47,6 @@ public class RequestContext
 	public Request getRequest()
 	{
 		return this.request;
-	}
-
-	public Response getResponse()
-	{
-		return this.reponse;
 	}
 
 //	public void callJsp( String jsp )
@@ -73,15 +64,15 @@ public class RequestContext
 		return this.args;
 	}
 
-	public void include( String path, Map< String, Object > args )
+	public HttpResponse include( String path, Map< String, Object > args )
 	{
 		RequestContext context = new RequestContext( this, path, args );
-		getApplication().dispatchInternal( context );
+		return getApplication().dispatchInternal( context );
 	}
 
-	public void include( String path )
+	public HttpResponse include( String path )
 	{
-		include( path, null );
+		return include( path, null );
 	}
 
 	public void setSession( Session session )
@@ -92,23 +83,5 @@ public class RequestContext
 	public Session getSession()
 	{
 		return this.session;
-	}
-
-	public void redirect( String path )
-	{
-		Response response = getResponse();
-//		response.reset(); Do not reset, we need the Set-Cookies
-		response.setStatusCode( 303, "Redirect" );
-		response.setHeader( "Location", path );
-	}
-
-	public void setAsync( boolean async )
-	{
-		this.async = async;
-	}
-
-	public boolean isAsync()
-	{
-		return this.async;
 	}
 }

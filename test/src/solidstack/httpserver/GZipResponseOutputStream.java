@@ -19,17 +19,20 @@ package solidstack.httpserver;
 import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
 
+
+// TODO It overrides OutputStream, shouldn't we throw IOExceptions?
 public class GZipResponseOutputStream extends ResponseOutputStream
 {
-	protected Response response;
+	protected ResponseOutputStream response;
 	protected GZIPOutputStream out;
 
-	public GZipResponseOutputStream( Response response )
+
+	public GZipResponseOutputStream( ResponseOutputStream out )
 	{
-		this.response = response;
+		this.response = out;
 		try
 		{
-			this.out = new GZIPOutputStream( response.getOutputStream() );
+			this.out = new GZIPOutputStream( out );
 		}
 		catch( IOException e )
 		{
@@ -105,14 +108,56 @@ public class GZipResponseOutputStream extends ResponseOutputStream
 	@Override
 	public void clear()
 	{
-		this.response.getOutputStream().clear();
+		this.response.clear();
 		try
 		{
-			this.out = new GZIPOutputStream( this.response.getOutputStream() );
+			this.out = new GZIPOutputStream( this.response );
 		}
 		catch( IOException e )
 		{
 			throw new HttpException( e );
 		}
+	}
+
+	@Override
+	public boolean isCommitted()
+	{
+		return this.response.isCommitted();
+	}
+
+	@Override
+	public void setStatusCode( int code, String message )
+	{
+		this.response.setStatusCode( code, message );
+	}
+
+	@Override
+	public void setContentType( String contentType, String charSet )
+	{
+		this.response.setContentType( contentType, charSet );
+	}
+
+	@Override
+	public void setHeader( String name, String value )
+	{
+		this.response.setHeader( name, value );
+	}
+
+	@Override
+	protected void setHeader0( String name, String value )
+	{
+		this.response.setHeader0( name, value );
+	}
+
+	@Override
+	public String getHeader( String name )
+	{
+		return this.response.getHeader( name );
+	}
+
+	@Override
+	public void setCookie( String name, String value )
+	{
+		this.response.setCookie( name, value );
 	}
 }
