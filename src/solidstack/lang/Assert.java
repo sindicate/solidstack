@@ -146,6 +146,12 @@ public class Assert
 		return throwAssertionFailure( null, 2 );
 	}
 
+	static public void isEmpty( CharSequence test )
+	{
+		if( test == null || test.length() != 0 )
+			throwAssertionFailure( null, 2 );
+	}
+
 	/**
 	 * Assert that String argument s is not null and not "". If not, it throws an {@link AssertionFailedException}.
 	 *
