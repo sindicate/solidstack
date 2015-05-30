@@ -50,10 +50,23 @@ public interface SourceReader
 	 * <li>\r\n becomes \n</li>
 	 * <li>\r without \n becomes \n</li>
 	 * </ul>
+	 * The line number is incremented when it returns a \n.
 	 *
 	 * @return A character. A carriage return is never returned.
 	 */
 	int read();
+
+	/**
+	 * Reads a character. The line number is incremented when it finds a \r or a \n that is not preceded by a \r.
+	 *
+	 * @return A character.
+	 */
+	int readRaw();
+
+	/**
+	 * Rewinds one character. The line number is decremented appropriately.
+	 */
+	void rewind();
 
 	/**
 	 * @return The underlying resource.

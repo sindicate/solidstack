@@ -48,6 +48,16 @@ public class ReaderSourceReader implements SourceReader
 	private int buffer = -1;
 
 	/**
+	 * The last character read.
+	 */
+	private int last = -1;
+
+	/**
+	 * The before last character read.
+	 */
+	private int lastlast = -1;
+
+	/**
 	 * Buffer to contain the line that is being read.
 	 */
 	private StringBuilder line;
@@ -111,7 +121,7 @@ public class ReaderSourceReader implements SourceReader
 	{
 		if( this.line == null )
 			this.line = new StringBuilder();
-		this.line.setLength( 0 );
+		this.line.setLength( 0 ); // TODO Maybe dump the stringbuilder if it is becoming too big
 
 		int ch;
 		while( true )
@@ -138,6 +148,23 @@ public class ReaderSourceReader implements SourceReader
 
 	public int read()
 	{
+		int result = readRaw();
+		switch( result )
+		{
+			case '\r':
+				result = readRaw();
+				if( result != '\n' )
+					this.buffer = result;
+				//$FALL-THROUGH$
+			case '\n':
+				return '\n';
+			default:
+				return result;
+		}
+	}
+
+	public int readRaw()
+	{
 		if( this.reader == null )
 			throw new IllegalStateException( "Closed" );
 
@@ -156,20 +183,41 @@ public class ReaderSourceReader implements SourceReader
 			switch( result )
 			{
 				case '\r':
-					result = this.reader.read();
-					if( result != '\n' )
-						this.buffer = result;
-					//$FALL-THROUGH$
-				case '\n':
 					this.location = this.location.nextLine();
-					return '\n';
+					this.lastlast = this.last;
+					this.last = result;
+					return result;
+				case '\n':
+					if( this.last != '\r' )
+						this.location = this.location.nextLine();
+					//$FALL-THROUGH$
 				default:
+					this.last = result;
+					this.lastlast = this.last;
 					return result;
 			}
 		}
 		catch( IOException e )
 		{
 			throw new FatalIOException( e );
+		}
+	}
+
+	public void rewind()
+	{
+		if( this.buffer >= 0 )
+			throw new IllegalStateException( "Rewind called twice" );
+		this.buffer = this.last;
+		this.last = this.lastlast;
+		this.lastlast = -1;
+		switch( this.buffer )
+		{
+			case '\r':
+				this.location = this.location.previousLine();
+				break;
+			case '\n':
+				if( this.last != '\r' )
+					this.location = this.location.previousLine();
 		}
 	}
 

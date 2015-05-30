@@ -58,6 +58,16 @@ public class RandomAccessSourceReader implements SourceReader
 		return this.reader.read();
 	}
 
+	public int readRaw()
+	{
+		return this.reader.readRaw();
+	}
+
+	public void rewind()
+	{
+		this.reader.rewind();
+	}
+
 	public String readLine()
 	{
 		return this.reader.readLine();
