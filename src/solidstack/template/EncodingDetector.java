@@ -16,11 +16,10 @@
 
 package solidstack.template;
 
-import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import solidstack.lang.SystemException;
+import solidstack.io.EncodingUtils;
 
 
 /**
@@ -52,7 +51,7 @@ public class EncodingDetector implements solidstack.io.EncodingDetector
 	{
 		String result = CHARSET_UTF; // Default
 
-		String first = toAscii( bytes );
+		String first = EncodingUtils.filter7bit( bytes );
 		Matcher matcher = ENCODING_PATTERN.matcher( first );
 		if( matcher.matches() )
 			result = matcher.group( 1 );
@@ -91,32 +90,5 @@ public class EncodingDetector implements solidstack.io.EncodingDetector
 		if( bytes[ 1 ] != 0 )
 			return CHARSET_UTF_16BE;
 		return CHARSET_UTF_32BE; // TODO Throw undetectable when length < 4
-	}
-
-	/**
-	 * Filters out ASCII bytes smaller than 128 and returns the result as a string.
-	 *
-	 * @param chars The bytes to filter.
-	 * @return The ASCII bytes smaller than 128.
-	 */
-	static public String toAscii( byte[] chars )
-	{
-		int len = chars.length;
-		int j = 0;
-		byte[] result = new byte[ len ];
-		for( int i = 0; i < len; i++ )
-		{
-			byte ch = chars[ i ];
-			if( ch > 0 && ch < 128 )
-				result[ j++ ] = ch;
-		}
-		try
-		{
-			return new String( result, 0, j, "ISO-8859-1" );
-		}
-		catch( UnsupportedEncodingException e )
-		{
-			throw new SystemException( e );
-		}
 	}
 }

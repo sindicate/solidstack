@@ -41,7 +41,6 @@
 
 	<path id="groovy.classpath">
 		<fileset dir="lib" includes="groovy*.jar" />
-		<fileset dir="tools/svnkit" includes="*.jar" />
 	</path>
 
 	<path id="jarjar.classpath">
@@ -162,16 +161,19 @@
 			<keep pattern="solidstack.**" />
 			<manifest>
 				<attribute name="Implementation-Title" value="SolidStack" />
-				<attribute name="Implementation-Version" value="${release.number}.${svn.revision}" />
+				<attribute name="Implementation-Version" value="${release.number}" />
 				<attribute name="Implementation-Vendor-Id" value="solidstack.googlecode.com" />
-				<attribute name="Version" value="${release.number}.${svn.revision}" />
+				<attribute name="Version" value="${release.number}" />
 				<attribute name="Project-Name" value="${ant.project.name}" />
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Target-JRE" value="${target-jre}" />
-				<attribute name="SVN-url" value="${svn.url}" />
-				<attribute name="SVN-revision" value="${svn.committedRevision}" />
 			</manifest>
 		</jarjar>
+	</target>
+	
+	
+	<target name="pushjar" depends="jar">
+		<copy file="${dist.home}/solidstack.jar" preservelastmodified="true" tofile="../solidbase/lib/solidstack-${release.number}.jar" />
 	</target>
 
 
@@ -273,15 +275,6 @@
 	</target>
 
 
-	<target name="checksvnstatus">
-	</target>
-
-
-	<target name="getsvninfo">
-		<groovy src="scripts/getsvninfo.groovy" />
-	</target>
-
-
 	<target name="sources">
 		<jar compress="yes" destfile="${dist.home}/solidstack-sources.jar">
 			<zipfileset dir="src" includes="**/*.java" />
@@ -289,7 +282,7 @@
 	</target>
 
 
-	<target name="dist" depends="checksvnstatus,getsvninfo,clean,test,build,javadocjar,sources" description="Complete build process to create the distribution files">
+	<target name="dist" depends="clean,test,build,javadocjar,sources" description="Complete build process to create the distribution files">
 		<echo message="Distribution files created in ${dist.home}" />
 	</target>
 
