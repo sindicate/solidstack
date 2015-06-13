@@ -40,8 +40,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import solidstack.io.FatalIOException;
 import solidstack.lang.Assert;
-import solidstack.lang.SystemException;
 import solidstack.script.java.Java;
 
 
@@ -405,7 +405,7 @@ public class Dumper
 		}
 		catch( IOException e )
 		{
-			throw new SystemException( e );
+			throw new FatalIOException( e );
 		}
 		catch( Exception e )
 		{

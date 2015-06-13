@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import solidstack.httpserver.HttpBodyInputStream;
-import solidstack.lang.SystemException;
+import solidstack.io.FatalIOException;
 
 
 public class Response
@@ -99,7 +99,7 @@ public class Response
 		}
 		catch( IOException e )
 		{
-			throw new SystemException( e );
+			throw new FatalIOException( e );
 		}
 	}
 

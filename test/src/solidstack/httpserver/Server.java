@@ -24,7 +24,7 @@ import java.net.SocketTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import solidstack.lang.SystemException;
+import solidstack.io.FatalIOException;
 import solidstack.lang.ThreadInterrupted;
 
 
@@ -73,7 +73,7 @@ public class Server extends Thread
 		}
 		catch( IOException e )
 		{
-			throw new SystemException( e );
+			throw new FatalIOException( e );
 		}
 	}
 
