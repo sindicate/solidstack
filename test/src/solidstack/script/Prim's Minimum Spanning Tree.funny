@@ -30,26 +30,19 @@ graph = Map
 
 prim = ( graph, start ) =>
 {
-	queue = Map();
-    parent = List();
- 
+	( queue, parent ) = ( Map(), List() );
  	graph.foreachKey( k => queue( k ) = INFINITY );
- 
- 	queue( start ) = 0;
- 	parent( start ) = null;
+	( queue( start ), parent( start ) ) = ( 0, null );
  
  	while( queue )
  	{
         // get the minimum value
-        min = INFINITY; minKey = -1;
-        queue.foreach( ( key, value ) => if( value < min ) minKey = key, min = value );
+        ( minKey, min ) = ( -1, INFINITY );
+        queue.foreach( ( key, value ) => if( value < min ) ( minKey, min ) = ( key, value ) );
 
 		graph( minKey ).foreach( ( v, weight ) =>
             if( weight > 0 && queue.containsKey( v ) && weight < queue( v ) )
-            (
-                parent( v ) = minKey;
-                queue( v ) = weight;
-            )
+            	( queue( v ), parent( v ) ) = ( weight, minKey )
 		);
  
  		queue.remove( minKey );
