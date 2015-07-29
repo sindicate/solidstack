@@ -172,6 +172,11 @@
 	</target>
 	
 	
+	<target name="jarto" depends="jar">
+		<copy file="${dist.home}/solidstack.jar" todir="../snippets/database/dictionary" overwrite="true" />
+	</target>
+	
+	
 	<target name="pushjar" depends="jar">
 		<copy file="${dist.home}/solidstack.jar" preservelastmodified="true" tofile="../solidbase/lib/solidstack-${release.number}.jar" />
 	</target>

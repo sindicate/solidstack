@@ -62,7 +62,7 @@ public class ClassBuilder
 			out.writeShort( 0 ); // minor version
 			out.writeShort( 49 ); // major version
 
-			ConstantPool pool = collectConstantPool();
+			ConstantPool pool = collectConstants();
 			out.writeShort( pool.size() + 1 );
 			for( Constant constant : pool.constants() )
 				constant.write( out );
@@ -87,7 +87,9 @@ public class ClassBuilder
 			out.writeShort( 0 );
 
 			// methods
-			out.writeShort( 0 );
+			out.writeShort( this.methods.size() );
+			for( Method method : this.methods )
+				method.write( out );
 
 			// attributes
 			out.writeShort( 0 );
@@ -101,7 +103,7 @@ public class ClassBuilder
 		return bytes.toByteArray();
 	}
 
-	private ConstantPool collectConstantPool()
+	private ConstantPool collectConstants()
 	{
 		ConstantPool pool = new ConstantPool();
 
@@ -119,6 +121,10 @@ public class ClassBuilder
 			for( Class<?> interfac : this.interfaces )
 				this.interfacesInfo.add( pool.add( new ConstantClass( pool, interfac.getName() ) ) );
 		}
+
+		// methods
+		for( Method method : this.methods )
+			method.collectConstants( pool );
 
 		return pool;
 	}
