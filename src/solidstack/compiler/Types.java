@@ -33,4 +33,18 @@ public class Types
 			return "V";
 		throw new UnsupportedOperationException( "Unknown primitive type [" + cls.getName() + "]" );
 	}
+
+	public static String toDescriptor( Class<?> ret, Class<?>... parameters )
+	{
+		StringBuilder descriptor = new StringBuilder();
+		descriptor.append( '(' );
+		for( Class<?> parameter : parameters )
+			descriptor.append( toFieldType( parameter ) );
+		descriptor.append( ')' );
+		if( ret == null )
+			descriptor.append( 'V' );
+		else
+			descriptor.append( toFieldType( ret ) );
+		return descriptor.toString();
+	}
 }

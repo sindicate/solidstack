@@ -52,6 +52,11 @@ public class ClassBuilder
 		return result;
 	}
 
+	public Method addConstructor( Class<?>... parameters )
+	{
+		return addMethod( "<init>", null, parameters );
+	}
+
 	public byte[] compile()
 	{
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();

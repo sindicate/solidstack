@@ -13,6 +13,11 @@ public class Return extends Statement
 	}
 
 	@Override
+	public void collectConstants( ConstantPool pool )
+	{
+	}
+
+	@Override
 	public void getByteCode( DataOutputStream out ) throws IOException
 	{
 		out.writeByte( 0x03 ); // iconst_0

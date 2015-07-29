@@ -29,19 +29,13 @@ public class Method
 	{
 		this.nameInfo = pool.add( new ConstantUtf8( this.name ) );
 
-		StringBuilder descriptor = new StringBuilder();
-		descriptor.append( '(' );
-		for( int i = 0; i < this.parameters.length; i++ )
-			descriptor.append( Types.toFieldType( this.parameters[ i ] ) );
-		descriptor.append( ')' );
-		if( this.ret == null )
-			descriptor.append( 'V' );
-		else
-			descriptor.append( Types.toFieldType( this.ret ) );
-
+		String descriptor = Types.toDescriptor( this.ret, this.parameters );
 		this.descriptor = pool.add( new ConstantUtf8( descriptor.toString() ) );
 
 		this.codeAttribute = pool.add( new ConstantUtf8( "Code" ) );
+
+		for( Statement stat : this.statements )
+			stat.collectConstants( pool );
 	}
 
 	public void write( DataOutputStream out ) throws IOException
@@ -93,5 +87,10 @@ public class Method
 	public void return_( int i )
 	{
 		this.statements.add( new Return( i ) );
+	}
+
+	public void callSuper( String name )
+	{
+		this.statements.add( new CallSuper( name ) );
 	}
 }
