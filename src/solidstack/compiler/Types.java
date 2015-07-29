@@ -1,5 +1,7 @@
 package solidstack.compiler;
 
+import solidstack.lang.Assert;
+
 public class Types
 {
 	static public String toFieldDescriptor( Class<?> cls )
@@ -46,5 +48,18 @@ public class Types
 		if( cls == void.class )
 			return "V";
 		throw new UnsupportedOperationException( "Unknown primitive type [" + cls.getName() + "]" );
+	}
+
+	public static String fieldDescriptorToClassName( String descriptor )
+	{
+		Assert.isTrue( descriptor.charAt( 0 ) == 'L' );
+		String result = descriptor.substring( 1, descriptor.length() - 1 );
+		return result.replace( '/', '.' );
+	}
+
+	public static String classNameToFieldDescriptor( String className )
+	{
+		String result = "L" + className + ";";
+		return result.replace( '.', '/' );
 	}
 }

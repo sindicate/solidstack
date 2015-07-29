@@ -8,9 +8,9 @@ public class ConstantMethodref extends Constant
 	private ConstantClass classInfo;
 	private ConstantNameAndType nameAndType;
 
-	public ConstantMethodref( ConstantPool pool, String cls, ConstantUtf8 name, ConstantUtf8 descriptor )
+	public ConstantMethodref( ConstantPool pool, ConstantClass cls, ConstantUtf8 name, ConstantUtf8 descriptor )
 	{
-		this.classInfo = pool.add( new ConstantClass( pool, cls ) );
+		this.classInfo = cls;
 		this.nameAndType = pool.add( new ConstantNameAndType( pool, name, descriptor ) );
 	}
 

@@ -101,9 +101,9 @@ public class Method
 		this.statements.add( new Return() );
 	}
 
-	public void callSuper( String name )
+	public void return_( Expression value )
 	{
-		this.statements.add( new CallSuper( name ) );
+		this.statements.add( new Return( value ) );
 	}
 
 	public void addStatement( Statement statement )

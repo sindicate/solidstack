@@ -28,4 +28,15 @@ public class AccessLocal extends Expression
 		out.writeByte( 0x19 );
 		out.writeByte( this.local );
 	}
+
+	@Override
+	public void collectConstants( ConstantPool pool )
+	{
+	}
+
+	@Override
+	public String getFieldDescriptor()
+	{
+		throw new UnsupportedOperationException();
+	}
 }

@@ -19,18 +19,33 @@ public class CompilerTests
 	{
 		ClassBuilder cls = new ClassBuilder( "Test", Comparator.class );
 
-		Field function = cls.addField( "function", FunctionObject.class );
-		function.setPrivate( true );
+		Field field = cls.addField( "function", FunctionObject.class );
+		field.setPrivate( true );
 
-		Method init = cls.addConstructor( FunctionObject.class );
-		init.callSuper( "<init>" );
-		ExpressionBuilder e = new ExpressionBuilder( init );
-		e.statement( e.setField( e.var( 0 ), "function", e.var( 1 ) ) );
-		init.return_();
-//		out.writeByte( 0xB1 ); // return
+		Method method = cls.addConstructor( FunctionObject.class );
+		ExpressionBuilder e = new ExpressionBuilder( method );
+		e.statement( e.callSuper( e.var( 0 ), "<init>" ) );
+		e.statement( e.setField( e.var( 0 ), "function", "Lsolidstack/script/objects/FunctionObject;", e.var( 1 ) ) );
+		method.return_();
 
 		Method compare = cls.addMethod( "compare", int.class, Object.class, Object.class );
-		compare.return_( 0 );
+//		return ( (java.lang.Integer)this.function.call( new java.lang.Object[] { o1, o2 } ) ).intValue()
+		// TODO Make more things implicit
+		compare.return_(
+			e.call(
+				e.cast(
+					e.call(
+						e.field( e.var( 0 ), "function", "Lsolidstack/script/objects/FunctionObject;" ),
+						"call",
+						"([Ljava/lang/Object;)Ljava/lang/Object;",
+						e.initArray( "java.lang.Object", e.var( 1 ), e.var( 2 ) )
+					),
+					"java.lang.Integer"
+				),
+				"intValue",
+				"()I"
+			)
+		);
 
 		byte[] compiled = cls.compile();
 
