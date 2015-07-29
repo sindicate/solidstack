@@ -8,6 +8,7 @@ import java.util.List;
 
 public class Method
 {
+	private ClassBuilder cls;
 	private String name;
 	private Class<?> ret;
 	private Class<?>[] parameters;
@@ -18,18 +19,24 @@ public class Method
 	private ConstantUtf8 descriptor;
 	private ConstantUtf8 codeAttribute;
 
-	public Method( String name, java.lang.Class<?> ret, java.lang.Class<?>... parameters )
+	public Method( ClassBuilder cls, String name, java.lang.Class<?> ret, java.lang.Class<?>... parameters )
 	{
+		this.cls = cls;
 		this.name = name;
 		this.ret = ret;
 		this.parameters = parameters;
+	}
+
+	public ClassBuilder classBuilder()
+	{
+		return this.cls;
 	}
 
 	public void collectConstants( ConstantPool pool )
 	{
 		this.nameInfo = pool.add( new ConstantUtf8( this.name ) );
 
-		String descriptor = Types.toDescriptor( this.ret, this.parameters );
+		String descriptor = Types.toMethodDescriptor( this.ret, this.parameters );
 		this.descriptor = pool.add( new ConstantUtf8( descriptor.toString() ) );
 
 		this.codeAttribute = pool.add( new ConstantUtf8( "Code" ) );
@@ -89,8 +96,24 @@ public class Method
 		this.statements.add( new Return( i ) );
 	}
 
+	public void return_()
+	{
+		this.statements.add( new Return() );
+	}
+
 	public void callSuper( String name )
 	{
 		this.statements.add( new CallSuper( name ) );
+	}
+
+	public void addStatement( Statement statement )
+	{
+		this.statements.add( statement );
+	}
+
+	public String fieldDescriptor( int local )
+	{
+		local--;
+		return Types.toFieldDescriptor( this.parameters[ local ] );
 	}
 }

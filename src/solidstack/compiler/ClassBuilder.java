@@ -15,6 +15,7 @@ public class ClassBuilder
 	private Class<?> superClass;
 	private List<Class<?>> interfaces;
 	private List<Method> methods = new ArrayList<Method>();
+	private List<Field> fields = new ArrayList<Field>();
 
 	private ConstantClass classInfo;
 	private ConstantClass superClassInfo;
@@ -45,9 +46,26 @@ public class ClassBuilder
 		return this.name;
 	}
 
+	public ConstantClass classInfo()
+	{
+		Assert.notNull( this.classInfo );
+		return this.classInfo;
+	}
+
+	public ConstantFieldref fieldref( String name )
+	{
+		for( Field field : this.fields )
+		{
+			if( field.name().equals( name ) )
+				return field.fieldref();
+		}
+		Assert.fail();
+		return null;
+	}
+
 	public Method addMethod( String name, Class<?> ret, Class<?>... parameters )
 	{
-		Method result = new Method( name, ret, parameters );
+		Method result = new Method( this, name, ret, parameters );
 		this.methods.add( result );
 		return result;
 	}
@@ -55,6 +73,13 @@ public class ClassBuilder
 	public Method addConstructor( Class<?>... parameters )
 	{
 		return addMethod( "<init>", null, parameters );
+	}
+
+	public Field addField( String name, Class<?> type )
+	{
+		Field result = new Field( this, name, type );
+		this.fields.add( result );
+		return result;
 	}
 
 	public byte[] compile()
@@ -89,7 +114,9 @@ public class ClassBuilder
 			}
 
 			// fields
-			out.writeShort( 0 );
+			out.writeShort( this.fields.size() );
+			for( Field field : this.fields )
+				field.write( out );
 
 			// methods
 			out.writeShort( this.methods.size() );
@@ -126,6 +153,10 @@ public class ClassBuilder
 			for( Class<?> interfac : this.interfaces )
 				this.interfacesInfo.add( pool.add( new ConstantClass( pool, interfac.getName() ) ) );
 		}
+
+		// fields
+		for( Field field : this.fields )
+			field.collectConstants( pool );
 
 		// methods
 		for( Method method : this.methods )

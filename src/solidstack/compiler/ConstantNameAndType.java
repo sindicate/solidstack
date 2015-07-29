@@ -8,10 +8,10 @@ public class ConstantNameAndType extends Constant
 	private ConstantUtf8 name;
 	private ConstantUtf8 descriptor;
 
-	public ConstantNameAndType( ConstantPool pool, String name, String descriptor )
+	public ConstantNameAndType( ConstantPool pool, ConstantUtf8 name, ConstantUtf8 descriptor )
 	{
-		this.name = pool.add( new ConstantUtf8( name ) );
-		this.descriptor = pool.add( new ConstantUtf8( descriptor ) );
+		this.name = name;
+		this.descriptor = descriptor;
 	}
 
 	@Override

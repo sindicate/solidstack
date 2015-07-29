@@ -2,13 +2,27 @@ package solidstack.compiler;
 
 public class Types
 {
-	static public String toFieldType( Class<?> cls )
+	static public String toFieldDescriptor( Class<?> cls )
 	{
 		if( cls.isPrimitive() )
 			return toBaseType( cls );
 		if( cls.isArray() )
 			throw new UnsupportedOperationException( "arrays not supported yet" );
 		return "L" + cls.getName().replace( '.', '/' ) + ";";
+	}
+
+	public static String toMethodDescriptor( Class<?> ret, Class<?>... parameters )
+	{
+		StringBuilder descriptor = new StringBuilder();
+		descriptor.append( '(' );
+		for( Class<?> parameter : parameters )
+			descriptor.append( toFieldDescriptor( parameter ) );
+		descriptor.append( ')' );
+		if( ret == null )
+			descriptor.append( 'V' );
+		else
+			descriptor.append( toFieldDescriptor( ret ) );
+		return descriptor.toString();
 	}
 
 	static public String toBaseType( Class<?> cls )
@@ -32,19 +46,5 @@ public class Types
 		if( cls == void.class )
 			return "V";
 		throw new UnsupportedOperationException( "Unknown primitive type [" + cls.getName() + "]" );
-	}
-
-	public static String toDescriptor( Class<?> ret, Class<?>... parameters )
-	{
-		StringBuilder descriptor = new StringBuilder();
-		descriptor.append( '(' );
-		for( Class<?> parameter : parameters )
-			descriptor.append( toFieldType( parameter ) );
-		descriptor.append( ')' );
-		if( ret == null )
-			descriptor.append( 'V' );
-		else
-			descriptor.append( toFieldType( ret ) );
-		return descriptor.toString();
 	}
 }

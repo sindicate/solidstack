@@ -3,8 +3,8 @@ package solidstack.compiler;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-abstract public class Statement
+public interface Statement
 {
-	abstract public void getByteCode( DataOutputStream out ) throws IOException;
-	abstract public void collectConstants( ConstantPool pool );
+	void getByteCode( DataOutputStream out ) throws IOException;
+	void collectConstants( ConstantPool pool );
 }

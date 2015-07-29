@@ -3,9 +3,13 @@ package solidstack.compiler;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Return extends Statement
+public class Return implements Statement
 {
-	private int value;
+	private Integer value;
+
+	public Return()
+	{
+	}
 
 	public Return( int value )
 	{
@@ -20,7 +24,12 @@ public class Return extends Statement
 	@Override
 	public void getByteCode( DataOutputStream out ) throws IOException
 	{
-		out.writeByte( 0x03 ); // iconst_0
-		out.writeByte( 0xAC ); // ireturn
+		if( this.value == null )
+			out.writeByte( 0xB1 ); // return
+		else
+		{
+			out.writeByte( 0x03 ); // iconst_0
+			out.writeByte( 0xAC ); // ireturn
+		}
 	}
 }
