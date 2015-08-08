@@ -45,6 +45,7 @@ import solidstack.script.objects.Assoc;
 import solidstack.script.objects.PString;
 import solidstack.script.objects.Type;
 import solidstack.script.scopes.DefaultScope;
+import solidstack.script.scopes.MapScope;
 import solidstack.script.scopes.Scope;
 import solidstack.util.ObjectArrayListIterator;
 
@@ -265,6 +266,11 @@ public class DefaultClassExtensions
 		return result;
 	}
 
+	static public Scope static_apply( Scope scope, Map map )
+	{
+		return new MapScope( map );
+	}
+
 	static public Set static_apply( Set set, Object... objects )
 	{
 		return new HashSet( Arrays.asList( objects ) );
@@ -288,6 +294,46 @@ public class DefaultClassExtensions
 	static public boolean apply( Set set, Object o )
 	{
 		return set.contains( o );
+	}
+
+	static public List distinct( Iterable iterable )
+	{
+		return distinct( iterable.iterator(), new ArrayList() );
+	}
+
+	static public List distinct( Iterator iterator )
+	{
+		return distinct( iterator, new ArrayList() );
+	}
+
+	static public LinkedList distinct( LinkedList list )
+	{
+		return (LinkedList)distinct( list.iterator(), new LinkedList() );
+	}
+
+	static private List distinct( Iterator iterator, List result )
+	{
+		HashSet temp = new HashSet();
+		while( iterator.hasNext() )
+			temp.add( iterator.next() );
+		result.addAll( temp );
+		return result;
+	}
+
+	static public Object[] distinct( Object[] array )
+	{
+		HashSet temp = new HashSet();
+		int len = array.length;
+		for( int i = 0; i < len; i++ )
+			temp.add( array[ i ] );
+
+		len = temp.size();
+		Object[] result = new Object[ len ];
+		int i = 0;
+		for( Object object : temp )
+			result[ i++ ] = object;
+
+		return result;
 	}
 
 	static public List filter( Iterable iterable, Function function )
