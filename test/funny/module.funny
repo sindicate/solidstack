@@ -1,0 +1,10 @@
+println( "Loading the module" );
+
+var export = Scope();
+
+export.add = ( a, b ) => a + b;
+
+var counter = 10;
+export.count = () => ( counter = counter + 1; println( counter ) );
+
+export;

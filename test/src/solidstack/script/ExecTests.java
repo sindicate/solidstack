@@ -17,4 +17,10 @@ public class ExecTests
 	{
 		Exec.main( "test/funny/caller.funny" );
 	}
+
+	@Test
+	static public void require() throws FileNotFoundException
+	{
+		Exec.main( "test/funny/require.funny" );
+	}
 }
