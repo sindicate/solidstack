@@ -23,6 +23,12 @@ public class Resource extends solidstack.io.Resource
 	}
 
 	@Override
+	public String getNormalized()
+	{
+		return "mem:" + this.name;
+	}
+
+	@Override
 	public boolean supportsReader()
 	{
 		return true;
