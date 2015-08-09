@@ -18,6 +18,7 @@ package solidstack.script;
 
 import java.math.BigDecimal;
 
+import funny.Symbol;
 import solidstack.io.PushbackReader;
 import solidstack.io.SourceException;
 import solidstack.io.SourceLocation;
@@ -49,7 +50,6 @@ import solidstack.script.expressions.While;
 import solidstack.script.expressions.With;
 import solidstack.script.operators.Operator;
 import solidstack.script.operators.Spread;
-import funny.Symbol;
 
 
 /**
@@ -317,9 +317,9 @@ public class ScriptParser
 				oldStop = swapStops( TokenType.PAREN_CLOSE );
 				expressions = parseExpressions();
 				swapStops( oldStop );
-				this.expectElse = true;
+				boolean oldElse = swapElse( true );
 				left = parseExpression();
-				this.expectElse = false;
+				swapElse( oldElse );
 				Expression right = null;
 				token2 = this.tokenizer.next();
 				if( token2.getType() == TokenType.ELSE )
@@ -427,6 +427,13 @@ public class ScriptParser
 	{
 		TokenType result = this.stop;
 		this.stop = stop;
+		return result;
+	}
+
+	private boolean swapElse( boolean expectElse )
+	{
+		boolean result = this.expectElse;
+		this.expectElse = expectElse;
 		return result;
 	}
 }
