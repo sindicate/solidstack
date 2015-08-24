@@ -88,7 +88,7 @@ public class MethodCall
 				this.method.setAccessible( true );
 			return this.method.invoke( this.object, this.args );
 		}
-		catch( InvocationTargetException e )
+		catch( InvocationTargetException e ) // TODO Shouldn't we unwrap this?
 		{
 			throw e;
 		}

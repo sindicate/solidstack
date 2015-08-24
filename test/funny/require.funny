@@ -1,0 +1,12 @@
+println( "Requiring the module" );
+var m = require( "module" );
+
+println( "Calling the module: " + m.add( 1, 2 ) );
+
+println( "Requiring the module (should not load twice)" );
+m = require( "module" );
+
+println( "Calling the module: " + m.add( 3, 4 ) );
+m.count();
+m.count();
+// println( m.counter ); should be undefined

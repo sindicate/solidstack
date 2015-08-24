@@ -87,7 +87,7 @@ public class ClassExtension
 	// ----------
 
 	private Map<String, List<ExtensionMethod>> methods = new HashMap<String, List<ExtensionMethod>>(); // TODO Optimise this data structure
-	private Map<String, ExtensionMethod> staticMethods = new HashMap<String, ExtensionMethod>();
+	private Map<String, List<ExtensionMethod>> staticMethods = new HashMap<String, List<ExtensionMethod>>();
 
 	private void addMethod( String name, Method method )
 	{
@@ -99,7 +99,10 @@ public class ClassExtension
 
 	private void addStaticMethod( String name, Method method )
 	{
-		this.staticMethods.put( name, new ExtensionMethod( method ) );
+		List<ExtensionMethod> methods = this.staticMethods.get( name );
+		if( methods == null )
+			this.staticMethods.put( name, methods = new ArrayList<ExtensionMethod>() );
+		methods.add( new ExtensionMethod( method ) );
 	}
 
 	public List<ExtensionMethod> getMethods( String name )
@@ -107,7 +110,7 @@ public class ClassExtension
 		return this.methods.get( name );
 	}
 
-	public ExtensionMethod getStaticMethod( String name )
+	public List<ExtensionMethod> getStaticMethods( String name )
 	{
 		return this.staticMethods.get( name );
 	}

@@ -30,6 +30,7 @@ import java.util.Map;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import funny.Symbol;
 import solidstack.io.SourceReader;
 import solidstack.io.memfs.Folder;
 import solidstack.io.memfs.Resource;
@@ -39,7 +40,6 @@ import solidstack.script.objects.Type;
 import solidstack.script.scopes.DefaultScope;
 import solidstack.script.scopes.GlobalScope;
 import solidstack.script.scopes.Scope;
-import funny.Symbol;
 
 
 @SuppressWarnings( { "javadoc", "unchecked", "rawtypes" } )
@@ -839,12 +839,9 @@ public class ScriptTests extends Util
 	@Test
 	static public void modules() throws FileNotFoundException
 	{
-		eval( "module( \"m1\" )( m2 = 3 )" );
-		test( "m1.m2", 3 );
-
 		Folder root = new Folder();
-		Resource module = root.putFile( "module.funny", "module( \"m1\" )( m2 = 3 )" );
-		root.putFile( "script.funny", "require( \"module.funny\" ); m1.m2" );
+		Resource module = root.putFile( "module.funny", "m2 = 3; this" );
+		root.putFile( "script.funny", "var m1 = require( \"module\" ); m1.m2" );
 
 		SourceReader reader = root.getSourceReader( "script.funny" );
 		Script script = load( reader );
@@ -853,21 +850,22 @@ public class ScriptTests extends Util
 		test( script, 3 );
 
 		// ---- Second time skips
-		module.setContents( "module( \"m1\" )( throw \"Should not come here\" )" );
+		module.setContents( "throw \"Should not come here\"" );
 		script.eval();
 
 		// TODO Require does nothing more than execute the script file
 		// ---- Circular tests
 		GlobalScope.instance.reset();
-		root.putFile( "module.funny", "module( \"m1\" )( require( \"module2.funny\" ) )" );
-		root.putFile( "module2.funny", "module( \"m2\" )( require( \"module.funny\" ) )" );
-		fail( script, ScriptException.class, "Circular module dependency detected" );
+		root.putFile( "module.funny", "require( \"module2\" )" );
+		root.putFile( "module2.funny", "require( \"module\" )" );
+		script.eval();
+		//fail( script, ScriptException.class, "Circular module dependency detected" );
 
 		// ---- Constructor
 		GlobalScope.instance.reset();
 		root = new Folder();
-		root.putFile( "deployer.funny", "module( \"Deployer\" )( var Deployer = x => x * 2 )" );
-		root.putFile( "script.funny", "require( \"deployer.funny\" ); var deployer = Deployer.Deployer( 1 )" );
+		root.putFile( "deployer.funny", "var Deployer = x => x * 2; this" );
+		root.putFile( "script.funny", "var Deployer = require( \"deployer\" ); var deployer = Deployer.Deployer( 1 )" );
 		reader = root.getSourceReader( "script.funny" );
 		script = load( reader );
 		test( script, 2 );

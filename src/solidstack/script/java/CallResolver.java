@@ -65,6 +65,7 @@ public class CallResolver
 
 		MethodCall result = resolveMethodCall0( context );
 
+		// TODO Should the fact that a method is not found also be cached?
 		if( result != null )
 			cache.put( context.getCallSignature(), new MethodHandle( result.method, result.extMethod, result.constructor, result.isVarargCall, result.field ) );
 
@@ -143,18 +144,18 @@ public class CallResolver
 		ClassExtension ext = ClassExtension.forClass( cls );
 		if( ext != null )
 		{
-			// TODO Multiple
-			ExtensionMethod method = ext.getStaticMethod( context.getName() );
-			if( method != null )
-			{
-				MethodCall caller = CallResolver.matchArguments( context, method.getParameterTypes(), method.isVararg() );
-				if( caller != null )
+			List<ExtensionMethod> methods = ext.getStaticMethods( context.getName() );
+			if( methods != null )
+				for( ExtensionMethod method : methods )
 				{
-					caller.object = context.getObject();
-					caller.extMethod = method;
-					context.addCandidate( caller );
+					MethodCall caller = matchArguments( context, method.getParameterTypes(), method.isVararg() );
+					if( caller != null )
+					{
+						caller.object = context.getObject();
+						caller.extMethod = method;
+						context.addCandidate( caller );
+					}
 				}
-			}
 		}
 	}
 

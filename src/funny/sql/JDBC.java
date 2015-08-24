@@ -13,6 +13,7 @@ import solidstack.query.ResultList;
 import solidstack.script.java.Function;
 import solidstack.script.objects.FunctionObject;
 import solidstack.script.objects.PString;
+import solidstack.script.objects.Tuple;
 
 
 // TODO Integrate with the query template package
@@ -117,6 +118,21 @@ public class JDBC
 	{
 		ResultSet resultSet = query( query );
 		return new ResultList( Query.listOfArrays( resultSet, true ), Query.getColumnLabelMap( resultSet.getMetaData() ) );
+	}
+
+	public Object first( String query ) throws SQLException
+	{
+		ResultSet resultSet = query( query );
+		boolean record = resultSet.next();
+		int count = resultSet.getMetaData().getColumnCount();
+
+		if( count == 1 )
+			return record ? resultSet.getObject( 1 ) : null;
+
+		Tuple tuple = new Tuple(); // TODO This is not language independent
+		for( int i = 1; i <= count; i++ )
+			tuple.append( record ? resultSet.getObject( i ) : null );
+		return tuple;
 	}
 
 	public boolean execute( String query ) throws SQLException

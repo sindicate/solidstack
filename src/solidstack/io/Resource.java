@@ -31,6 +31,7 @@ import java.net.URL;
  */
 public class Resource
 {
+	// TODO Maybe use generic properties instead of this gzip
 	private boolean gzip;
 
 	/**

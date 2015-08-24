@@ -1,6 +1,8 @@
 package solidstack.script;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
 
 import solidstack.io.Resource;
 import solidstack.io.SourceException;
@@ -17,6 +19,13 @@ import solidstack.script.scopes.Scope;
 // TODO Not used yet
 public class GlobalFunctions
 {
+	private Map<String, Object> modules = new HashMap<String, Object>();
+
+	public Object brake()
+	{
+		return null;
+	}
+
 	public Object call( String path )
 	{
 		return compileFile( path ).eval( new DefaultScope() );
@@ -51,7 +60,6 @@ public class GlobalFunctions
 			throw new ThrowException( "File not found: " + resource, thread.cloneStack() );
 		}
 
-		Script script;
 		try
 		{
 			return Script.compile( reader );
@@ -107,6 +115,40 @@ public class GlobalFunctions
 
 	public Object require( String path )
 	{
-		return call( path );
+		path += ".funny";
+
+		ThreadContext thread = ThreadContext.get();
+
+		SourceLocation location = thread.getStackHead();
+		Resource resource = location.getResource().resolve( path ); // TODO What if the resource is null?
+		String id = resource.getNormalized();
+
+		if( this.modules.containsKey( id ) )
+			return this.modules.get( id );
+
+		SourceReader reader;
+		try
+		{
+			reader = SourceReaders.forResource( resource, UTFEncodingDetector.INSTANCE, "UTF-8" );
+		}
+		catch( FileNotFoundException e )
+		{
+			throw new ThrowException( "File not found: " + resource, thread.cloneStack() );
+		}
+
+		Script script;
+		try
+		{
+			script = Script.compile( reader );
+		}
+		catch( SourceException e )
+		{
+			throw new ThrowException( e.getMessage(), thread.cloneStack() );
+		}
+
+		Object object = script.eval( new DefaultScope() );
+		this.modules.put( id, object );
+
+		return object;
 	}
 }
