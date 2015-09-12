@@ -16,6 +16,8 @@
 
 package solidstack.io;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -72,30 +74,37 @@ public class ResourceTests
 	public void testFileResource()
 	{
 		Resource resource = Resources.getResource( "file:test/src/solidstack/query/test.sql.slt" );
-		Assert.assertTrue( resource.exists() );
+		assertThat( resource.exists() ).isTrue();
 
 		String file = resource.toString();
-		System.out.println( file );
+		assertThat( file ).endsWith( "/test/src/solidstack/query/test.sql.slt" );
 		resource = Resources.getResource( file );
-		System.out.println( resource.toString() );
-		Assert.assertTrue( resource.exists() );
+		assertThat( resource.toString() ).endsWith( "/test/src/solidstack/query/test.sql.slt" );
+		assertThat( resource.exists() ).isTrue();
 
 		resource = new URIResource( resource.getURI() );
-		System.out.println( resource.toString() );
-//		Assert.assertTrue( resource.exists() );
+		assertThat( resource.toString() ).startsWith( "file:/" );
+		assertThat( resource.toString() ).endsWith( "/test/src/solidstack/query/test.sql.slt" );
 
 		resource = resource.unwrap();
-		System.out.println( resource.toString() );
-		Assert.assertTrue( resource.exists() );
+		assertThat( resource ).isExactlyInstanceOf( FileResource.class );
+		assertThat( resource.toString() ).endsWith( "/test/src/solidstack/query/test.sql.slt" );
+		assertThat( resource.exists() ).isTrue();
 
 		resource = Resources.currentFolder();
-		System.out.println( resource.getURL() );
+		assertThat( resource ).isExactlyInstanceOf( FileResource.class );
+		assertThat( resource.getURL().toString() ).endsWith( "/" );
 		resource = resource.resolve( "build.xml" );
-		System.out.println( resource.getURL() );
+		assertThat( resource.getURL().toString() ).endsWith( "/build.xml" );
 		resource = resource.resolve( ".project" );
-		System.out.println( resource.getURL() );
+		assertThat( resource.getURL().toString() ).endsWith( "/.project" );
 
-		System.out.println( new File( "" ).toURI().toString() );
+		// Space in the foldername & filename
+		resource = Resources.getResource( new File( "space folder/build.xml" ) );
+		Resource resource2 = resource.resolve( "upgrade.sql" );
+		assertThat( resource2.toString() ).endsWith( "/space folder/upgrade.sql" );
+		resource2 = resource.resolve( "space upgrade.sql" );
+		assertThat( resource2.toString() ).endsWith( "/space folder/space upgrade.sql" );
 	}
 
 	@Test

@@ -140,7 +140,7 @@ public class ClassPathResource extends Resource
 	public Resource resolve( String path )
 	{
 		// FIXME I think this should inherit the class loader
-		return Resources.getResource( this.uri.resolve( path ).toString() ); // TODO Test \
+		return Resources.getResource( this.uri.resolve( path ) ); // TODO Test \
 	}
 
 	@Override

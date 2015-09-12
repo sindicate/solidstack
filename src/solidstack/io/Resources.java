@@ -18,7 +18,8 @@ package solidstack.io;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.BitSet;
 
 
 /**
@@ -41,24 +42,10 @@ public final class Resources
 	{
 		if( path.equals( "-" ) )
 			return new SystemInOutResource();
-
-		URI uri;
-		try
-		{
-			uri = new URI( path );
-		}
-		catch( URISyntaxException e )
-		{
-			throw new FatalURISyntaxException( e );
-		}
-
+		URI uri = URI.create( path );
 		if( uri.getScheme() == null || uri.getScheme().length() == 1 || "file".equals( uri.getScheme() ) )
 			return new FileResource( path );
-
-		if( "classpath".equals( uri.getScheme() ) )
-			return new ClassPathResource( path );
-
-		return new URIResource( path );
+		return getResource( uri );
 	}
 
 	/**
@@ -76,7 +63,11 @@ public final class Resources
 	 */
 	static public Resource getResource( URI uri )
 	{
-		return getResource( uri.toString() );
+		if( uri.getScheme() == null || uri.getScheme().length() == 1 || "file".equals( uri.getScheme() ) )
+			return new FileResource( uri );
+		if( "classpath".equals( uri.getScheme() ) )
+			return new ClassPathResource( uri );
+		return new URIResource( uri );
 	}
 
 	/**
@@ -93,7 +84,7 @@ public final class Resources
 	 */
 	static public Resource currentFolder()
 	{
-		return getResource( "" ); // TODO Unit test
+		return new FileResource( "" ); // TODO Unit test
 	}
 
 	/**
@@ -107,5 +98,48 @@ public final class Resources
 		if( path.endsWith( "/" ) || path.endsWith( "\\" ) )
 			return path;
 		return path + "/";
+	}
+
+	static private BitSet no;
+	static private Charset UTF8 = Charset.forName( "UTF-8" ); // TODO Use this everywhere
+
+	static
+	{
+		no = new BitSet( 256 );
+		for( int i = 'a'; i <= 'z'; i++ )
+			no.set( i );
+		for( int i = 'A'; i <= 'Z'; i++ )
+			no.set( i );
+		for( int i = '0'; i <= '9'; i++ )
+			no.set( i );
+		no.set( '-' );
+		no.set( '_' );
+		no.set( '.' );
+		no.set( '*' );
+		no.set( '/' );
+		no.set( '\\' );
+	}
+
+	static public String path2uri( String path )
+	{
+		byte[] bytes = path.getBytes( UTF8 );
+		int len = bytes.length;
+		StringBuilder out = new StringBuilder( len );
+		boolean changed = false;
+		for( int i = 0; i < len; i++ )
+		{
+			int c = bytes[ i ];
+			if( no.get( c ) )
+				out.append( (char)c );
+			else
+			{
+				changed = true;
+				out.append( '%' );
+				out.append( Character.toUpperCase( Character.forDigit( c >> 4, 16 ) ) );
+				out.append( Character.toUpperCase( Character.forDigit( c & 0xF, 16 ) ) );
+			}
+		}
+
+		return changed ? out.toString() : path;
 	}
 }

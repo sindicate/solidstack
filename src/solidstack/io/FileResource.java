@@ -134,7 +134,7 @@ public class FileResource extends Resource
 	@Override
 	public Resource resolve( String path )
 	{
-		return Resources.getResource( this.file.toURI().resolve( path ) );
+		return Resources.getResource( this.file.toURI().resolve( Resources.path2uri( path ) ) );
 	}
 
 	@Override
