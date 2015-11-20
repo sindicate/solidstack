@@ -202,6 +202,7 @@ public class ScriptTokenizer
 			switch( ch )
 			{
 				// Identifier
+				// TODO Scala's identifiers are formed with operator characters: These consist of all printable ASCII characters \u0020 - \u007F which are in none of the sets above, mathematical symbols (Sm) and other symbols (So).
 				case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g': case 'h': case 'i': case 'j':
 				case 'k': case 'l': case 'm': case 'n': case 'o': case 'p': case 'q': case 'r': case 's': case 't':
 				case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
@@ -235,19 +236,20 @@ public class ScriptTokenizer
 						{
 							case -1: throw new SourceException( "Missing \"", in.getLocation() );
 							case '"': return new Token( TokenType.STRING, location, result.toString() );
+							case '\n': throw new SourceException( "Unexpected LF", in.getLocation() );
+							case '\r': throw new SourceException( "Unexpected CR", in.getLocation() );
 							case '\\':
 								switch( ch = in.read() )
 								{
-									case -1: throw new SourceException( "Incomplete escape sequence", in.getLocation() );
 									case '\n': continue; // Skip newline
 									case 'b': ch = '\b'; break;
 									case 'f': ch = '\f'; break;
 									case 'n': ch = '\n'; break;
 									case 'r': ch = '\r'; break;
 									case 't': ch = '\t'; break;
-									case '\"': break;
+									case '"':
+									case '\'':
 									case '\\': break;
-									case '$': result.append( '\\' ); break; // As is. TODO Remember, not for '' strings
 									case 'u': // TODO Actually, these escapes should be active through the entire script, like Java and Scala do. Maybe disabled by default. Or removed and optional for String literals.
 										char[] codePoint = new char[ 4 ];
 										for( int i = 0; i < 4; i++ )
@@ -261,9 +263,12 @@ public class ScriptTokenizer
 									default:
 										throw new SourceException( "Illegal escape sequence: \\" + ( ch >= 0 ? (char)ch : "" ), in.getLastLocation() );
 								}
+							// TODO Scala's octal escape for characters between 0 and 255: /12 is 0x10
 						}
 						result.append( (char)ch );
 					}
+
+				// TODO Scala's multiline string: """ every character except 3 double quotes """, none of the escapes
 
 				// Character
 				case '\'':
@@ -271,6 +276,7 @@ public class ScriptTokenizer
 					ch = in.read();
 					if( ch == -1 ) throw new SourceException( "Unexpected EOF", in.getLocation() );
 					int ch2 = in.read();
+					// TODO Add escaping
 					if( ch2 == '\'' )
 						return new Token( TokenType.CHAR, location, String.valueOf( (char)ch ) );
 					in.push( ch2 );

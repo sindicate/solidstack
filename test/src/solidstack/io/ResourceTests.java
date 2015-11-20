@@ -73,6 +73,7 @@ public class ResourceTests
 	@Test
 	public void testFileResource()
 	{
+		// relative url
 		Resource resource = Resources.getResource( "file:test/src/solidstack/query/test.sql.slt" );
 		assertThat( resource.exists() ).isTrue();
 

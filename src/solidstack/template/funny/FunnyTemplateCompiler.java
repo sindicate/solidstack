@@ -38,6 +38,14 @@ public class FunnyTemplateCompiler
 	{
 		StringBuilder buffer = new StringBuilder( 1024 );
 
+		if( context.getImports() != null )
+			for( String imprt : context.getImports() )
+			{
+				int pos = imprt.lastIndexOf( '.' );
+				String shortName = imprt.substring( pos + 1 );
+				buffer.append( "var " ).append( shortName ).append( '=' ).append( "loadClass(\"" ).append( imprt ).append( "\");" );
+			}
+
 		boolean text = false;
 		for( ParseEvent event : context.getEvents() )
 			switch( event.getEvent() )
@@ -69,9 +77,7 @@ public class FunnyTemplateCompiler
 					if( !text )
 						buffer.append( "out.write(s\"" );
 					text = true;
-					buffer.append( "${" );
-					writeFunnyString( buffer, event.getData() ); // TODO This is not right, why write like this?
-					buffer.append( '}' );
+					buffer.append( "${" ).append( event.getData() ).append( '}' );
 					break;
 
 				case DIRECTIVE:
@@ -106,7 +112,6 @@ public class FunnyTemplateCompiler
 		context.setTemplate( new FunnyTemplate( script ) );
 	}
 
-	// TODO Unit test: what if $ or ${ in the string?
 	static private void writeFunnyString( StringBuilder buffer, String s )
 	{
 		char[] chars = s.toCharArray();
@@ -119,8 +124,8 @@ public class FunnyTemplateCompiler
 				case '\b': buffer.append( '\\' ); c = 'b'; break;
 				case '\f': buffer.append( '\\' ); c = 'f'; break;
 				case '"':
-				case '\\':
-					buffer.append( '\\' );
+				case '\\': buffer.append( '\\' ); break;
+				case '$': buffer.append( '$' ); break;
 			}
 			buffer.append( c );
 		}

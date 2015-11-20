@@ -172,8 +172,13 @@
 	</target>
 	
 	
-	<target name="pushjar" depends="jar">
+	<target name="tosolidbase" depends="jar">
 		<copy file="${dist.home}/solidstack.jar" preservelastmodified="true" tofile="../solidbase/lib/solidstack-${release.number}.jar" />
+	</target>
+
+
+	<target name="tosnippets" depends="jar">
+		<copy file="${dist.home}/solidstack.jar" preservelastmodified="true" tofile="../snippets/database/dictionary/solidstack.jar" />
 	</target>
 
 

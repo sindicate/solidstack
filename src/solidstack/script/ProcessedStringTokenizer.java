@@ -27,7 +27,20 @@ import solidstack.io.SourceReader;
  *
  * @author René de Bloois
  */
-public class StringTokenizer extends ScriptTokenizer
+/*
+Scala:
+SimpleExpr1  ::= ... | processedStringLiteral
+processedStringLiteral
+             ::= alphaid`"' {printableChar \ (`"' | `$') | escape} `"'
+              |  alphaid `"""' {[`"'] [`"'] char \ (`"' | `$') | escape} {`"'} `"""'
+escape       ::= `$$'
+              |  `$' letter { letter | digit }
+              |  `$'BlockExpr
+alphaid      ::=  upper idrest
+              |  varid
+ */
+// TODO Include 'raw' and 'f'
+public class ProcessedStringTokenizer extends ScriptTokenizer
 {
 	private boolean found;
 	private boolean doubleQuoted;
@@ -36,13 +49,13 @@ public class StringTokenizer extends ScriptTokenizer
 	/**
 	 * @param in The source reader.
 	 */
-	public StringTokenizer( SourceReader in, boolean doubleQuoted )
+	public ProcessedStringTokenizer( SourceReader in, boolean doubleQuoted )
 	{
 		super( in );
 		this.doubleQuoted = doubleQuoted;
 	}
 
-	public StringTokenizer( PushbackReader in, boolean doubleQuoted )
+	public ProcessedStringTokenizer( PushbackReader in, boolean doubleQuoted )
 	{
 		super( in );
 		this.doubleQuoted = doubleQuoted;
@@ -54,6 +67,8 @@ public class StringTokenizer extends ScriptTokenizer
 	 *
 	 * @return The fragment. Maybe empty but never null.
 	 */
+	// TODO No escaping allowed, no " allowed
+	// TODO """ processed string
 	public Fragment getFragment()
 	{
 		this.found = false;
@@ -83,17 +98,35 @@ public class StringTokenizer extends ScriptTokenizer
 						this.found = true;
 						return new Fragment( location, result.toString() );
 					}
-					in.push( ch2 );
+					if( ch2 != '$' )
+						throw new SourceException( "$ must start an escape like ${...} or $$", in.getLocation() );
 					break;
 
+				// TODO This Tokenizer should not process escapes, that should be done in the specific implementations
 				case '\\':
-					ch2 = in.read();
-					if( this.doubleQuoted && ch2 == '"' )
-						ch = '"';
-					else if( ch2 == '$' )
-						ch = '$';
-					else
-						in.push( ch2 );
+					switch( ch = in.read() )
+					{
+						case 'b': ch = '\b'; break;
+						case 'f': ch = '\f'; break;
+						case 'n': ch = '\n'; break;
+						case 'r': ch = '\r'; break;
+						case 't': ch = '\t'; break;
+						case '"': // TODO And what if not double quoted?
+						case '\'':
+						case '\\': break;
+						case 'u': // TODO Actually, these escapes should be active through the entire script, like Java and Scala do. Maybe disabled by default. Or removed and optional for String literals.
+							char[] codePoint = new char[ 4 ];
+							for( int i = 0; i < 4; i++ )
+							{
+								codePoint[ i ] = Character.toUpperCase( (char)( ch = in.read() ) );
+								if( !( ch >= '0' && ch <= '9' || ch >= 'A' && ch <= 'F' ) )
+									throw new SourceException( "Illegal escape sequence: \\u" + new String( codePoint, 0, i + 1 ), in.getLastLocation() );
+							}
+							ch = Integer.valueOf( new String( codePoint ), 16 );
+							break;
+						default:
+							throw new SourceException( "Illegal escape sequence: \\" + ( ch >= 0 ? (char)ch : "" ), in.getLastLocation() );
+					}
 					break;
 
 			}

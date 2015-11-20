@@ -55,6 +55,11 @@ public class PString
 		return toString().length();
 	}
 
+	public String[] getFragments()
+	{
+		return this.fragments;
+	}
+
 	public Object[] getValues()
 	{
 		return this.values;

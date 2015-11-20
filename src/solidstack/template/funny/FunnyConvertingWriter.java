@@ -18,6 +18,7 @@ package solidstack.template.funny;
 
 import java.io.IOException;
 
+import solidstack.script.objects.PString;
 import solidstack.template.ConvertingWriter;
 import solidstack.template.EncodingWriter;
 
@@ -48,18 +49,56 @@ public class FunnyConvertingWriter implements ConvertingWriter
 	{
 		if( o == null )
 			this.writer.write( null );
+		else if( o instanceof String )
+			this.writer.write( (String)o );
+		else if( o instanceof PString )
+		{
+			PString pString = (PString)o;
+			String[] strings = pString.getFragments();
+			Object[] values = pString.getValues();
+			int v = 0;
+			for( int i = 0; i < strings.length; i++ )
+			{
+				if( strings[ i ] != null )
+					this.writer.write( strings[ i ] );
+				else
+					writeEncoded( values[ v++ ] );
+			}
+		}
+//		else if( o instanceof Closure )
+//		{
+//			Closure c = (Closure)o;
+//			int pars = c.getMaximumNumberOfParameters();
+//			if( pars > 0 )
+//				throw new TemplateException( "Closures with parameters are not supported in expressions." );
+//			write( c.call() ); // May be recursive
+//		}
 		else
 			this.writer.write( o.toString() );
+//			this.writer.write( (String)InvokerHelper.invokeMethod( o, "asType", String.class ) );
 	}
 
 	public void writeEncoded( Object o ) throws IOException
 	{
 		if( o == null )
 			this.writer.writeEncoded( null );
+		else if( o instanceof String )
+			this.writer.writeEncoded( o );
+		else if( o instanceof PString )
+			this.writer.writeEncoded( o.toString() );
+//		else if( o instanceof Closure )
+//		{
+//			Closure c = (Closure)o;
+//			int pars = c.getMaximumNumberOfParameters();
+//			if( pars > 0 )
+//				throw new TemplateException( "Closures with parameters are not supported in expressions." );
+//			writeEncoded( c.call() ); // May be recursive
+//		}
 		else
 		{
 			if( this.writer.stringsOnly() )
-				this.writer.writeEncoded( o.toString() );
+//				this.writer.writeEncoded( InvokerHelper.invokeMethod( o, "asType", String.class ) );
+				this.writer.write( o.toString() );
 			else
 				this.writer.writeEncoded( o );
 		}

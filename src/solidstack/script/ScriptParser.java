@@ -27,7 +27,7 @@ import solidstack.io.SourceReaders;
 import solidstack.lang.Assert;
 import solidstack.script.ScriptTokenizer.Token;
 import solidstack.script.ScriptTokenizer.TokenType;
-import solidstack.script.StringTokenizer.Fragment;
+import solidstack.script.ProcessedStringTokenizer.Fragment;
 import solidstack.script.expressions.Block;
 import solidstack.script.expressions.BooleanLiteral;
 import solidstack.script.expressions.CharLiteral;
@@ -379,7 +379,7 @@ public class ScriptParser
 	static public Expression parseString( String s, SourceLocation location )
 	{
 		SourceReader in = SourceReaders.forString( s, location );
-		StringTokenizer t = new StringTokenizer( in, false );
+		ProcessedStringTokenizer t = new ProcessedStringTokenizer( in, false );
 		return parsePString( t, location );
 	}
 
@@ -394,11 +394,11 @@ public class ScriptParser
 	{
 		if( !token.eq( "s" ) )
 			throw new SourceException( "Only 's' is currently allowed", token.getLocation() );
-		StringTokenizer t = new StringTokenizer( in, true );
+		ProcessedStringTokenizer t = new ProcessedStringTokenizer( in, true );
 		return parsePString( t, token.getLocation() );
 	}
 
-	static private Expression parsePString( StringTokenizer t, SourceLocation location )
+	static private Expression parsePString( ProcessedStringTokenizer t, SourceLocation location )
 	{
 		ScriptParser parser = new ScriptParser( t );
 		parser.swapStops( TokenType.BRACE_CLOSE );

@@ -421,7 +421,7 @@ public class ScriptTests extends Util
 	{
 		test( "a = 1; s\"a = ${a}\".toString()", "a = 1" );
 		test( "a = 1; s = s\"a = ${a}\"; a = 2; s.toString()", "a = 1" );
-		test( "a = 1; s\"a = \\${a}\"", "a = ${a}" );
+		test( "a = 1; s\"a = $${a}\"", "a = ${a}" );
 		test( "s\"${1}\".toString()", "1" );
 		test( "s\"${}\"", "" );
 		test( "s\"\".getClass()", String.class );

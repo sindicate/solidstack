@@ -474,16 +474,21 @@ public class JSPLikeTemplateParser
 					}
 					break;
 				case '$':
-					if( quote == '"' )
+					if( quote == '"' ) // TODO This is Groovy --> respect the language setting
 					{
 						c = reader.read();
-						if( c != '{' )
-							throw new ParseException( "Expecting an { after the $", reader.getLocation() );
-						buffer.append( '$' );
-						buffer.append( '{' );
-						readGStringExpression( multiline );
-						buffer.append( '}' );
-						break;
+						if( c == '$' )
+							buffer.append( '$' );
+						else
+						{
+							if( c != '{' )
+								throw new ParseException( "Expecting an { after the $", reader.getLocation() );
+							buffer.append( '$' );
+							buffer.append( '{' );
+							readGStringExpression( multiline );
+							buffer.append( '}' );
+							break;
+						}
 					}
 					buffer.append( (char)c );
 					break;

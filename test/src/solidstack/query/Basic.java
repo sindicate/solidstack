@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.fest.assertions.api.Assertions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -254,6 +255,64 @@ public class Basic
 	}
 
 	@Test
+	public void testTransformFunny() throws Exception
+	{
+		TemplateLoader loader = new TemplateLoader();
+		loader.setTemplatePath( "classpath:/solidstack/query" );
+		loader.setDefaultLanguage( "javascript" );
+
+		Resource resource = Resources.getResource( "test/src/solidstack/query/testfunny.sql.slt" );
+		TemplateCompilerContext context = new TemplateCompilerContext();
+		context.setResource( resource );
+		context.setPath( "p/c" );
+		new TemplateCompiler( loader ).compile( context );
+
+//		System.out.println( groovy.replaceAll( "\t", "\\\\t" ).replaceAll( " ", "#" ) );
+
+		Assert.assertEquals( context.getScript().toString(), "var Timestamp=loadClass(\"java.sql.Timestamp\");\n" +
+				" // Test if the import at the bottom works, and this comment too of course\n" +
+				"new Timestamp( new Date().time ) \n" +
+				";out.write(s\"SELECT *\n" +
+				"FROM SYS.SYSTABLES\n" +
+				"\");\n" +
+				"\n" +
+				"\n" +
+				"\n" +
+				"out.write(s\"WHERE 1 = 1\n" +
+				"\"); if( prefix ) ( \n" +
+				";out.write(s\"AND TABLENAME LIKE '\");out.write( prefix );out.write(s\"%'\n" +
+				"\"); ) \n" +
+				"; if( name ) ( \n" +
+				";out.write(s\"AND TABLENAME = ${name}\n" +
+				"AND TABLENAME = ${s\"${name}\"}\n" +
+				"AND TABLENAME = ${{()=>name}}\n" +
+				"\"); ) \n" +
+				"; if( names ) ( \n" +
+				";out.write(s\"AND TABLENAME IN (${names})\n" +
+				"\"); ) \n" +
+				";\n" );
+
+		QueryLoader queries = new QueryLoader( loader );
+
+		Map< String, Object > params = new HashMap< String, Object >();
+		params.put( "prefix", "SYST" );
+		params.put( "name", null );
+		params.put( "names", new String[] { "SYSTABLES", "SYSCOLUMNS" } );
+		Query query = queries.getQuery( "testfunny.sql" );
+		PreparedSQL sql = query.getPreparedSQL( params );
+
+		Assertions.assertThat( sql.getSQL() ).isEqualTo( "SELECT *\n" +
+				"FROM SYS.SYSTABLES\n" +
+				"WHERE 1 = 1\n" +
+				"AND TABLENAME LIKE 'SYST%'\n" +
+				"AND TABLENAME IN (?,?)\n" );
+
+//		Writer out = new OutputStreamWriter( new FileOutputStream( "test.out" ), "UTF-8" );
+//		out.write( sql );
+//		out.close();
+	}
+
+	@Test
 	public void testBigIN() throws Exception
 	{
 		Connection connection = DriverManager.getConnection( "jdbc:derby:memory:test;create=true", "app", null );
@@ -304,7 +363,7 @@ public class Basic
 	private Map<String, Object> parameters;
 	{
 		this.parameters = new HashMap<String, Object>();
-		this.parameters.put( "var", "value" );
+		this.parameters.put( "key", "value" );
 	}
 
 	static String execute( Template template, Map< String, Object > parameters )
@@ -332,6 +391,20 @@ public class Basic
 		String g = context.getScript().toString();
 //		System.out.println( g );
 		Assert.assertEquals( g, this.start + groovy + this.end );
+
+		String result = execute( context.getTemplate(), this.parameters );
+//		System.out.println( result );
+		Assert.assertEquals( result, output );
+	}
+
+	private void translateFunnyTest( String input, String funny, String output )
+	{
+		input = "<%@template version=\"1.0\" language=\"funny\"%>" + input;
+
+		TemplateCompilerContext context = translate( input );
+		String g = context.getScript().toString();
+//		System.out.println( g );
+		Assert.assertEquals( g, funny );
 
 		String result = execute( context.getTemplate(), this.parameters );
 //		System.out.println( result );
@@ -369,7 +442,7 @@ public class Basic
 
 		translateTest( "X<%=\"X\"%>X", "out.write(\"\"\"X\"\"\");out.write(\"X\");out.write(\"\"\"X\"\"\");", "XXX" );
 		translateTest( "X<%=\"%>\"%>X", "out.write(\"\"\"X\"\"\");out.write(\"%>\");out.write(\"\"\"X\"\"\");", "X%>X" );
-		translateTest( "X<%=\"${var}\"%>X", "out.write(\"\"\"X\"\"\");out.write(\"${var}\");out.write(\"\"\"X\"\"\");", "XvalueX" );
+		translateTest( "X<%=\"${key}\"%>X", "out.write(\"\"\"X\"\"\");out.write(\"${key}\");out.write(\"\"\"X\"\"\");", "XvalueX" );
 		translateTest( "X<%=\"${\"te\\\"xt\"}\"%>X", "out.write(\"\"\"X\"\"\");out.write(\"${\"te\\\"xt\"}\");out.write(\"\"\"X\"\"\");", "Xte\"xtX" );
 		translateTest( "X<%=\"${\"te\\${x}t\"}\"%>X", "out.write(\"\"\"X\"\"\");out.write(\"${\"te\\${x}t\"}\");out.write(\"\"\"X\"\"\");", "Xte${x}tX" );
 		translateError( "X<%=\"${\"te\"xt\"}\"%>X" );
@@ -380,13 +453,13 @@ public class Basic
 
 		translateTest( "X<%='X'%>X", "out.write(\"\"\"X\"\"\");out.write('X');out.write(\"\"\"X\"\"\");", "XXX" );
 		translateTest( "X<%='%>'%>X", "out.write(\"\"\"X\"\"\");out.write('%>');out.write(\"\"\"X\"\"\");", "X%>X" );
-		translateTest( "X<%='${var}'%>X", "out.write(\"\"\"X\"\"\");out.write('${var}');out.write(\"\"\"X\"\"\");", "X${var}X" );
+		translateTest( "X<%='${key}'%>X", "out.write(\"\"\"X\"\"\");out.write('${key}');out.write(\"\"\"X\"\"\");", "X${key}X" );
 		translateTest( "X<%=\"${'te${x}t'}\"%>X", "out.write(\"\"\"X\"\"\");out.write(\"${'te${x}t'}\");out.write(\"\"\"X\"\"\");", "Xte${x}tX" );
 
 		// GString expressions with "
 
-		translateTest( "X${var}X", "out.write(\"\"\"X${var}X\"\"\");", "XvalueX" );
-		translateTest( "X${\nvar}X", "out.write(\"\"\"X${\nvar}X\"\"\");", "XvalueX" );
+		translateTest( "X${key}X", "out.write(\"\"\"X${key}X\"\"\");", "XvalueX" );
+		translateTest( "X${\nkey}X", "out.write(\"\"\"X${\nkey}X\"\"\");", "XvalueX" );
 		translateTest( "X${\"te\\nxt\"}X", "out.write(\"\"\"X${\"te\\nxt\"}X\"\"\");", "Xte\nxtX" );
 		translateTest( "X${\"Y\\${Y\"}X", "out.write(\"\"\"X${\"Y\\${Y\"}X\"\"\");", "XY${YX" );
 		translateError( "X${\"te\"xt\"}X" );
@@ -395,9 +468,9 @@ public class Basic
 		translateError( "X${\"${\"text\ntext\"}\"}X" );
 		translateTest( "X${\"\"\"te\"xt\ntext\\\"\"\"\"}X", "out.write(\"\"\"X${\"\"\"te\"xt\ntext\\\"\"\"\"}X\"\"\");", "Xte\"xt\ntext\"X" );
 		// TODO An if in an expression? Can we do that for the other kind of expression too?
-		translateTest( "${if(var){\"true\"}else{\"false\"}}", "out.write(\"\"\"${if(var){\"true\"}else{\"false\"}}\"\"\");", "true" );
+		translateTest( "${if(key){\"true\"}else{\"false\"}}", "out.write(\"\"\"${if(key){\"true\"}else{\"false\"}}\"\"\");", "true" );
 		translateError( "X${\"Y${\n}Y\"}X" );
-		translateTest( "X${\"\"\"Y${\nvar\n}Y\"\"\"}X", "out.write(\"\"\"X${\"\"\"Y${\nvar\n}Y\"\"\"}X\"\"\");", "XYvalueYX" );
+		translateTest( "X${\"\"\"Y${\nkey\n}Y\"\"\"}X", "out.write(\"\"\"X${\"\"\"Y${\nkey\n}Y\"\"\"}X\"\"\");", "XYvalueYX" );
 
 		// GString expressions with '
 
@@ -417,5 +490,65 @@ public class Basic
 		translateTest( "<%if(true){%>X<%}%>Y", "if(true){;out.write(\"\"\"X\"\"\");};out.write(\"\"\"Y\"\"\");", "XY" );
 		translateTest( "<%if(true){%>X<%}else{%>Y<%}%>", "if(true){;out.write(\"\"\"X\"\"\");}else{;out.write(\"\"\"Y\"\"\");};", "X" );
 		translateTest( "<%if(true){%>X<%};if(false){%>X<%}%>", "if(true){;out.write(\"\"\"X\"\"\");};if(false){;out.write(\"\"\"X\"\"\");};", "X" );
+	}
+
+	@Test
+	public void testFunny()
+	{
+		// Escaping in the text
+
+		translateFunnyTest( "\"\"\"", "out.write(s\"\\\"\\\"\\\"\");", "\"\"\"" );
+		translateFunnyTest( "X\"X'X", "out.write(s\"X\\\"X'X\");", "X\"X'X" );
+		translateFunnyTest( "X\\\\\"X'X", "out.write(s\"X\\\\\\\"X'X\");", "X\\\"X'X" );
+		translateFunnyTest( "X\\\\X'X", "out.write(s\"X\\\\X'X\");", "X\\X'X" );
+		translateFunnyTest( "X\"\"\"X'X", "out.write(s\"X\\\"\\\"\\\"X'X\");", "X\"\"\"X'X" );
+		translateFunnyTest( "X\\<%X", "out.write(s\"X<%X\");", "X<%X" );
+		translateFunnyTest( "X\\${X", "out.write(s\"X$${X\");", "X${X" );
+		// TODO Maybe we should allow $$ escaping too, or exclusively
+
+		// Expressions with "
+
+		translateFunnyTest( "X<%=\"X\"%>X", "out.write(s\"X\");out.write(\"X\");out.write(s\"X\");", "XXX" );
+		translateFunnyTest( "X<%=\"%>\"%>X", "out.write(s\"X\");out.write(\"%>\");out.write(s\"X\");", "X%>X" );
+		translateFunnyTest( "X<%=s\"${key}\"%>X", "out.write(s\"X\");out.write(s\"${key}\");out.write(s\"X\");", "XvalueX" );
+		translateFunnyTest( "X<%=s\"${\"te\\\"xt\"}\"%>X", "out.write(s\"X\");out.write(s\"${\"te\\\"xt\"}\");out.write(s\"X\");", "Xte\"xtX" );
+		translateFunnyTest( "X<%=s\"${s\"te$${x}t\"}\"%>X", "out.write(s\"X\");out.write(s\"${s\"te$${x}t\"}\");out.write(s\"X\");", "Xte${x}tX" );
+		translateError( "X<%=\"${\"te\"xt\"}\"%>X" );
+		translateFunnyTest( "X<%=s\"${\"te\\\"xt\"}\"%>X", "out.write(s\"X\");out.write(s\"${\"te\\\"xt\"}\");out.write(s\"X\");", "Xte\"xtX" );
+		translateFunnyTest( "X<%=s\"Y${s\"Z${\"text\"}Z\"}Y\"%>X", "out.write(s\"X\");out.write(s\"Y${s\"Z${\"text\"}Z\"}Y\");out.write(s\"X\");", "XYZtextZYX" );
+
+		// Expressions with '
+
+		translateFunnyTest( "X<%='X'%>X", "out.write(s\"X\");out.write('X');out.write(s\"X\");", "XXX" );
+		translateFunnyTest( "X<%=\"%>\"%>X", "out.write(s\"X\");out.write(\"%>\");out.write(s\"X\");", "X%>X" );
+		translateFunnyTest( "X<%=\"${key}\"%>X", "out.write(s\"X\");out.write(\"${key}\");out.write(s\"X\");", "X${key}X" );
+		translateFunnyTest( "X<%=s\"${\"te${x}t\"}\"%>X", "out.write(s\"X\");out.write(s\"${\"te${x}t\"}\");out.write(s\"X\");", "Xte${x}tX" );
+
+		// GString expressions with "
+
+		translateFunnyTest( "X${key}X", "out.write(s\"X${key}X\");", "XvalueX" );
+		translateFunnyTest( "X${\nkey}X", "out.write(s\"X${\nkey}X\");", "XvalueX" );
+		translateFunnyTest( "X${\"te\\nxt\"}X", "out.write(s\"X${\"te\\nxt\"}X\");", "Xte\nxtX" );
+		translateFunnyTest( "X${s\"Y$${Y\"}X", "out.write(s\"X${s\"Y$${Y\"}X\");", "XY${YX" );
+		translateError( "X${\"te\"xt\"}X" );
+		translateFunnyTest( "X${\"te\\\"xt\"}X", "out.write(s\"X${\"te\\\"xt\"}X\");", "Xte\"xtX" );
+		translateError( "X${\"text\ntext\"}X" );
+		translateError( "X${\"${\"text\ntext\"}\"}X" );
+		translateFunnyTest( "X${s\"te\\\"xt\\ntext\\\"\"}X", "out.write(s\"X${s\"te\\\"xt\\ntext\\\"\"}X\");", "Xte\"xt\ntext\"X" );
+		// TODO An if in an expression? Can we do that for the other kind of expression too?
+		translateFunnyTest( "${if(key){\"true\"}else{\"false\"}}", "out.write(s\"${if(key){\"true\"}else{\"false\"}}\");", "true" );
+		translateError( "X${\"Y${\n}Y\"}X" );
+		// TODO Should this work with scala?
+		//translateFunnyTest( "X${s\"Y${\nkey\n}Y\"}X", "out.write(\"\"\"X${\"\"\"Y${\nkey\n}Y\"\"\"}X\"\"\");", "XYvalueYX" );
+
+		// Miscellaneous
+		translateFunnyTest( "X${1}${new Integer(2)}X", "out.write(s\"X${1}${new Integer(2)}X\");", "X12X" ); // ${} connected with integers
+		translateFunnyTest( "X<%=1%><%=new Integer(2)%>X", "out.write(s\"X\");out.write(1);out.write(new Integer(2));out.write(s\"X\");", "X12X" ); // <%=%> connected with integers
+
+		// Groovy BUG
+
+		translateFunnyTest( "<%if(true){%>X<%}%>Y", "if(true){;out.write(s\"X\");};out.write(s\"Y\");", "XY" );
+		translateFunnyTest( "<%if(true){%>X<%}else{%>Y<%}%>", "if(true){;out.write(s\"X\");}else{;out.write(s\"Y\");};", "X" );
+		translateFunnyTest( "<%if(true){%>X<%};if(false){%>X<%}%>", "if(true){;out.write(s\"X\");};if(false){;out.write(s\"X\");};", "X" );
 	}
 }
