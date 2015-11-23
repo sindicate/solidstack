@@ -31,6 +31,7 @@ import solidstack.template.JSPLikeTemplateParser.EVENT;
 import solidstack.template.JSPLikeTemplateParser.ParseEvent;
 import solidstack.template.funny.FunnyTemplateCompiler;
 import solidstack.template.groovy.GroovyTemplateCompiler;
+import solidstack.template.java.JavaTemplateCompiler;
 import solidstack.template.javascript.JavaScriptTemplateCompiler;
 
 /**
@@ -148,6 +149,13 @@ public class TemplateCompiler
 				GroovyTemplateCompiler compiler = new GroovyTemplateCompiler();
 				compiler.generateScript( context );
 				Loggers.compiler.trace( "Generated Groovy:\n{}", context.getScript() );
+				compiler.compileScript( context );
+			}
+			else if( lang.equals( "java" ) )
+			{
+				JavaTemplateCompiler compiler = new JavaTemplateCompiler();
+				compiler.generateScript( context );
+				Loggers.compiler.trace( "Generated Java:\n{}", context.getScript() );
 				compiler.compileScript( context );
 			}
 			else

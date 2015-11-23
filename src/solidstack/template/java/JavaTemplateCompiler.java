@@ -14,38 +14,28 @@
  * limitations under the License.
  */
 
-package solidstack.template.groovy;
+package solidstack.template.java;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.codehaus.groovy.control.CompilationUnit;
-import org.codehaus.groovy.control.Phases;
-import org.codehaus.groovy.tools.GroovyClass;
-
-import groovy.lang.Closure;
-import groovy.lang.GroovyObject;
 import solidstack.lang.Assert;
-import solidstack.template.DefiningClassLoader;
 import solidstack.template.JSPLikeTemplateParser.ParseEvent;
 import solidstack.template.TemplateCompilerContext;
-import solidstack.template.Util;
 
 
 /**
- * Compiles the given parser events, directives and imports to a {@link GroovyTemplate}.
+ * Compiles the given parser events, directives and imports to a {@link JavaTemplate}.
  *
  * @author René de Bloois
  */
-public class GroovyTemplateCompiler
+public class JavaTemplateCompiler
 {
 	private static final String TEMPLATE_PKG = "solidstack.template.tmp";
 	static private final Pattern PATH_PATTERN = Pattern.compile( "/*(?:(.+?)/+)?([^/]+)" );
 
-
 	/**
-	 * Generates the Groovy script.
+	 * Generates the Java.
 	 *
 	 * @param context The compilation context.
 	 */
@@ -68,40 +58,46 @@ public class GroovyTemplateCompiler
 			for( String imprt : context.getImports() )
 				buffer.append( "import " ).append( imprt ).append( ';' );
 		buffer.append( "class " ).append( name.replaceAll( "[\\.-]", "_" ) );
-		buffer.append( "{Closure getClosure(){return{out->" );
+		buffer.append( "{ public void execute(solidstack.template.EncodingWriter out,Map args){" );
 
 		boolean text = false;
 		for( ParseEvent event : context.getEvents() )
 			switch( event.getEvent() )
 			{
 				case TEXT:
-				case NEWLINE:
 				case WHITESPACE:
 					if( !text )
-						buffer.append( "out.write(\"\"\"" );
+						buffer.append( "out.write(\"" );
 					text = true;
-					writeGroovyString( buffer, event.getData() );
+					writeJavaString( buffer, event.getData() );
+					break;
+
+				case NEWLINE:
+					if( !text )
+						buffer.append( "out.write(\"" );
+					text = true;
+					buffer.append( "\\n\\\n" );
 					break;
 
 				case SCRIPT:
 					if( text )
-						buffer.append( "\"\"\");" );
+						buffer.append( "\");" );
 					text = false;
 					buffer.append( event.getData() ).append( ';' );
 					break;
 
 				case EXPRESSION:
 					if( text )
-						buffer.append( "\"\"\");" );
+						buffer.append( "\");" );
 					text = false;
 					buffer.append( "out.write(" ).append( event.getData() ).append( ");" );
 					break;
 
 				case EXPRESSION2:
-					if( !text )
-						buffer.append( "out.write(\"\"\"" );
-					text = true;
-					buffer.append( "${" ).append( event.getData() ).append( '}' ); // FIXME Need to escape """
+					if( text )
+						buffer.append( "\");" );
+					text = false;
+					buffer.append( "out.writeEncoded(" ).append( event.getData() ).append( ");" );
 					break;
 
 				case DIRECTIVE:
@@ -109,67 +105,29 @@ public class GroovyTemplateCompiler
 					if( event.getData().length() == 0 )
 						break;
 					if( text )
-						buffer.append( "\"\"\");" );
+						buffer.append( "\");" );
 					text = false;
 					buffer.append( event.getData() );
 					break;
 
-				case EOF:
 				default:
 					Assert.fail( "Unexpected event " + event.getEvent() );
 			}
 
 		if( text )
-			buffer.append( "\"\"\");" );
-		buffer.append( "}}}" );
+			buffer.append( "\");" );
+		buffer.append( "}}" );
 
 		context.setScript( buffer );
 	}
 
-	/**
-	 * Compiles the Groovy script.
-	 *
-	 * @param context The compilation context.
-	 */
 	public void compileScript( TemplateCompilerContext context )
 	{
-		// Compile to bytes
-		CompilationUnit unit = new CompilationUnit();
-		unit.addSource( context.getPath(), context.getScript().toString() );
-		unit.compile( Phases.CLASS_GENERATION );
-
-		// Results
-		@SuppressWarnings( "unchecked" )
-		List< GroovyClass > classes = unit.getClasses();
-		Assert.isTrue( classes.size() > 0, "Expecting 1 or more classes" );
-
-		ClassLoader parent = Thread.currentThread().getContextClassLoader();
-		if( parent == null )
-			parent = GroovyTemplateCompiler.class.getClassLoader();
-
-		// Define the class
-		// TODO Configurable class loader
-		DefiningClassLoader classLoader = new DefiningClassLoader( parent );
-		Class< ? > first = null;
-		for( GroovyClass cls : classes )
-		{
-			Class< ? > clas = classLoader.defineClass( cls.getName(), cls.getBytes() );
-			if( first == null )
-				first = clas; // TODO Are we sure that the first one is always the right one?
-		}
-
-		// Instantiate the first
-		GroovyObject object = (GroovyObject)Util.newInstance( first );
-		Closure closure = (Closure)object.invokeMethod( "getClosure", null );
-
-		// The old way:
-//		Class< GroovyObject > groovyClass = new GroovyClassLoader().parseClass( new GroovyCodeSource( getSource(), getName(), "x" ) );
-
-		context.setTemplate( new GroovyTemplate( closure ) );
+		throw new UnsupportedOperationException();
 	}
 
 	// TODO Any other characters?
-	static private void writeGroovyString( StringBuilder buffer, String s )
+	static private void writeJavaString( StringBuilder buffer, String s )
 	{
 		char[] chars = s.toCharArray();
 		int len = chars.length;
@@ -179,7 +137,6 @@ public class GroovyTemplateCompiler
 			{
 				case '"':
 				case '\\':
-				case '$':
 					buffer.append( '\\' ); //$FALL-THROUGH$
 				default:
 					buffer.append( c );
