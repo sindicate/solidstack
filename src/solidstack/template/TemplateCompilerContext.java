@@ -38,6 +38,8 @@ public class TemplateCompilerContext
 	private String charSet;
 	private StringBuilder script;
 	private Template template;
+	private String pkg;
+	private String className;
 
 	public void setResource( Resource resource )
 	{
@@ -152,5 +154,25 @@ public class TemplateCompilerContext
 	public Template getTemplate()
 	{
 		return this.template;
+	}
+
+	public String getPackage()
+	{
+		return this.pkg;
+	}
+
+	public void setPackage( String pkg )
+	{
+		this.pkg = pkg;
+	}
+
+	public String getClassName()
+	{
+		return this.className;
+	}
+
+	public void setClassName( String className )
+	{
+		this.className = className;
 	}
 }

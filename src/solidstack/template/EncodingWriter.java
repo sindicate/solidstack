@@ -16,8 +16,6 @@
 
 package solidstack.template;
 
-import java.io.IOException;
-
 /**
  * An encoding writer. Can encode strings to the target content type.
  *
@@ -29,17 +27,15 @@ public interface EncodingWriter
 	 * Write the string to the writer unencoded.
 	 *
 	 * @param s The string to write.
-	 * @throws IOException Whenever an IOException occurs.
 	 */
-	void write( String s ) throws IOException;
+	void write( String s );
 
 	/**
 	 * Write the value to the writer encoded.
 	 *
 	 * @param value The value to write.
-	 * @throws IOException Whenever an IOException occurs.
 	 */
-	void writeEncoded( Object value ) throws IOException;
+	void writeEncoded( Object value );
 
 	/**
 	 * Indicates that {@link #writeEncoded(Object)} only accepts Strings, not Objects.
@@ -50,8 +46,6 @@ public interface EncodingWriter
 
 	/**
      * Flushes the stream.
-     *
-	 * @throws IOException If an I/O error occurs.
 	 */
-	void flush() throws IOException;
+	void flush();
 }
