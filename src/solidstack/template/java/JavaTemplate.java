@@ -16,74 +16,27 @@
 
 package solidstack.template.java;
 
-import java.io.IOException;
 import java.util.Map;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ImporterTopLevel;
-import org.mozilla.javascript.NativeJavaObject;
-import org.mozilla.javascript.Script;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.TopLevel;
-
-import solidstack.io.FatalIOException;
-import solidstack.template.ConvertingWriter;
 import solidstack.template.EncodingWriter;
 import solidstack.template.Template;
 
 
 /**
- * A compiled JavaScript template.
+ * A compiled Java template.
  *
  * @author René M. de Bloois
  */
-public class JavaTemplate extends Template
+abstract public class JavaTemplate extends Template
 {
-	private Script script;
-
-
-	/**
-	 * @param script The JavaScript script.
-	 */
-	public JavaTemplate( Script script )
-	{
-		this.script = script;
-	}
-
 	@Override
 	public void apply( Object params, EncodingWriter writer )
 	{
-		Context cx = Context.enter();
-		try
-		{
-			TopLevel topLevel = new ImporterTopLevel( cx );
-
-			ConvertingWriter out = new JavaConvertingWriter( writer );
-			topLevel.put( "out", topLevel, out );
-
-			Scriptable scope;
-			if( params instanceof Map )
-			{
-				scope = topLevel;
-				for( Map.Entry<String, Object> param : ( (Map<String, Object>)params ).entrySet() )
-					scope.put( param.getKey(), scope, Context.javaToJS( param.getValue(), scope ) );
-			}
-			else
-				scope = new NativeJavaObject( topLevel, params, null );
-
-			cx.executeScriptWithContinuations( this.script, scope );
-			try
-			{
-				out.flush();
-			}
-			catch( IOException e )
-			{
-				throw new FatalIOException( e );
-			}
-		}
-		finally
-		{
-			Context.exit();
-		}
+		if( params instanceof Map<?, ?> )
+			execute( writer, (Map<?, ?>)params );
+		else
+			throw new UnsupportedOperationException( params.getClass().getName() + " not supported as params" );
 	}
+
+	abstract public void execute( EncodingWriter out, Map args );
 }

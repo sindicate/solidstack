@@ -56,7 +56,7 @@ public class XMLEncodingWriter extends NoEncodingWriter
 	 * @throws IOException Whenever an IOException occurs.
 	 */
 	@Override
-	public void writeEncoded( Object value ) throws IOException
+	public void writeEncoded( Object value )
 	{
 		if( value == null )
 			return;

@@ -1,9 +1,9 @@
 <%@ template version="1.0" encoding="UTF-8" language="java" %>
 <% // Comment
 new Timestamp( new Date().getTime() );
-String prefix = args.get( "prefix" );
-String name = args.get( "name" );
-String names = args.get( "names" );
+String prefix = (String)args.get( "prefix" );
+String name = (String)args.get( "name" );
+String names = (String)args.get( "names" );
 %>
 SELECT *
 <%@ template contentType="text/html; charset=ISO-8859-1" %>
@@ -13,13 +13,13 @@ FROM SYS.SYSTABLES
 	interfere with the linenumbers
 	--%>
 WHERE 1 = 1
-		<% if( prefix ) { %>
+		<% if( prefix != null ) { %>
 AND TABLENAME LIKE '<%= prefix %>%'
 		<% } %>
-		<% if( name ) { %>
+		<% if( name != null ) { %>
 AND TABLENAME = ${name}
 		<% } %>
-		<% if( names ) { %>
+		<% if( names != null ) { %>
 AND TABLENAME IN (${names})
 		<% } %>
-<%@ template import = "java.sql.Timestamp" %>
+<%@ template import = "java.sql.Timestamp" import = "java.util.Date" %>

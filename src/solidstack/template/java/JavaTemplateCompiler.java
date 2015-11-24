@@ -19,11 +19,7 @@ package solidstack.template.java;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.tools.JavaCompiler;
-import javax.tools.JavaCompiler.CompilationTask;
-import javax.tools.JavaFileManager;
-import javax.tools.ToolProvider;
-
+import solidstack.javac.CompilerClassLoader;
 import solidstack.lang.Assert;
 import solidstack.lang.SystemException;
 import solidstack.template.JSPLikeTemplateParser.ParseEvent;
@@ -51,11 +47,14 @@ public class JavaTemplateCompiler
 		Matcher matcher = PATH_PATTERN.matcher( context.getPath() );
 		Assert.isTrue( matcher.matches() );
 		String path = matcher.group( 1 );
-		String name = matcher.group( 2 );
+		String name = matcher.group( 2 ).replaceAll( "[\\.-]", "_" );
 
 		String pkg = TEMPLATE_PKG;
 		if( path != null )
 			pkg += "." + path.replaceAll( "/+", "." );
+
+		context.setPackage( pkg );
+		context.setClassName( name );
 
 		StringBuilder buffer = new StringBuilder( 1024 );
 
@@ -63,8 +62,8 @@ public class JavaTemplateCompiler
 		if( context.getImports() != null )
 			for( String imprt : context.getImports() )
 				buffer.append( "import " ).append( imprt ).append( ';' );
-		buffer.append( "class " ).append( name.replaceAll( "[\\.-]", "_" ) );
-		buffer.append( "{ public void execute(solidstack.template.EncodingWriter out,Map args){" );
+		buffer.append( "public class " ).append( name ).append( " extends solidstack.template.java.JavaTemplate" );
+		buffer.append( "{ public void execute(solidstack.template.EncodingWriter out,java.util.Map args){" );
 
 		boolean text = false;
 		for( ParseEvent event : context.getEvents() )
@@ -129,14 +128,20 @@ public class JavaTemplateCompiler
 
 	public void compileScript( TemplateCompilerContext context )
 	{
-		// https://github.com/OpenHFT/Java-Runtime-Compiler
-		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		JavaFileManager fileManager = new MyJavaFileManager( Thread.currentThread().getContextClassLoader() );
-		StringJavaFileObject file = new StringJavaFileObject( "test", context.getScript() );
-//		Writer out = new StringWriter();
-		CompilationTask task = compiler.getTask( null, fileManager, null, null, null, file );
-		if( !task.call() )
-			throw new SystemException( "compilation failed" );
+		CompilerClassLoader compiler = new CompilerClassLoader( Thread.currentThread().getContextClassLoader() );
+		Class<?> cls = compiler.compile( context.getPackage() + "." + context.getClassName(), context.getScript() );
+		try
+		{
+			context.setTemplate( (JavaTemplate)cls.newInstance() );
+		}
+		catch( InstantiationException e )
+		{
+			throw new SystemException( e ); // TODO Is this the correct exception?
+		}
+		catch( IllegalAccessException e )
+		{
+			throw new SystemException( e ); // TODO Is this the correct exception?
+		}
 	}
 
 	// TODO Any other characters?

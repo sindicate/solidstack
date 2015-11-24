@@ -19,6 +19,8 @@ package solidstack.template;
 import java.io.IOException;
 import java.io.Writer;
 
+import solidstack.io.FatalIOException;
+
 /**
  * An encoding writer that passes through everything unmodified.
  *
@@ -47,20 +49,26 @@ public class NoEncodingWriter implements EncodingWriter
 	 * @param chars The characters.
 	 * @param off The start index.
 	 * @param len The length.
-	 * @throws IOException Whenever an IOException is thrown.
 	 */
-	public void write( char[] chars, int off, int len ) throws IOException
+	public void write( char[] chars, int off, int len )
 	{
-		this.out.write( chars, off, len );
+		try
+		{
+			this.out.write( chars, off, len );
+		}
+		catch( IOException e )
+		{
+			throw new FatalIOException( e );
+		}
 	}
 
-	public void write( String s ) throws IOException
+	public void write( String s )
 	{
 		if( s != null )
 			write( s.toCharArray(), 0, s.length() );
 	}
 
-	public void writeEncoded( Object o ) throws IOException
+	public void writeEncoded( Object o )
 	{
 		write( (String)o );
 	}
@@ -70,8 +78,15 @@ public class NoEncodingWriter implements EncodingWriter
 		return true;
 	}
 
-	public void flush() throws IOException
+	public void flush()
 	{
-		this.out.flush();
+		try
+		{
+			this.out.flush();
+		}
+		catch( IOException e )
+		{
+			throw new FatalIOException( e );
+		}
 	}
 }
