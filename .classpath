@@ -20,9 +20,5 @@
 	<classpathentry kind="lib" path="test/lib/fest-util-1.2.3.jar"/>
 	<classpathentry kind="lib" path="C:/PROJECTS/mysql-connector-java-5.1.36-bin.jar"/>
 	<classpathentry kind="lib" path="C:/PROJECTS/ojdbc7-12.1.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/apache-ant-1.7.1.jar"/>
-	<classpathentry kind="lib" path="test/lib/ant-testutil.jar"/>
-	<classpathentry kind="lib" path="test/lib/junit-4.7.jar"/>
-	<classpathentry kind="lib" path="test/lib/ant-launcher.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
