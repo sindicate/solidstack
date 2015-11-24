@@ -8,4 +8,6 @@ public class UndefinedPropertyException extends ThrowException
 	{
 		super( "'" + name + "' undefined", stack );
 	}
+
+	// TODO This one should not have a stacktrace?
 }

@@ -19,7 +19,13 @@ package solidstack.template.java;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.tools.JavaCompiler;
+import javax.tools.JavaCompiler.CompilationTask;
+import javax.tools.JavaFileManager;
+import javax.tools.ToolProvider;
+
 import solidstack.lang.Assert;
+import solidstack.lang.SystemException;
 import solidstack.template.JSPLikeTemplateParser.ParseEvent;
 import solidstack.template.TemplateCompilerContext;
 
@@ -76,7 +82,7 @@ public class JavaTemplateCompiler
 					if( !text )
 						buffer.append( "out.write(\"" );
 					text = true;
-					buffer.append( "\\n\\\n" );
+					buffer.append( "\\n\"+\n\"" );
 					break;
 
 				case SCRIPT:
@@ -123,7 +129,14 @@ public class JavaTemplateCompiler
 
 	public void compileScript( TemplateCompilerContext context )
 	{
-		throw new UnsupportedOperationException();
+		// https://github.com/OpenHFT/Java-Runtime-Compiler
+		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		JavaFileManager fileManager = new MyJavaFileManager( Thread.currentThread().getContextClassLoader() );
+		StringJavaFileObject file = new StringJavaFileObject( "test", context.getScript() );
+//		Writer out = new StringWriter();
+		CompilationTask task = compiler.getTask( null, fileManager, null, null, null, file );
+		if( !task.call() )
+			throw new SystemException( "compilation failed" );
 	}
 
 	// TODO Any other characters?

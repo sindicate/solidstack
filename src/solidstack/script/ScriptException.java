@@ -36,4 +36,6 @@ public class ScriptException extends RuntimeException
 	{
 		super( message, cause );
 	}
+
+	// TODO This one should not have a stacktrace?
 }

@@ -25,7 +25,7 @@ import funny.Symbol;
 
 public interface Scope
 {
-	void var( Symbol symbol, Object value ); // TODO Rename to var
+	void var( Symbol symbol, Object value );
 	void val( Symbol symbol, Object value );
 
 	Object get( Symbol symbol );
