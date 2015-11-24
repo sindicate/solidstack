@@ -66,42 +66,67 @@ public class JavaTemplateCompiler
 		buffer.append( "{ public void execute(solidstack.template.EncodingWriter out,java.util.Map args){" );
 
 		boolean text = false;
+		boolean plus = false;
 		for( ParseEvent event : context.getEvents() )
 			switch( event.getEvent() )
 			{
 				case TEXT:
 				case WHITESPACE:
 					if( !text )
+					{
 						buffer.append( "out.write(\"" );
-					text = true;
+						text = true;
+					}
+					else if( plus )
+					{
+						buffer.append( "+\"" );
+						plus = false;
+					}
 					writeJavaString( buffer, event.getData() );
 					break;
 
 				case NEWLINE:
 					if( !text )
+					{
 						buffer.append( "out.write(\"" );
-					text = true;
-					buffer.append( "\\n\"+\n\"" );
+						text = true;
+					}
+					else if( plus )
+						buffer.append( "+\"" );
+					buffer.append( "\\n\"\n" );
+					plus = true;
 					break;
 
 				case SCRIPT:
 					if( text )
-						buffer.append( "\");" );
-					text = false;
+					{
+						if( !plus )
+							buffer.append( '"' );
+						buffer.append( ");" );
+						text = plus = false;
+					}
 					buffer.append( event.getData() ).append( ';' );
 					break;
 
 				case EXPRESSION:
 					if( text )
-						buffer.append( "\");" );
-					text = false;
+					{
+						if( !plus )
+							buffer.append( '"' );
+						buffer.append( ");" );
+						text = plus = false;
+					}
 					buffer.append( "out.write(" ).append( event.getData() ).append( ");" );
 					break;
 
 				case EXPRESSION2:
 					if( text )
-						buffer.append( "\");" );
-					text = false;
+					{
+						if( !plus )
+							buffer.append( '"' );
+						buffer.append( ");" );
+						text = plus = false;
+					}
 					buffer.append( "out.writeEncoded(" ).append( event.getData() ).append( ");" );
 					break;
 
@@ -110,8 +135,12 @@ public class JavaTemplateCompiler
 					if( event.getData().length() == 0 )
 						break;
 					if( text )
-						buffer.append( "\");" );
-					text = false;
+					{
+						if( !plus )
+							buffer.append( '"' );
+						buffer.append( ");" );
+						text = plus = false;
+					}
 					buffer.append( event.getData() );
 					break;
 
