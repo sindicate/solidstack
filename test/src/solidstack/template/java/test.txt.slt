@@ -1,0 +1,25 @@
+<%@ template version="1.0" encoding="UTF-8" language="java" %>
+<% // Comment
+new Timestamp( new Date().getTime() );
+String prefix = (String)args.get( "prefix" );
+String name = (String)args.get( "name" );
+String names = (String)args.get( "names" );
+%>
+SELECT *
+<%@ template contentType="text/html; charset=ISO-8859-1" %>
+FROM SYS.SYSTABLES
+	<%--
+	This comment should not 
+	interfere with the linenumbers
+	--%>
+WHERE 1 = 1
+		<% if( prefix != null ) { %>
+AND TABLENAME LIKE '<%= prefix %>%'
+		<% } %>
+		<% if( name != null ) { %>
+AND TABLENAME = ${name}
+		<% } %>
+		<% if( names != null ) { %>
+AND TABLENAME IN (${names})
+		<% } %>
+<%@ template import = "java.sql.Timestamp" import = "java.util.Date" %>

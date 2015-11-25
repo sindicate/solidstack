@@ -1,0 +1,17 @@
+package solidstack.javac;
+
+public class HelloWorld
+{
+	public String sayHello()
+	{
+		return "Hello " + new Helper().who() + "!";
+	}
+	
+	static public class Helper
+	{
+		public String who()
+		{
+			return "World";
+		}
+	}
+}

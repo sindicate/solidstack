@@ -16,7 +16,6 @@
 
 package solidstack.query;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -42,7 +41,7 @@ public class QueryEncodingWriter implements EncodingWriter
 	}
 
 	//@Override
-	public void writeEncoded( Object o ) throws IOException
+	public void writeEncoded( Object o )
 	{
 		this.isValue.set( this.values.size() );
 		this.values.add( o );
@@ -88,7 +87,7 @@ public class QueryEncodingWriter implements EncodingWriter
 		return result.toString();
 	}
 
-	public void flush() throws IOException
+	public void flush()
 	{
 		// Nothing to flush
 	}
