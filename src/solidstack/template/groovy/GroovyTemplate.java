@@ -1,5 +1,5 @@
 /*--
- * Copyright 2006 René M. de Bloois
+ * Copyright 2012 René M. de Bloois
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
 
 package solidstack.template.groovy;
 
-import groovy.lang.Closure;
-
 import java.io.IOException;
 
+import groovy.lang.Closure;
 import solidstack.io.FatalIOException;
 import solidstack.template.ConvertingWriter;
 import solidstack.template.EncodingWriter;

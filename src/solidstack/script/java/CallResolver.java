@@ -265,7 +265,7 @@ public class CallResolver
 					index ++;
 				else
 					best2.remove( index + 1 );
-		}
+			}
 			else
 			{
 				if( moreSpecificThan( candidate2.getParameterTypes(), candidate2.isVararg(), candidate1.getParameterTypes(), candidate1.isVararg() ) )
