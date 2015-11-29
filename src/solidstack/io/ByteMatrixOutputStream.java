@@ -29,9 +29,20 @@ import java.util.List;
  */
 public class ByteMatrixOutputStream extends OutputStream
 {
+	private int blockSize;
 	private List< byte[] > buffer = new ArrayList< byte[] >();
 	private byte[] last;
 	private int lastPos;
+
+	public ByteMatrixOutputStream()
+	{
+		this.blockSize = 1024;
+	}
+
+	public ByteMatrixOutputStream( int blockSize )
+	{
+		this.blockSize = blockSize;
+	}
 
 	@Override
 	public void write( byte b[], int off, int len ) throws IOException
@@ -41,10 +52,10 @@ public class ByteMatrixOutputStream extends OutputStream
 
 		if( this.last == null )
 		{
-			if( len < 4096 )
+			if( len < this.blockSize )
 			{
 				// Check
-				this.last = new byte[ 4096 ];
+				this.last = new byte[ this.blockSize ];
 				this.lastPos = 0; // Init first before copying
 				System.arraycopy( b, off, this.last, 0, len );
 				this.lastPos = len; // Last, to prevent corruption
@@ -57,7 +68,7 @@ public class ByteMatrixOutputStream extends OutputStream
 				this.buffer.add( temp ); // Last, to prevent corruption
 			}
 		}
-		else if( this.lastPos + len > 4096 )
+		else if( this.lastPos + len > this.blockSize )
 		{
 			// Check
 			byte[] temp = new byte[ this.lastPos + len ];
@@ -71,7 +82,7 @@ public class ByteMatrixOutputStream extends OutputStream
 			// Check
 			System.arraycopy( b, off, this.last, this.lastPos, len );
 			this.lastPos += len; // Last, to prevent corruption
-			if( this.lastPos >= 4096 )
+			if( this.lastPos >= this.blockSize )
 			{
 				// Check
 				this.buffer.add( this.last );
@@ -85,14 +96,14 @@ public class ByteMatrixOutputStream extends OutputStream
 	{
 		if( this.last == null )
 		{
-			this.last = new byte[ 4096 ];
+			this.last = new byte[ this.blockSize ];
 			this.last[ 0 ] = (byte)b;
 			this.lastPos = 1;
 		}
 		else
 		{
 			this.last[ this.lastPos++ ] = (byte)b;
-			if( this.lastPos >= 4096 )
+			if( this.lastPos >= this.blockSize )
 			{
 				this.buffer.add( this.last );
 				this.last = null;

@@ -28,26 +28,14 @@ import org.testng.annotations.Test;
 
 public class JavacTests
 {
+	private CompilerClassLoader compiler = new CompilerClassLoader( Thread.currentThread().getContextClassLoader() );
+
 	@Test
 	public void basicTest() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, IOException
 	{
-		String source;
-		InputStream is = JavacTests.class.getResourceAsStream( "HelloWorld.avaj" );
-		Assertions.assertThat( is ).isNotNull();
-		try
-		{
-			InputStreamReader in = new InputStreamReader( is );
-			char[] buffer = new char[ 4096 ];
-			int len = in.read( buffer );
-			source = new String( buffer, 0, len );
-		}
-		finally
-		{
-			is.close();
-		}
+		String source = readFile( "HelloWorld.avaj" );
 
-		CompilerClassLoader compiler = new CompilerClassLoader( Thread.currentThread().getContextClassLoader() );
-		Class<?> cls = compiler.compile( "solidstack.javac.HelloWorld", source );
+		Class<?> cls = this.compiler.compile( "solidstack.javac.HelloWorld", source );
 
 		Assertions.assertThat( cls ).isNotNull();
 		Assertions.assertThat( cls.getDeclaredMethods() ).hasSize( 1 );
@@ -58,5 +46,41 @@ public class JavacTests
 
 		Assertions.assertThat( result ).isExactlyInstanceOf( String.class );
 		Assertions.assertThat( (String)result ).isEqualTo( "Hello World!" );
+	}
+
+	@Test(dependsOnMethods="basicTest")
+	public void dependentTest() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, IOException
+	{
+		String source = readFile( "HelloWorld2.avaj" );
+
+		Class<?> cls = this.compiler.compile( "solidstack.javac.HelloWorld2", source );
+
+		Assertions.assertThat( cls ).isNotNull();
+		Assertions.assertThat( cls.getDeclaredMethods() ).hasSize( 1 );
+
+		Object instance = cls.newInstance();
+		Method sayHello = cls.getMethod( "sayHello" );
+		Object result = sayHello.invoke( instance );
+
+		Assertions.assertThat( result ).isExactlyInstanceOf( String.class );
+		Assertions.assertThat( (String)result ).isEqualTo( "Hello World!" );
+	}
+
+	private String readFile( String filename ) throws IOException
+	{
+		String result;
+		InputStream is = JavacTests.class.getResourceAsStream( filename );
+		Assertions.assertThat( is ).isNotNull();
+		try
+		{
+			InputStreamReader in = new InputStreamReader( is );
+			char[] buffer = new char[ 4096 ];
+			int len = in.read( buffer );
+			return new String( buffer, 0, len );
+		}
+		finally
+		{
+			is.close();
+		}
 	}
 }
