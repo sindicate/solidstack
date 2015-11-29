@@ -298,6 +298,12 @@ public class CompilerClassLoader extends DynamicClassLoader
 						return ClassIterable.this.parent.next();
 					return ClassIterable.this.myclasses.next();
 				}
+
+				@Override
+				public void remove()
+				{
+					throw new UnsupportedOperationException();
+				}
 			};
 		}
 	}

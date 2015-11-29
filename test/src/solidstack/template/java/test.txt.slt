@@ -1,9 +1,9 @@
 <%@ template version="1.0" encoding="UTF-8" language="java" %>
 <% // Comment
 new Timestamp( new Date().getTime() );
-String prefix = (String)args.get( "prefix" );
-String name = (String)args.get( "name" );
-String names = (String)args.get( "names" );
+String prefix = scope.find( "prefix" );
+String name = scope.find( "name" );
+String names = scope.find( "names" );
 %>
 SELECT *
 <%@ template contentType="text/html; charset=ISO-8859-1" %>

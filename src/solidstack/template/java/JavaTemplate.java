@@ -20,6 +20,8 @@ import java.util.Map;
 
 import solidstack.template.EncodingWriter;
 import solidstack.template.Template;
+import solidstack.template.java.scope.DefaultScope;
+import solidstack.template.java.scope.Scope;
 
 
 /**
@@ -33,10 +35,12 @@ abstract public class JavaTemplate extends Template
 	public void apply( Object params, EncodingWriter writer )
 	{
 		if( params instanceof Map<?, ?> )
-			execute( writer, (Map<?, ?>)params );
+			execute( writer, new DefaultScope( (Map<String, Object>)params ) );
+		else if( params instanceof Scope )
+			execute( writer, (Scope)params );
 		else
 			throw new UnsupportedOperationException( params.getClass().getName() + " not supported as params" );
 	}
 
-	abstract public void execute( EncodingWriter out, Map args );
+	abstract public void execute( EncodingWriter out, Scope scope );
 }

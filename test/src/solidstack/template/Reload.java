@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
+import java.net.UnknownHostException;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -70,8 +71,10 @@ public class Reload
 		}
 		catch( FatalIOException e )
 		{
-			Assert.assertTrue( e.getCause() instanceof ConnectException );
-			System.out.println( "Couldn't test http protocol: " + e.getCause().getMessage() );
+			if( e.getCause() instanceof ConnectException || e.getCause() instanceof UnknownHostException )
+				System.out.println( "Couldn't test http protocol: " + e.getCause().getMessage() );
+			else
+				throw e;
 		}
 	}
 

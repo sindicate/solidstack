@@ -63,7 +63,7 @@ public class JavaTemplateCompiler
 			for( String imprt : context.getImports() )
 				buffer.append( "import " ).append( imprt ).append( ';' );
 		buffer.append( "public class " ).append( name ).append( " extends solidstack.template.java.JavaTemplate" );
-		buffer.append( "{ public void execute(solidstack.template.EncodingWriter out,java.util.Map args){" );
+		buffer.append( "{ public void execute(solidstack.template.EncodingWriter out,solidstack.template.java.scope.Scope scope){" );
 
 		boolean text = false;
 		boolean plus = false;
