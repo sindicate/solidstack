@@ -393,7 +393,7 @@ public class Query
 				else
 				{
 					Assert.isFalse( par instanceof Collection );
-					Assert.isFalse( par.getClass().isArray() );
+					Assert.isFalse( par.getClass().isArray() && !( par instanceof byte[] ) );
 					statement.setObject( ++i, par );
 				}
 			}
@@ -417,6 +417,8 @@ public class Query
 				pars.add( object2 );
 			appendExtraQuestionMarks( buildSql, size - 1 );
 		}
+		else if( object instanceof byte[] ) // TODO What about char[]?
+			pars.add( object ); // TODO Add unit test
 		else if( object != null && object.getClass().isArray() )
 		{
 			int size = Array.getLength( object );
