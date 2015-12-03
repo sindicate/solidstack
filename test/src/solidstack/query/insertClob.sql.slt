@@ -1,0 +1,3 @@
+<%@ template version="1.0" language = "groovy" %>
+<%@ query language = "SQL" %>
+INSERT INTO TEXTTABLE ( TEXT ) VALUES ( ${text} )
