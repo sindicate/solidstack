@@ -16,6 +16,8 @@
 
 package solidstack.query;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.lang.reflect.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -386,10 +388,11 @@ public class Query
 			for( Object par : pars )
 			{
 				if( par == null )
-				{
-					// Tested in Oracle with an INSERT
-					statement.setNull( ++i, Types.NULL );
-				}
+					statement.setNull( ++i, Types.NULL ); // Tested in Oracle with an INSERT
+				else if( par instanceof InputStream )
+					statement.setBinaryStream( ++i, (InputStream)par );
+				else if( par instanceof Reader )
+					statement.setCharacterStream( ++i, (Reader)par );
 				else
 				{
 					Assert.isFalse( par instanceof Collection );
