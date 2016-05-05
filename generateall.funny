@@ -1,0 +1,56 @@
+/*--
+ * Copyright 2015 René M. de Bloois
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var props = Properties( File( "database.properties" ) );
+var url = props( "database.url" );
+var driver = props( "database.driver" );
+var username = props( "database.username" );
+var password = props( "database.password" );
+
+var jdbc = JDBC( driver, url, username, password );
+
+var objects = require( "databaseobjects" ).retrieve( jdbc );
+
+require( "dictionary" ).generate( objects, "doc/dictionary.html" );
+
+/*
+import groovy.sql.Sql
+import groovy.xml.streamingmarkupsupport.StreamingMarkupWriter
+import org.codehaus.groovy.runtime.StackTraceUtils
+
+try
+{
+	def url = properties."database.url"
+	def driver = properties."database.driver"
+	def username = properties."database.username"
+	def password = properties."database.password"
+	
+	def sql = Sql.newInstance( url, username, password, driver )
+
+	def objects = new DatabaseObjects()
+	objects.retrieve( sql, url, driver, username, password )
+
+//	new checkaudittables().check( sql, objects )
+	new generatedictionary().generate( objects, "doc/dictionary.html" )
+	new generatedeletes().generate( objects, "doc/deletes.sql" )
+	new generatesignature().generate( sql, objects, "doc/signature.txt" )
+	println "DO NOT COMMIT signature.txt WHEN YOUR DATABASE IS NOT CLEAN!"
+}
+catch( Throwable t )
+{
+	throw StackTraceUtils.deepSanitize( t )
+}
+*/

@@ -1,0 +1,244 @@
+/*--
+ * Copyright 2015 René M. de Bloois
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Define method to get the correct column type
+var columnType = ( typ, typeOwner, charLength, precision, scale, charUsed, dataLength ) =>
+{
+	if( typ == "DATE" || typ.startsWith( "TIMESTAMP" ) || typ == "BLOB" || typ == "CLOB" || typeOwner != null )
+		typ
+	else if( typ == "VARCHAR2" || typ == "CHAR" )
+		typ + s"(${charLength} ${ if( charUsed == "C" ) "CHAR" else "BYTE" })"
+	else if( typ == "RAW" )
+		typ + s"(${dataLength})"
+	else if( typ == "NUMBER" )
+		if( scale == 0 )
+			if( precision == null ) 
+				"INTEGER"
+			else
+				typ + s"(${precision})"
+		else if( scale == null )
+			"NUMBER"
+		else
+			typ + s"(${precision},${scale})"
+	else
+		s"???${typ},${typeOwner},${charLength},${precision},${scale},${charUsed},${dataLength}"
+};
+
+Scope(
+	'retrieve -> jdbc =>
+	(
+		println( "Retrieving objects from the Oracle database..." );
+	
+		// Retrieve the version
+		var version = jdbc.first( "SELECT VERSION FROM DBVERSION" );
+	
+		// Retrieve the tables 
+		var tables = jdbc.list( "
+			SELECT T.TABLE_NAME, C.COMMENTS 
+			FROM USER_TABLES T, USER_TAB_COMMENTS C 
+			WHERE T.TABLE_NAME NOT LIKE 'MDRT\\_%$' ESCAPE '\\'
+			AND C.TABLE_NAME = T.TABLE_NAME
+			ORDER BY T.TABLE_NAME
+		" );
+		println( s"    ${tables.size()} tables found." );
+	
+		// Retrieve the columns
+		var results = jdbc.list( "
+			WITH PKCOLS AS
+			(
+				SELECT CCC.TABLE_NAME, CCC.COLUMN_NAME, CONS.CONSTRAINT_TYPE
+				FROM USER_CONS_COLUMNS CCC, USER_CONSTRAINTS CONS
+				WHERE CONS.CONSTRAINT_NAME = CCC.CONSTRAINT_NAME
+				AND CONS.CONSTRAINT_TYPE = 'P'
+			)
+			SELECT C.TABLE_NAME, C.COLUMN_NAME, CC.COMMENTS, C.DATA_TYPE, C.DATA_TYPE_MOD, C.DATA_LENGTH, C.DATA_PRECISION, C.DATA_SCALE, C.NULLABLE, C.DATA_DEFAULT, C.CHAR_LENGTH, C.CHAR_USED, PKCOLS.CONSTRAINT_TYPE, C.DATA_TYPE_OWNER
+			FROM USER_TAB_COLUMNS C, USER_COL_COMMENTS CC, PKCOLS
+			WHERE C.TABLE_NAME NOT LIKE 'MDRT\\_%$' ESCAPE '\\'
+			AND CC.TABLE_NAME = C.TABLE_NAME
+			AND CC.COLUMN_NAME = C.COLUMN_NAME
+			AND PKCOLS.TABLE_NAME (+) = C.TABLE_NAME
+			AND PKCOLS.COLUMN_NAME (+) = C.COLUMN_NAME
+			ORDER BY C.TABLE_NAME, C.COLUMN_ID
+		" );
+		println( s"    ${results.size()} columns found." );
+	
+		// Map the columns by table
+	
+		var columns = Map();
+		results.foreach( r => (
+			var row = Scope( r );
+			var cols = columns( row.TABLE_NAME );
+			if( cols == null )
+				cols = columns( row.TABLE_NAME ) = List();
+			cols.add( Map(
+				'name -> row.COLUMN_NAME,
+//				'mod -> row.DATA_TYPE_MOD,
+				'nullable -> row.NULLABLE == 'Y', 
+				'default -> row.DATA_DEFAULT, 
+				'comments -> row.COMMENTS, 
+				'pk -> row.CONSTRAINT_TYPE == 'P', 
+				'prettyType -> columnType( row.DATA_TYPE, row.DATA_TYPE_OWNER, row.CHAR_LENGTH, row.DATA_PRECISION, row.DATA_SCALE, row.CHAR_USED, row.DATA_LENGTH )
+			) )
+		) );
+	
+		// Retrieve the foreign keys
+
+		results = jdbc.list( "
+			SELECT CC.CONSTRAINT_NAME, CC.TABLE_NAME, CC.COLUMN_NAME, R.TABLE_NAME REF_TABLE_NAME
+			FROM USER_CONSTRAINTS CONS, USER_CONS_COLUMNS CC, USER_CONSTRAINTS R
+			WHERE CC.TABLE_NAME NOT LIKE 'MDRT\\_%$' ESCAPE '\\'
+			AND CONS.CONSTRAINT_TYPE = 'R'
+			AND CONS.CONSTRAINT_NAME = CC.CONSTRAINT_NAME
+			AND R.CONSTRAINT_NAME = CONS.R_CONSTRAINT_NAME
+			ORDER BY CC.CONSTRAINT_NAME, CC.POSITION 
+		" );
+
+		println( s"    ${results.map( fk => fk( "CONSTRAINT_NAME" ) ).distinct().size()} foreign keys found." );
+//		println( s"    ${(results.collect(it => it.constraint_name) as Set).size()} foreign keys found." );
+
+		// Convert foreign keys to maps 
+
+		var master2ChildMap = Map();
+		var column2MasterMap = Map();
+		results.foreach( r => (
+			var row = Scope( r );
+			
+			var ref = master2ChildMap( row.REF_TABLE_NAME );
+			if( ref == null )
+				ref = master2ChildMap( row.REF_TABLE_NAME ) = Set();
+			ref.add( row.TABLE_NAME );
+			
+			var col = row.TABLE_NAME + "." + row.COLUMN_NAME;
+			ref = column2MasterMap( col );
+			if( ref == null )
+				ref = column2MasterMap( col ) = List();
+			ref.add( row.REF_TABLE_NAME );
+		) );
+
+		// Retrieve other constraints
+
+		results = jdbc.list( "
+			SELECT CONS.CONSTRAINT_NAME, CONS.CONSTRAINT_TYPE, CONS.SEARCH_CONDITION, CC.TABLE_NAME, CC.COLUMN_NAME
+			FROM USER_CONSTRAINTS CONS, USER_CONS_COLUMNS CC
+			WHERE CC.TABLE_NAME NOT LIKE 'MDRT\\_%$' ESCAPE '\\'
+			AND CONS.CONSTRAINT_TYPE IN ( 'P', 'U', 'C' )
+			AND CONS.CONSTRAINT_NAME = CC.CONSTRAINT_NAME
+			ORDER BY CC.CONSTRAINT_NAME, CC.POSITION 
+		" );
+
+		// Create unique constraint map and check map
+
+		var uniqueMap = Map();
+		var checkMap = Map();
+		results.foreach( r => (
+			var row = Scope( r );
+			if( row.constraint_type == 'U' || row.constraint_type == 'P' )
+			(
+				var unique = uniqueMap( row.table_name );
+				if( unique == null )
+					unique = uniqueMap( row.table_name ) = Map();
+				var cols = unique( row.constraint_name );
+				if( cols == null )
+					cols = unique( row.constraint_name ) = List();
+				cols.add( row.column_name )
+			)
+			else if( row.search_condition != s"\"${row.column_name}\" IS NOT NULL" )
+			(
+				//assert_( row.constraint_type == 'C' );
+				var checks = checkMap( row.table_name );
+				if( checks == null )
+					checks = checkMap( row.table_name ) = Set();
+				checks.add( row.search_condition );
+			)
+		) );
+
+		println( s"    ${ uniqueMap.values().fold( 0, ( count, map ) => count + map.size() ) } unique constraints found." );
+		println( s"    ${ checkMap.values().fold( 0, ( count, collection ) => count + collection.size() ) } check constraints found." );
+		
+		// Retrieve indexes
+
+		results = jdbc.list( "
+			SELECT I.INDEX_NAME, I.TABLE_NAME, I.UNIQUENESS, I.GENERATED, C.COLUMN_NAME, C.COLUMN_POSITION
+			FROM USER_INDEXES I, USER_IND_COLUMNS C
+			WHERE I.TABLE_NAME NOT LIKE 'MDRT\\_%$' ESCAPE '\\'
+			AND C.INDEX_NAME = I.INDEX_NAME
+			ORDER BY I.TABLE_NAME, I.INDEX_NAME, C.COLUMN_POSITION
+		" );
+
+		// Create unique and nonUnique index map
+
+		var uniqueIndexMap = Map();
+		var indexMap = Map();
+		results.foreach( r => (
+			var row = Scope( r );
+			if( row.uniqueness == "UNIQUE" )
+			(
+				var unique = uniqueMap( row.table_name );
+				if( !unique || !unique( row.index_name ) ) // Check if a unique constraint with the same name already exists
+				(
+					unique = uniqueIndexMap( row.table_name );
+					if( unique == null )
+						unique = uniqueIndexMap( row.table_name ) = Map();
+					var cols = unique( row.index_name );
+					if( cols == null )
+						cols = unique( row.index_name ) = List();
+					cols.add( row.column_name );
+				)
+			)
+			else
+			(
+				var unique = indexMap( row.table_name );
+				if( unique == null )
+					unique = indexMap( row.table_name ) = Map();
+				var cols = unique( row.index_name );
+				if( cols == null )
+					cols = unique( row.index_name ) = List();
+				cols.add( row.column_name );
+			)
+		) );
+
+		println( s"    ${ uniqueIndexMap.values().fold( 0, ( count, map ) => count + map.size() ) } unique indexes found." );
+		println( s"    ${ indexMap.values().fold( 0, ( count, map ) => count + map.size() ) } non-unique indexes found." );
+
+		// Retrieve the sequences
+
+		sequences = jdbc.list( "
+			SELECT SEQUENCE_NAME, CACHE_SIZE, LAST_NUMBER
+			FROM USER_SEQUENCES
+			WHERE SEQUENCE_NAME NOT LIKE 'MDRS\\_%$' ESCAPE '\\'
+			ORDER BY SEQUENCE_NAME
+		" );
+
+		println( s"    ${sequences.size()} sequences found." );
+
+		// Count records in each table
+
+		println( "    Counting records..." );
+
+		recordCounts = Map();
+		tables.foreach( t => (
+			var table = Scope( t );
+			var count = jdbc.first( "SELECT COUNT(*) FROM " + table.table_name );
+			recordCounts( table.table_name ) = count;
+		) );
+		
+		Scope(
+			'version -> version, 
+			'tables -> tables, 
+			'columns -> columns
+		);
+	)
+);
