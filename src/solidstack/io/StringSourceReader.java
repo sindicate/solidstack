@@ -96,7 +96,10 @@ public class StringSourceReader implements SourceReader
 					return result;
 
 				case '\n':
-					return getRecorded();
+					rewind();
+					result = getRecorded();
+					read();
+					return result;
 			}
 	}
 

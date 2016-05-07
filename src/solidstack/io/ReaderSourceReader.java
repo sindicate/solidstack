@@ -126,7 +126,10 @@ public class ReaderSourceReader implements SourceReader
 					return result;
 
 				case '\n':
-					return getRecorded();
+					rewind();
+					result = getRecorded();
+					read();
+					return result;
 			}
 	}
 
@@ -167,7 +170,12 @@ public class ReaderSourceReader implements SourceReader
 			if( this.buffer.hasRemaining() )
 				result = this.buffer.get();
 			else
-				this.buffer.put( result = this.reader.read() );
+			{
+				result = this.reader.read();
+				if( result == -1 )
+					return result;
+				this.buffer.put( result );
+			}
 
 			if( this.recorder != null )
 				this.recorder.append( (char)result );
