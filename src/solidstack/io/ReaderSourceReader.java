@@ -28,7 +28,7 @@ import java.io.Reader;
 public class ReaderSourceReader implements SourceReader
 {
 	/**
-	 * The reader used to read from.
+	 * The reader to read from.
 	 */
 	private Reader reader;
 
@@ -43,24 +43,14 @@ public class ReaderSourceReader implements SourceReader
 	private SourceLocation lastLocation;
 
 	/**
-	 * Buffer to contain a character that has been read by mistake.
+	 * Buffer that contains the last characters that have been read.
 	 */
-	private int buffer = -1;
+	private RotatingIntBuffer buffer = new RotatingIntBuffer( 3 );
 
 	/**
-	 * The last character read.
+	 * To record the characters that have been read.
 	 */
-	private int last = -1;
-
-	/**
-	 * The before last character read.
-	 */
-	private int lastlast = -1;
-
-	/**
-	 * Buffer to contain the line that is being read.
-	 */
-	private StringBuilder line;
+	private StringBuilder recorder;
 
 	/**
 	 * The character encoding of the resource.
@@ -78,7 +68,7 @@ public class ReaderSourceReader implements SourceReader
 
 	/**
 	 * @param reader The reader to read from.
-	 * @param location The location.
+	 * @param location The location and line number of the resource.
 	 */
 	public ReaderSourceReader( Reader reader, SourceLocation location )
 	{
@@ -87,8 +77,8 @@ public class ReaderSourceReader implements SourceReader
 
 	/**
 	 * @param reader The reader to read from.
-	 * @param location The location.
-	 * @param encoding The encoding used.
+	 * @param location The location and line number of the resource.
+	 * @param encoding The encoding of the resource.
 	 */
 	public ReaderSourceReader( Reader reader, SourceLocation location, String encoding )
 	{
@@ -98,8 +88,9 @@ public class ReaderSourceReader implements SourceReader
 	}
 
 	/**
-	 * Close the reader and the underlying reader.
+	 * Close any resources.
 	 */
+	@Override
 	public void close()
 	{
 		if( this.reader == null )
@@ -117,28 +108,27 @@ public class ReaderSourceReader implements SourceReader
 		this.reader = null;
 	}
 
+	@Override
 	public String readLine()
 	{
-		if( this.line == null )
-			this.line = new StringBuilder();
-		this.line.setLength( 0 ); // TODO Maybe dump the stringbuilder if it is becoming too big
+		record();
 
-		int ch;
 		while( true )
-			switch( ch = read() )
+			switch( read() )
 			{
 				case -1:
-					if( this.line.length() == 0 )
+					String result = getRecorded();
+					if( result.length() == 0 )
 						return null;
 					this.location = this.location.nextLine(); // Not incremented by read(), so do it here
-					//$FALL-THROUGH$
+					return result;
+
 				case '\n':
-					return this.line.toString();
-				default:
-					this.line.append( (char)ch );
+					return getRecorded();
 			}
 	}
 
+	@Override
 	public int getLineNumber()
 	{
 		if( this.reader == null )
@@ -146,23 +136,23 @@ public class ReaderSourceReader implements SourceReader
 		return this.location.getLineNumber();
 	}
 
+	@Override
 	public int read()
 	{
 		int result = readRaw();
-		switch( result )
+		if( result == '\r' )
 		{
-			case '\r':
-				result = readRaw();
-				if( result != '\n' )
-					this.buffer = result;
-				//$FALL-THROUGH$
-			case '\n':
-				return '\n';
-			default:
-				return result;
+			result = readRaw();
+			if( result != '\n' )
+			{
+				this.buffer.rewind();
+				result = '\n';
+			}
 		}
+		return result;
 	}
 
+	@Override
 	public int readRaw()
 	{
 		if( this.reader == null )
@@ -172,30 +162,24 @@ public class ReaderSourceReader implements SourceReader
 		try
 		{
 			int result;
-			if( this.buffer >= 0 )
-			{
-				result = this.buffer;
-				this.buffer = -1;
-			}
+			if( this.buffer.hasRemaining() )
+				result = this.buffer.get();
 			else
-				result = this.reader.read();
+				this.buffer.put( result = this.reader.read() );
+
+			if( this.recorder != null )
+				this.recorder.append( (char)result );
 
 			switch( result )
 			{
 				case '\r':
 					this.location = this.location.nextLine();
-					this.lastlast = this.last;
-					this.last = result;
-					return result;
+					break;
 				case '\n':
-					if( this.last != '\r' )
+					if( this.buffer.beforeLast() != '\r' ) // If there is no beforeLast(), it will be 0
 						this.location = this.location.nextLine();
-					//$FALL-THROUGH$
-				default:
-					this.last = result;
-					this.lastlast = this.last;
-					return result;
 			}
+			return result;
 		}
 		catch( IOException e )
 		{
@@ -203,34 +187,70 @@ public class ReaderSourceReader implements SourceReader
 		}
 	}
 
+	@Override
 	public void rewind()
 	{
-		if( this.buffer >= 0 )
-			throw new IllegalStateException( "Rewind called twice" );
-		this.buffer = this.last;
-		this.last = this.lastlast;
-		this.lastlast = -1;
-		switch( this.buffer )
+		switch( this.buffer.rewind() )
 		{
+			case '\n':
+				if( this.buffer.rewind() != '\r' )
+					this.buffer.get();
+				else
+					if( this.recorder != null )
+						this.recorder.setLength( this.recorder.length() - 1 );
+				//$FALL-THROUGH$
 			case '\r':
 				this.location = this.location.previousLine();
-				break;
-			case '\n':
-				if( this.last != '\r' )
-					this.location = this.location.previousLine();
 		}
+		if( this.recorder != null )
+			this.recorder.setLength( this.recorder.length() - 1 );
 	}
 
+	@Override
+	public void mark()
+	{
+		this.buffer.mark();
+	}
+
+	@Override
+	public void reset()
+	{
+		int delta = this.buffer.reset();
+		if( this.recorder != null )
+			this.recorder.setLength( this.recorder.length() - delta );
+	}
+
+	@Override
+	public void record()
+	{
+		if( this.recorder != null )
+			throw new FatalIOException( "Already recording" );
+		this.recorder = new StringBuilder();
+	}
+
+	@Override
+	public String getRecorded()
+	{
+		if( this.recorder == null )
+			throw new FatalIOException( "Not recording" );
+		String result = this.recorder.toString();
+		this.recorder = null; // TODO Or keep the string builder?
+		return result;
+	}
+
+	@Override
 	public Resource getResource()
 	{
 		return this.location.getResource();
 	}
 
+	@Override
 	public String getEncoding()
 	{
 		return this.encoding;
 	}
 
+	@Override
 	public SourceLocation getLocation()
 	{
 		if( this.reader == null )
@@ -238,22 +258,15 @@ public class ReaderSourceReader implements SourceReader
 		return this.location;
 	}
 
+	@Override
 	public SourceLocation getLastLocation()
 	{
 		if( this.reader == null )
 			throw new IllegalStateException( "Closed" );
 		if( this.lastLocation == null )
 			throw new IllegalStateException( "No character read yet" );
-		if( this.buffer >= 0 )
+		if( this.buffer.hasRemaining() )
 			throw new IllegalStateException( "Last location is not valid, pushed back a character" );
 		return this.lastLocation;
-	}
-
-	// This is only used to push back the first character (for byte order mark detection)
-	void push( int ch )
-	{
-		if( this.buffer != -1 )
-			throw new IllegalStateException( "Buffer is not empty" );
-		this.buffer = ch;
 	}
 }

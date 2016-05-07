@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
@@ -124,7 +123,7 @@ public class SourceReaders
 			{
 				int bom = result.read();
 				if( bom != 0xFEFF ) // The Byte Order Mark = ZERO WIDTH NO-BREAK SPACE (deprecated character)
-					result.push( bom );
+					result.rewind();
 			}
 
 			success = true;
@@ -156,7 +155,7 @@ public class SourceReaders
 	 */
 	static public SourceReader forString( String text, SourceLocation location )
 	{
-		return new ReaderSourceReader( new StringReader( text ), location );
+		return new StringSourceReader( text, location );
 	}
 
 	/**
@@ -165,6 +164,6 @@ public class SourceReaders
 	 */
 	static public SourceReader forString( String text )
 	{
-		return new ReaderSourceReader( new StringReader( text ) );
+		return new StringSourceReader( text );
 	}
 }

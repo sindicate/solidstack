@@ -16,7 +16,6 @@
 
 package solidstack.script;
 
-import solidstack.io.PushbackReader;
 import solidstack.io.SourceException;
 import solidstack.io.SourceLocation;
 import solidstack.io.SourceReader;
@@ -55,12 +54,6 @@ public class ProcessedStringTokenizer extends ScriptTokenizer
 		this.doubleQuoted = doubleQuoted;
 	}
 
-	public ProcessedStringTokenizer( PushbackReader in, boolean doubleQuoted )
-	{
-		super( in );
-		this.doubleQuoted = doubleQuoted;
-	}
-
 	/**
 	 * Read a string fragment. A fragment ends at a ${ or at the end of the string. After calling this method the method
 	 * {@link #foundExpression()} indicates if an ${ expression was encountered while reading the last fragment.
@@ -73,7 +66,7 @@ public class ProcessedStringTokenizer extends ScriptTokenizer
 	{
 		this.found = false;
 		StringBuilder result = clearBuffer();
-		PushbackReader in = getIn();
+		SourceReader in = getIn();
 		SourceLocation location = in.getLocation();
 
 		while( true )

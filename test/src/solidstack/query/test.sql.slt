@@ -1,8 +1,9 @@
 <%@ template version="1.0" language = "groovy" %>
 <% // Test if the import at the bottom works, and this comment too of course
 new Timestamp( new Date().time ) %>
-SELECT *
-FROM SYS.SYSTABLES
+SELECT T.*
+FROM SYS.SYSTABLES T
+JOIN SYS.SYSSCHEMAS S ON S.SCHEMAID = T.SCHEMAID AND S.SCHEMANAME = 'SYS'
 	<%--
 	This comment should not 
 	interfere with the linenumbers

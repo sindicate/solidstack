@@ -53,51 +53,85 @@ public class RandomAccessSourceReader implements SourceReader
 		this.reader = SourceReaders.forResource( resource, detector );
 	}
 
+	@Override
 	public int read()
 	{
 		return this.reader.read();
 	}
 
+	@Override
 	public int readRaw()
 	{
 		return this.reader.readRaw();
 	}
 
+	@Override
 	public void rewind()
 	{
 		this.reader.rewind();
 	}
 
+	@Override
+	public void mark()
+	{
+		this.reader.mark();
+	}
+
+	@Override
+	public void reset()
+	{
+		this.reader.reset();
+	}
+
+	@Override
+	public void record()
+	{
+		this.reader.record();
+	}
+
+	@Override
+	public String getRecorded()
+	{
+		return this.reader.getRecorded();
+	}
+
+	@Override
 	public String readLine()
 	{
 		return this.reader.readLine();
 	}
 
+	@Override
 	public Resource getResource()
 	{
 		return this.reader.getResource();
 	}
 
+	@Override
 	public SourceLocation getLocation()
 	{
 		return this.reader.getLocation();
 	}
 
+	@Override
 	public SourceLocation getLastLocation()
 	{
 		return this.reader.getLastLocation();
 	}
 
+	@Override
 	public int getLineNumber()
 	{
 		return this.reader.getLineNumber();
 	}
 
+	@Override
 	public String getEncoding()
 	{
 		return this.reader.getEncoding();
 	}
 
+	@Override
 	public void close()
 	{
 		if( this.reader != null )

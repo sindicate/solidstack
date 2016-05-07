@@ -2,7 +2,8 @@
 <% // Test if the import at the bottom works, and this comment too of course
 new Timestamp( new java.util.Date().time ) %>
 SELECT *
-FROM SYS.SYSTABLES
+FROM SYS.SYSTABLES T
+JOIN SYS.SYSSCHEMAS S ON S.SCHEMAID = T.SCHEMAID AND S.SCHEMANAME = 'SYS'
 	<%--
 	This comment should not 
 	interfere with the linenumbers

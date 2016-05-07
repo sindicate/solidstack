@@ -47,8 +47,8 @@ public interface SourceReader
 	/**
 	 * Reads a character. Carriage return characters (\r) are filtered out:
 	 * <ul>
-	 * <li>\r\n becomes \n</li>
-	 * <li>\r without \n becomes \n</li>
+	 * <li>\r\n becomes \n (Microsoft)</li>
+	 * <li>\r without \n becomes \n (Apple)</li>
 	 * </ul>
 	 * The line number is incremented when it returns a \n.
 	 *
@@ -67,6 +67,28 @@ public interface SourceReader
 	 * Rewinds one character. The line number is decremented appropriately.
 	 */
 	void rewind();
+
+	/**
+	 * Mark the current read position.
+	 */
+	void mark();
+
+	/**
+	 * Reset the read position to the marked position.
+	 */
+	void reset();
+
+	/**
+	 * Record the characters being read from the current position.
+	 */
+	void record();
+
+	/**
+	 * Return the string that has been recorded, and stop recording.
+	 *
+	 * @return The string that has been recorded.
+	 */
+	String getRecorded();
 
 	/**
 	 * @return The underlying resource.

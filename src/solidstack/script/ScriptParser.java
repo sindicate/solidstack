@@ -19,15 +19,14 @@ package solidstack.script;
 import java.math.BigDecimal;
 
 import funny.Symbol;
-import solidstack.io.PushbackReader;
 import solidstack.io.SourceException;
 import solidstack.io.SourceLocation;
 import solidstack.io.SourceReader;
 import solidstack.io.SourceReaders;
 import solidstack.lang.Assert;
+import solidstack.script.ProcessedStringTokenizer.Fragment;
 import solidstack.script.ScriptTokenizer.Token;
 import solidstack.script.ScriptTokenizer.TokenType;
-import solidstack.script.ProcessedStringTokenizer.Fragment;
 import solidstack.script.expressions.Block;
 import solidstack.script.expressions.BooleanLiteral;
 import solidstack.script.expressions.CharLiteral;
@@ -390,7 +389,7 @@ public class ScriptParser
 	 * @param in The source reader to read the processed string from.
 	 * @return An expression.
 	 */
-	static public Expression parsePString( Token token, PushbackReader in )
+	static public Expression parsePString( Token token, SourceReader in )
 	{
 		if( !token.eq( "s" ) )
 			throw new SourceException( "Only 's' is currently allowed", token.getLocation() );

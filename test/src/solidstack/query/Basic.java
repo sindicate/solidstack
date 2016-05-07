@@ -16,6 +16,8 @@
 
 package solidstack.query;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -58,7 +60,7 @@ public class Basic
 			System.out.println( "Column: " + name );
 		for( Map< String, Object > row : result )
 			System.out.println( "Table: " + row.get( "TABLEname" ) );
-		assert result.size() == 22;
+		assertThat( result.size() ).isEqualTo( 21 );
 
 		result = query.listOfMaps( connection, new Pars( "prefix", "SYST" ) );
 		assert result.size() == 3;
@@ -111,8 +113,8 @@ public class Basic
 		for( String name : result.get( 0 ).keySet() )
 			System.out.println( "Column: " + name );
 		for( Map< String, Object > row : result )
-			System.out.println( "Table: " + row.get( "TABLEname" ) );
-		assert result.size() == 22;
+			System.out.println( "Table: " + row.get( "SCHEMAname" ) + "." + row.get( "TABLEname" ) );
+		assertThat( result.size() ).isEqualTo( 21 );
 
 		result = query.listOfMaps( connection, pars.set( "prefix", "SYST" ) );
 		assert result.size() == 3;
@@ -155,8 +157,9 @@ public class Basic
 		Assert.assertEquals( context.getScript().toString(), "package solidstack.template.tmp.p;import java.sql.Timestamp;class c{Closure getClosure(){return{out->\n" +
 				" // Test if the import at the bottom works, and this comment too of course\n" +
 				"new Timestamp( new Date().time ) \n" +
-				";out.write(\"\"\"SELECT *\n" +
-				"FROM SYS.SYSTABLES\n" +
+				";out.write(\"\"\"SELECT T.*\n" +
+				"FROM SYS.SYSTABLES T\n" +
+				"JOIN SYS.SYSSCHEMAS S ON S.SCHEMAID = T.SCHEMAID AND S.SCHEMANAME = 'SYS'\n" +
 				"\"\"\");\n" +
 				"\n" +
 				"\n" +
@@ -187,8 +190,9 @@ public class Basic
 		PreparedSQL sql = query.getPreparedSQL( params );
 
 		// TODO SQL or Sql?
-		assert sql.getSQL().equals( "SELECT *\n" +
-				"FROM SYS.SYSTABLES\n" +
+		assertThat( sql.getSQL() ).isEqualTo( "SELECT T.*\n" +
+				"FROM SYS.SYSTABLES T\n" +
+				"JOIN SYS.SYSSCHEMAS S ON S.SCHEMAID = T.SCHEMAID AND S.SCHEMANAME = 'SYS'\n" +
 				"WHERE 1 = 1\n" +
 				"AND TABLENAME LIKE 'SYST%'\n" +
 				"AND TABLENAME IN (?,?)\n" );
@@ -217,7 +221,8 @@ public class Basic
 				" // Test if the import at the bottom works, and this comment too of course\n" +
 				"new Timestamp( new java.util.Date().time ) \n" +
 				";out.write(\"SELECT *\\n\\\n" +
-				"FROM SYS.SYSTABLES\\n\\\n" +
+				"FROM SYS.SYSTABLES T\\n\\\n" +
+				"JOIN SYS.SYSSCHEMAS S ON S.SCHEMAID = T.SCHEMAID AND S.SCHEMANAME = 'SYS'\\n\\\n" +
 				"\");\n" +
 				"\n" +
 				"\n" +
@@ -243,8 +248,9 @@ public class Basic
 		Query query = queries.getQuery( "testjs.sql" );
 		PreparedSQL sql = query.getPreparedSQL( params );
 
-		assert sql.getSQL().equals( "SELECT *\n" +
-				"FROM SYS.SYSTABLES\n" +
+		assertThat( sql.getSQL() ).isEqualTo( "SELECT *\n" +
+				"FROM SYS.SYSTABLES T\n" +
+				"JOIN SYS.SYSSCHEMAS S ON S.SCHEMAID = T.SCHEMAID AND S.SCHEMANAME = 'SYS'\n" +
 				"WHERE 1 = 1\n" +
 				"AND TABLENAME LIKE 'SYST%'\n" +
 				"AND TABLENAME IN (?,?)\n" );
@@ -355,7 +361,7 @@ public class Basic
 
 		Query query = queries.getQuery( "test2.sql" );
 		List< Map< String, Object > > result = query.listOfMaps( connection, new Pars( "prefix", null, "name", null, "names", null ) );
-		assert result.size() == 22;
+		assertThat( result.size() ).isEqualTo( 21 );
 	}
 
 	private String start = "package solidstack.template.tmp.p;class c{Closure getClosure(){return{out->";

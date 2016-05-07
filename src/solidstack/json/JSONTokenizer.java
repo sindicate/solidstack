@@ -18,7 +18,6 @@ package solidstack.json;
 
 import java.math.BigDecimal;
 
-import solidstack.io.PushbackReader;
 import solidstack.io.SourceException;
 import solidstack.io.SourceLocation;
 import solidstack.io.SourceReader;
@@ -35,7 +34,7 @@ public class JSONTokenizer
 	/**
 	 * The reader used to read from and push back characters.
 	 */
-	protected PushbackReader in;
+	protected SourceReader in;
 
 	/**
 	 * Buffer for the result.
@@ -50,7 +49,7 @@ public class JSONTokenizer
 	 */
 	public JSONTokenizer( SourceReader in )
 	{
-		this.in = new PushbackReader( in );
+		this.in = in;
 	}
 
 	/**
@@ -171,7 +170,7 @@ public class JSONTokenizer
 							ch = this.in.read();
 						}
 					}
-					this.in.push( ch );
+					this.in.rewind();
 					return new Token( TYPE.NUMBER, new BigDecimal( result.toString() ) );
 				case 'a': case 'b': case 'c': case 'd': case 'e':
 				case 'f': case 'g': case 'h': case 'i': case 'j':
@@ -184,7 +183,7 @@ public class JSONTokenizer
 						result.append( (char)ch );
 						ch = this.in.read();
 					}
-					this.in.push( ch );
+					this.in.rewind();
 
 					String keyword = result.toString();
 					if( keyword.equals( "false" ) )
@@ -228,7 +227,7 @@ public class JSONTokenizer
 	 */
 	public SourceReader getReader()
 	{
-		return this.in.getReader();
+		return this.in;
 	}
 
 

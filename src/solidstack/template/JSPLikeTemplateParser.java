@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import solidstack.io.PushbackReader;
 import solidstack.io.SourceLocation;
 import solidstack.io.SourceReader;
 
@@ -92,7 +91,7 @@ public class JSPLikeTemplateParser
 	/**
 	 * The reader from which the source of the template is read.
 	 */
-	private PushbackReader reader;
+	private SourceReader reader;
 
 	/**
 	 * A buffer that is used to build up text and whitespace events.
@@ -108,7 +107,7 @@ public class JSPLikeTemplateParser
 	 */
 	public JSPLikeTemplateParser( SourceReader reader )
 	{
-		this.reader = new PushbackReader( reader );
+		this.reader = reader;
 	}
 
 	/**
@@ -147,7 +146,7 @@ public class JSPLikeTemplateParser
 	 */
 	private ParseEvent next0()
 	{
-		PushbackReader reader = this.reader;
+		SourceReader reader = this.reader;
 		StringBuilder buffer = this.buffer;
 		int c;
 		boolean textFound = false;
@@ -179,7 +178,7 @@ public class JSPLikeTemplateParser
 					c = reader.read();
 					if( c != '%' )
 					{
-						reader.push( c );
+						reader.rewind();
 						buffer.append( '<' );
 						textFound = true;
 						if( buffer.length() >= 0x1000 )
@@ -188,8 +187,8 @@ public class JSPLikeTemplateParser
 					}
 					if( buffer.length() > 0 )
 					{
-						reader.push( c );
-						reader.push( '<' );
+						reader.rewind();
+						reader.rewind();
 						return new ParseEvent( textFound ? EVENT.TEXT : EVENT.WHITESPACE, popBuffer() );
 					}
 					return readMarkup();
@@ -197,7 +196,7 @@ public class JSPLikeTemplateParser
 				case '$':
 					if( buffer.length() > 0 )
 					{
-						reader.push( c );
+						reader.rewind();
 						return new ParseEvent( textFound ? EVENT.TEXT : EVENT.WHITESPACE, popBuffer() );
 					}
 					return readDollar();
@@ -205,7 +204,7 @@ public class JSPLikeTemplateParser
 				case '\n':
 					if( buffer.length() > 0 )
 					{
-						reader.push( c );
+						reader.rewind();
 						ParseEvent result = new ParseEvent( textFound ? EVENT.TEXT : EVENT.WHITESPACE, popBuffer() );
 						textFound = false;
 						return result;
@@ -244,7 +243,7 @@ public class JSPLikeTemplateParser
 	 */
 	private ParseEvent readMarkup()
 	{
-		this.reader.mark( 2 );
+		this.reader.mark();
 		int c = this.reader.read();
 		switch( c )
 		{
@@ -284,7 +283,7 @@ public class JSPLikeTemplateParser
 	 */
 	private String getToken()
 	{
-		PushbackReader reader = this.reader;
+		SourceReader reader = this.reader;
 
 		// Skip whitespace
 		int ch;
@@ -341,7 +340,7 @@ public class JSPLikeTemplateParser
 						ch = reader.read();
 						if( !Character.isJavaIdentifierPart( ch ) || ch == '$' ) // TODO Why is $ special?
 						{
-							reader.push( ch );
+							reader.rewind();
 							return result.toString();
 						}
 					}
@@ -359,7 +358,7 @@ public class JSPLikeTemplateParser
 	 */
 	private ParseEvent readDirective()
 	{
-		PushbackReader reader = this.reader;
+		SourceReader reader = this.reader;
 
 		String name = getToken();
 		if( name == null )
@@ -393,7 +392,7 @@ public class JSPLikeTemplateParser
 		// Expecting ", ' or %>
 		// %> within strings should not end the script
 
-		PushbackReader reader = this.reader;
+		SourceReader reader = this.reader;
 		StringBuilder buffer = this.buffer;
 
 		while( true )
@@ -413,7 +412,7 @@ public class JSPLikeTemplateParser
 					int cc = reader.read();
 					if( cc == '>' )
 						return new ParseEvent( event, popBuffer() );
-					reader.push( cc );
+					reader.rewind();
 					//$FALL-THROUGH$
 
 				default:
@@ -429,12 +428,12 @@ public class JSPLikeTemplateParser
 		// " within ${} should not end this string
 		// \ is used to escape $, " and itself, and special characters
 
-		PushbackReader reader = this.reader;
+		SourceReader reader = this.reader;
 		StringBuilder buffer = this.buffer;
 
 		buffer.append( quote );
 		boolean multiline = false;
-		reader.mark( 2 );
+		reader.mark();
 		if( reader.read() == quote && reader.read() == quote )
 		{
 			multiline = true;
@@ -500,7 +499,7 @@ public class JSPLikeTemplateParser
 						if( !multiline )
 							return;
 
-						reader.mark( 2 );
+						reader.mark();
 						if( reader.read() == quote && reader.read() == quote )
 						{
 							buffer.append( quote );
@@ -524,7 +523,7 @@ public class JSPLikeTemplateParser
 		// Expecting }, ", ' and {
 		// } within a string should not end this expression
 
-		PushbackReader reader = this.reader;
+		SourceReader reader = this.reader;
 		StringBuilder buffer = this.buffer;
 
 		int c;
@@ -556,7 +555,7 @@ public class JSPLikeTemplateParser
 		// Expecting }, " or '
 		// } within a string should not end this block
 
-		PushbackReader reader = this.reader;
+		SourceReader reader = this.reader;
 		StringBuilder buffer = this.buffer;
 
 		buffer.append( '{' );
@@ -593,7 +592,7 @@ public class JSPLikeTemplateParser
 		// Comments can be nested
 		// Newlines are transferred to the script
 
-		PushbackReader reader = this.reader;
+		SourceReader reader = this.reader;
 
 		while( true )
 			switch( reader.read() )
@@ -601,13 +600,13 @@ public class JSPLikeTemplateParser
 				case -1:
 					throw new ParseException( "Unexpected end of file", reader.getLocation() );
 				case '-':
-					reader.mark( 3 );
+					reader.mark();
 					if( reader.read() == '-' && reader.read() == '%' && reader.read() == '>' )
 						return new ParseEvent( EVENT.COMMENT, popBuffer() );
 					reader.reset();
 					break;
 				case '<':
-					reader.mark( 3 );
+					reader.mark();
 					if( reader.read() == '%' && reader.read() == '-' && reader.read() == '-' )
 					{
 						readComment();

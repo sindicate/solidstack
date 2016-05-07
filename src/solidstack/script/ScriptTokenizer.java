@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import solidstack.io.PushbackReader;
 import solidstack.io.SourceException;
 import solidstack.io.SourceLocation;
 import solidstack.io.SourceReader;
@@ -86,7 +85,7 @@ public class ScriptTokenizer
 	/**
 	 * The reader used to read from and push back characters.
 	 */
-	private PushbackReader in;
+	private SourceReader in;
 
 	/**
 	 * Buffer for the result.
@@ -110,22 +109,17 @@ public class ScriptTokenizer
 	 */
 	public ScriptTokenizer( SourceReader in )
 	{
-		this.in = new PushbackReader( in );
-	}
-
-	public ScriptTokenizer( PushbackReader in )
-	{
 		this.in = in;
 	}
 
 	/**
 	 * @return The underlying reader.
 	 */
-	public PushbackReader getIn()
+	public SourceReader getIn()
 	{
 		if( this.pos == 3 )
 			return this.in;
-		throw new IllegalStateException( "There are still token in the push back buffer" );
+		throw new IllegalStateException( "There are still tokens in the push back buffer" );
 	}
 
 	/**
@@ -183,7 +177,7 @@ public class ScriptTokenizer
 	private Token readToken()
 	{
 		StringBuilder result = clearBuffer();
-		PushbackReader in = getIn();
+		SourceReader in = this.in;
 
 		while( true )
 		{
@@ -220,12 +214,12 @@ public class ScriptTokenizer
 					TokenType type = RESERVED_WORDS.get( value );
 					if( type != null )
 					{
-						in.push( ch );
+						in.rewind();
 						return new Token( type, location, value );
 					}
 					if( ch == '"' )
 						return new Token( TokenType.PSTRING, location, value );
-					in.push( ch );
+					in.rewind();
 					return new Token( TokenType.IDENTIFIER, location, value );
 
 				// String
@@ -279,7 +273,7 @@ public class ScriptTokenizer
 					// TODO Add escaping
 					if( ch2 == '\'' )
 						return new Token( TokenType.CHAR, location, String.valueOf( (char)ch ) );
-					in.push( ch2 );
+					in.rewind();
 					if( !( ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch == '$' || ch == '_' ) )
 						throw new SourceException( "Unexpected character '" + (char)ch + "'", in.getLocation() ); // TODO What about non-printable characters
 					do
@@ -288,7 +282,7 @@ public class ScriptTokenizer
 						ch = in.read();
 					}
 					while( ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '$' || ch == '_' );
-					in.push( ch );
+					in.rewind();
 					return new Token( TokenType.SYMBOL, location, result.toString() );
 
 				// Number
@@ -306,8 +300,8 @@ public class ScriptTokenizer
 						ch = in.read();
 						if( !( ch >= '0' && ch <= '9' ) )
 						{
-							in.push( ch );
-							in.push( '.' );
+							in.rewind();
+							in.rewind();
 							return new Token( TokenType.INTEGER, location, result.toString() );
 						}
 						result.append( '.' );
@@ -338,7 +332,7 @@ public class ScriptTokenizer
 						while( ch >= '0' && ch <= '9' );
 						decimal = true;
 					}
-					in.push( ch );
+					in.rewind();
 					return new Token( decimal ? TokenType.DECIMAL : TokenType.INTEGER, location, result.toString() );
 
 				// Parenthesis
@@ -388,12 +382,12 @@ public class ScriptTokenizer
 								ch = in.read();
 								if( ch == '/' )
 									break;
-								in.push( ch );
+								in.rewind();
 							}
 						}
 						break;
 					}
-					in.push( ch2 );
+					in.rewind();
 
 				// Operators
 				// $FALL-THROUGH$
@@ -405,7 +399,7 @@ public class ScriptTokenizer
 						ch = in.read();
 					}
 					while( isOperatorChar( ch ) );
-					in.push( ch );
+					in.rewind();
 					value = result.toString();
 					type = RESERVED_WORDS.get( value );
 					if( type != null )
