@@ -133,7 +133,10 @@ public class StringSourceReader implements SourceReader
 		this.lastLocation = this.location;
 
 		if( this.pos >= this.string.length() )
+		{
+			this.pos++;
 			return -1;
+		}
 
 		int result = this.string.charAt( this.pos++ );
 		switch( result )
@@ -151,15 +154,18 @@ public class StringSourceReader implements SourceReader
 	@Override
 	public void rewind()
 	{
-		switch( this.string.charAt( --this.pos ) )
-		{
-			case '\n':
-				if( this.string.charAt( this.pos - 1 ) == '\r' )
-					this.pos--;
-				//$FALL-THROUGH$
-			case '\r':
-				this.location = this.location.previousLine();
-		}
+		this.pos--;
+
+		if( this.pos < this.string.length() )
+			switch( this.string.charAt( this.pos ) )
+			{
+				case '\n':
+					if( this.pos > 0 && this.string.charAt( this.pos - 1 ) == '\r' )
+						this.pos--;
+					//$FALL-THROUGH$
+				case '\r':
+					this.location = this.location.previousLine();
+			}
 	}
 
 	@Override
@@ -189,7 +195,7 @@ public class StringSourceReader implements SourceReader
 	{
 		if( this.recorder < 0 )
 			throw new FatalIOException( "Not recording" );
-		String result = this.string.substring( this.recorder, this.pos );
+		String result = this.string.substring( this.recorder, Math.min( this.pos, this.string.length() ) );
 		this.recorder = -1;
 		return result;
 	}

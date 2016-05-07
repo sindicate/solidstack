@@ -47,7 +47,7 @@ public class ReaderSourceReader implements SourceReader
 	/**
 	 * Buffer that contains the last characters that have been read.
 	 */
-	private IntWindowBuffer buffer = new IntWindowBuffer( 3 );
+	private IntWindowBuffer buffer = new IntWindowBuffer( 6 ); // 3 times /r/n
 
 	/**
 	 * To record the characters that have been read.
@@ -170,18 +170,12 @@ public class ReaderSourceReader implements SourceReader
 			if( this.buffer.hasRemaining() )
 				result = this.buffer.get();
 			else
-			{
-				result = this.reader.read();
-				if( result == -1 )
-					return result;
-				this.buffer.put( result );
-			}
-
-			if( this.recorder != null )
-				this.recorder.append( (char)result );
+				this.buffer.put( result = this.reader.read() );
 
 			switch( result )
 			{
+				case -1:
+					return result;
 				case '\r':
 					this.location = this.location.nextLine();
 					break;
@@ -189,6 +183,10 @@ public class ReaderSourceReader implements SourceReader
 					if( this.buffer.beforeLast() != '\r' ) // If there is no beforeLast(), it will be 0
 						this.location = this.location.nextLine();
 			}
+
+			if( this.recorder != null )
+				this.recorder.append( (char)result );
+
 			return result;
 		}
 		catch( IOException e )
@@ -202,6 +200,8 @@ public class ReaderSourceReader implements SourceReader
 	{
 		switch( this.buffer.rewind() )
 		{
+			case -1:
+				return;
 			case '\n':
 				if( this.buffer.rewind() != '\r' )
 					this.buffer.get();
@@ -212,6 +212,7 @@ public class ReaderSourceReader implements SourceReader
 			case '\r':
 				this.location = this.location.previousLine();
 		}
+
 		if( this.recorder != null )
 			this.recorder.setLength( this.recorder.length() - 1 );
 	}

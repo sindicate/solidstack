@@ -27,4 +27,23 @@ public class SourceReaderTests
 		line = source.readLine();
 		assertThat( line ).isEqualTo( "line2" );
 	}
+
+	@Test
+	public void testRewindEOF()
+	{
+		String text = "x";
+
+		Reader reader = new StringReader( text );
+		SourceReader source = new ReaderSourceReader( reader );
+		assertThat( source.read() ).isEqualTo( 'x' );
+		assertThat( source.read() ).isEqualTo( -1 );
+		source.rewind();
+		assertThat( source.read() ).isEqualTo( -1 );
+
+		source = new StringSourceReader( text );
+		assertThat( source.read() ).isEqualTo( 'x' );
+		assertThat( source.read() ).isEqualTo( -1 );
+		source.rewind();
+		assertThat( source.read() ).isEqualTo( -1 );
+	}
 }
