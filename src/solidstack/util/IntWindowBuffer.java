@@ -1,10 +1,10 @@
-package solidstack.io;
+package solidstack.util;
 
 
 /**
  * An int buffer.
  */
-public class RotatingIntBuffer
+public class IntWindowBuffer
 {
 	private int size;
 
@@ -19,10 +19,10 @@ public class RotatingIntBuffer
 	 *
 	 * @param capacity The number of ints this buffer can contain.
 	 */
-	public RotatingIntBuffer( int capacity )
+	public IntWindowBuffer( int capacity )
 	{
 		if( capacity < 2 )
-			throw new FatalIOException( "Capacity must be at least 2" );
+			throw new IllegalArgumentException( "Capacity must be at least 2" );
 		this.size = capacity + 1;
 		this.ints = new int[ this.size ];
 	}
@@ -41,12 +41,11 @@ public class RotatingIntBuffer
 	 * Get the next int.
 	 *
 	 * @return The next int.
-	 * @throws FatalIOException whenever there are no ints to be read.
 	 */
 	public int get()
 	{
 		if( !hasRemaining() )
-			throw new FatalIOException( "Buffer underflow" );
+			throw new IllegalStateException( "Buffer underflow" );
 		int result = this.ints[ this.reader ];
 		this.reader = inc( this.reader );
 		return result;
@@ -55,7 +54,7 @@ public class RotatingIntBuffer
 	/**
 	 * Returns the before last int that has been read or written.
 	 *
-	 * @return The before last in that has been read or written.
+	 * @return The before last int that has been read or written.
 	 */
 	public int beforeLast()
 	{
@@ -80,18 +79,17 @@ public class RotatingIntBuffer
 	 * Rewind to the last int read or written.
 	 *
 	 * @return The last int that has been read or written.
-	 * @throws FatalIOException whenever you are rewinding too far.
 	 */
 	public int rewind()
 	{
 		int r = dec( this.reader );
 		if( this.writer == r )
-			throw new FatalIOException( "Buffer underflow" );
+			throw new IllegalStateException( "Buffer underflow" );
 		return this.ints[ this.reader = r ];
 	}
 
 	/**
-	 * Mark the corrent read position.
+	 * Mark the current read position.
 	 */
 	public void mark()
 	{
@@ -106,7 +104,7 @@ public class RotatingIntBuffer
 	public int reset()
 	{
 		if( this.mark < 0 )
-			throw new FatalIOException( "Mark expired or not set" );
+			throw new IllegalStateException( "Mark expired or not set" );
 		int delta = this.reader - this.mark;
 		if( delta < 0 )
 			delta += this.size;

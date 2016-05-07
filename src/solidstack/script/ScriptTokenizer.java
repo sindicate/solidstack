@@ -16,15 +16,14 @@
 
 package solidstack.script;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import solidstack.io.SourceException;
 import solidstack.io.SourceLocation;
 import solidstack.io.SourceReader;
 import solidstack.lang.Assert;
+import solidstack.util.WindowBuffer;
 
 
 /**
@@ -92,14 +91,8 @@ public class ScriptTokenizer
 	 */
 	private StringBuilder buffer = new StringBuilder( 256 );
 
-	// A window that caches the last 3 tokens
-	private List<Token> window = new ArrayList<Token>();
-	{
-		this.window.add( null );
-		this.window.add( null );
-		this.window.add( null );
-	}
-	private int pos = 3;
+	// A window that holds the last 3 tokens read
+	private WindowBuffer<Token> window = new WindowBuffer<Token>( 3 );
 
 
 	/**
@@ -117,9 +110,9 @@ public class ScriptTokenizer
 	 */
 	public SourceReader getIn()
 	{
-		if( this.pos == 3 )
-			return this.in;
-		throw new IllegalStateException( "There are still tokens in the push back buffer" );
+		if( this.window.hasRemaining() )
+			throw new IllegalStateException( "There are still tokens in the buffer" );
+		return this.in;
 	}
 
 	/**
@@ -141,37 +134,20 @@ public class ScriptTokenizer
 	 */
 	public Token next()
 	{
-		if( this.pos == 3 )
-		{
-			this.window.remove( 0 );
-			Token token = readToken();
-			this.window.add( token );
-			return token;
-		}
-		return this.window.get( this.pos++ );
+		if( this.window.hasRemaining() )
+			return this.window.get();
+
+		Token token = readToken();
+		this.window.put( token );
+		return token;
 	}
 
 	/**
-	 * @return The last token read.
+	 * Rewind to the previous token.
 	 */
-	public Token last()
+	public void rewind()
 	{
-		if( this.pos == 0 )
-			throw new IllegalStateException( "There is no last token" );
-		Token result = this.window.get( this.pos - 1 );
-		if( result == null )
-			throw new IllegalStateException( "No token available" );
-		return result;
-	}
-
-	/**
-	 * Push the token back.
-	 */
-	public void push()
-	{
-		if( this.pos == 0 )
-			throw new IllegalStateException( "Can't push further" );
-		this.pos--;
+		this.window.rewind();
 	}
 
 	private Token readToken()

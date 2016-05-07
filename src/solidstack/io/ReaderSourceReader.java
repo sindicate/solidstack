@@ -19,6 +19,8 @@ package solidstack.io;
 import java.io.IOException;
 import java.io.Reader;
 
+import solidstack.util.IntWindowBuffer;
+
 
 /**
  * A source reader that reads from a reader.
@@ -45,7 +47,7 @@ public class ReaderSourceReader implements SourceReader
 	/**
 	 * Buffer that contains the last characters that have been read.
 	 */
-	private RotatingIntBuffer buffer = new RotatingIntBuffer( 3 );
+	private IntWindowBuffer buffer = new IntWindowBuffer( 3 );
 
 	/**
 	 * To record the characters that have been read.

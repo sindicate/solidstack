@@ -116,7 +116,7 @@ public class ScriptParser
 			TokenType type = token.getType();
 			if( type == this.stop )
 			{
-				this.tokenizer.push();
+				this.tokenizer.rewind();
 				return result;
 			}
 
@@ -128,7 +128,7 @@ public class ScriptParser
 					return result;
 				case SEMICOLON:
 					if( !consumeSemi )
-						this.tokenizer.push();
+						this.tokenizer.rewind();
 					return result;
 
 				case OPERATOR:
@@ -156,7 +156,7 @@ public class ScriptParser
 				case ELSE:
 					if( !this.expectElse )
 						throw new SourceException( "Unexpected token '" + token + "'", token.getLocation() );
-					this.tokenizer.push();
+					this.tokenizer.rewind();
 					return result;
 
 				case IDENTIFIER:
@@ -209,7 +209,7 @@ public class ScriptParser
 			TokenType type = token.getType();
 			if( type == this.stop )
 			{
-				this.tokenizer.push();
+				this.tokenizer.rewind();
 				return null;
 			}
 
@@ -327,7 +327,7 @@ public class ScriptParser
 					if( token2.getType() == TokenType.ELSE )
 						right = parseExpression( false );
 					else
-						this.tokenizer.push();
+						this.tokenizer.rewind();
 					return new If( token.getLocation(), expressions, left, right );
 
 				case NEW:
