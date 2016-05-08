@@ -19,7 +19,7 @@ package solidstack.template;
 
 /**
  * An exception occurred during template processing.
- * 
+ *
  * @author René de Bloois
  */
 public class TemplateException extends RuntimeException
@@ -28,11 +28,16 @@ public class TemplateException extends RuntimeException
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param message The message.
 	 */
 	public TemplateException( String message )
 	{
 		super( message );
+	}
+
+	public TemplateException( Throwable cause )
+	{
+		super( cause );
 	}
 }

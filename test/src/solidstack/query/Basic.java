@@ -154,7 +154,7 @@ public class Basic
 		new TemplateCompiler( null ).compile( context );
 //		System.out.println( groovy.replaceAll( "\t", "\\\\t" ).replaceAll( " ", "#" ) );
 //		System.out.println( groovy );
-		Assert.assertEquals( context.getScript().toString(), "package solidstack.template.tmp.p;import java.sql.Timestamp;class c{Closure getClosure(){return{out->\n" +
+		Assert.assertEquals( context.getScript().toString(), "import java.sql.Timestamp;\n" +
 				" // Test if the import at the bottom works, and this comment too of course\n" +
 				"new Timestamp( new Date().time ) \n" +
 				";out.write(\"\"\"SELECT T.*\n" +
@@ -177,7 +177,7 @@ public class Basic
 				";out.write(\"\"\"AND TABLENAME IN (${names})\n" +
 				"\"\"\"); } \n" +
 				";\n" +
-				"}}}"
+				""
 				);
 
 		QueryLoader queries = new QueryLoader();

@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
 import solidstack.io.Resource;
 import solidstack.io.SourceReader;
 import solidstack.io.SourceReaders;
@@ -33,6 +36,7 @@ import solidstack.template.funny.FunnyTemplateCompiler;
 import solidstack.template.groovy.GroovyTemplateCompiler;
 import solidstack.template.java.JavaTemplateCompiler;
 import solidstack.template.javascript.JavaScriptTemplateCompiler;
+import solidstack.template.scriptengine.ScriptEngineTemplateCompiler;
 
 /**
  * Template compiler.
@@ -158,8 +162,35 @@ public class TemplateCompiler
 				Loggers.compiler.trace( "Generated Java:\n{}", context.getScript() );
 				compiler.compileScript( context );
 			}
+			else if( lang.startsWith( "scriptengine:" ) )
+			{
+				lang = lang.substring( 13 );
+				ScriptEngineManager manager = new ScriptEngineManager();
+				ScriptEngine engine = manager.getEngineByName( lang );
+				if( engine.getFactory().getNames().contains( "rhino" ) )
+				{
+					JavaScriptTemplateCompiler compiler = new JavaScriptTemplateCompiler();
+					compiler.generateScript( context );
+					Loggers.compiler.trace( "Generated JavaScript:\n{}", context.getScript() );
+					new ScriptEngineTemplateCompiler( engine ).compileScript( context );
+				}
+				else if( engine.getFactory().getNames().contains( "groovy" ) )
+				{
+					GroovyTemplateCompiler compiler = new GroovyTemplateCompiler();
+					compiler.generateScript( context );
+					Loggers.compiler.trace( "Generated Groovy:\n{}", context.getScript() );
+					new ScriptEngineTemplateCompiler( engine ).compileScript( context );
+				}
+				else
+				{
+					StringBuilder names = new StringBuilder();
+					for( String name : engine.getFactory().getNames() )
+						names.append( name ).append( '/' );
+					throw new TemplateException( "Unsupported script engine: " + engine.getFactory().getEngineName() + " (" + names.substring( 0, names.length() - 1 ) + ")" );
+				}
+			}
 			else
-				throw new TemplateException( "Unsupported scripting language: " + lang );
+				throw new TemplateException( "Unsupported language: " + lang );
 
 			configureTemplate( context );
 		}

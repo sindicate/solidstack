@@ -63,12 +63,12 @@ public class GroovyTemplateCompiler
 
 		StringBuilder buffer = new StringBuilder( 1024 );
 
-		buffer.append( "package " ).append( pkg ).append( ";" );
+//		buffer.append( "package " ).append( pkg ).append( ";" );
 		if( context.getImports() != null )
 			for( String imprt : context.getImports() )
 				buffer.append( "import " ).append( imprt ).append( ';' );
-		buffer.append( "class " ).append( name.replaceAll( "[\\.-]", "_" ) );
-		buffer.append( "{Closure getClosure(){return{out->" );
+//		buffer.append( "class " ).append( name.replaceAll( "[\\.-]", "_" ) );
+//		buffer.append( "{Closure getClosure(){return{out->" );
 
 		boolean text = false;
 		for( ParseEvent event : context.getEvents() )
@@ -121,7 +121,7 @@ public class GroovyTemplateCompiler
 
 		if( text )
 			buffer.append( "\"\"\");" );
-		buffer.append( "}}}" );
+//		buffer.append( "}}}" );
 
 		context.setScript( buffer );
 	}
