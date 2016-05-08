@@ -27,6 +27,7 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.TopLevel;
 
 import solidstack.io.FatalIOException;
+import solidstack.script.scopes.Scope;
 import solidstack.template.ConvertingWriter;
 import solidstack.template.EncodingWriter;
 import solidstack.template.Template;
@@ -58,6 +59,7 @@ public class JavaScriptTemplate extends Template
 		{
 			TopLevel topLevel = new ImporterTopLevel( cx );
 
+			// TODO 'out' should not be in the toplevel but the leaf level
 			ConvertingWriter out = new JavaScriptConvertingWriter( writer );
 			topLevel.put( "out", topLevel, out );
 
@@ -68,6 +70,8 @@ public class JavaScriptTemplate extends Template
 				for( Map.Entry<String, Object> param : ( (Map<String, Object>)params ).entrySet() )
 					scope.put( param.getKey(), scope, Context.javaToJS( param.getValue(), scope ) );
 			}
+			else if( params instanceof Scope )
+				scope = new ScriptableScope( topLevel, (Scope)params );
 			else
 				scope = new NativeJavaObject( topLevel, params, null );
 

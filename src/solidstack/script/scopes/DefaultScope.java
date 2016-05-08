@@ -92,6 +92,7 @@ public class DefaultScope extends AbstractScope
 			throw new ReadOnlyException();
 	}
 
+	@Override
 	public Object apply( Symbol symbol, Object... args )
 	{
 		Value ref = this.values.get( symbol );
@@ -135,6 +136,7 @@ public class DefaultScope extends AbstractScope
 		}
 	}
 
+	@Override
 	public Object apply( Symbol symbol, Map args )
 	{
 		Value ref = this.values.get( symbol );
