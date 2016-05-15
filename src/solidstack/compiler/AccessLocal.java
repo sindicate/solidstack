@@ -1,17 +1,21 @@
 package solidstack.compiler;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-public class AccessLocal extends Expression
+public class AccessLocal implements Expression
 {
+	static public enum TYPE { INT, REF }
+
 	private Method method;
 	private int local;
+	private TYPE type;
 
-	public AccessLocal( Method method, int local )
+
+	public AccessLocal( Method method, int local, TYPE type )
 	{
+		if( local < 0 )
+			throw new IllegalArgumentException();
 		this.method = method;
 		this.local = local;
+		this.type = type;
 	}
 
 	@Override
@@ -23,10 +27,33 @@ public class AccessLocal extends Expression
 	}
 
 	@Override
-	public void getByteCode( DataOutputStream out ) throws IOException
+	public void getByteCode( Bytes bytes )
 	{
-		out.writeByte( 0x19 );
-		out.writeByte( this.local );
+		if( this.local >= 256 )
+			throw new UnsupportedOperationException(); // TODO Wide
+
+		switch( this.type )
+		{
+			case INT:
+				if( this.local < 4 )
+				{
+					bytes.writeByte( 0x1A + this.local ); // iload_0
+					return;
+				}
+				bytes.writeByte( 0x15 ); // iload
+				bytes.writeByte( this.local );
+				return;
+
+			case REF:
+				if( this.local < 4 )
+				{
+					bytes.writeByte( 0x2A + this.local ); // aload_0
+					return;
+				}
+				bytes.writeByte( 0x19 ); // aload
+				bytes.writeByte( this.local );
+				return;
+		}
 	}
 
 	@Override

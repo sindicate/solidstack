@@ -1,7 +1,5 @@
 package solidstack.compiler;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,50 +43,46 @@ public class Method
 			stat.collectConstants( pool );
 	}
 
-	public void write( DataOutputStream out ) throws IOException
+	public void write( Bytes bytes ) throws IOException
 	{
-		out.writeShort( 0x1001 ); // public & synthetic
-		out.writeShort( this.nameInfo.index() ); // name_index
-		out.writeShort( this.descriptor.index() ); // descriptor_index
+		bytes.writeShort( 0x1001 ); // public & synthetic
+		bytes.writeShort( this.nameInfo.index() ); // name_index
+		bytes.writeShort( this.descriptor.index() ); // descriptor_index
 
 		// attributes
-		out.writeShort( 1 ); // attributes_count
+		bytes.writeShort( 1 ); // attributes_count
 
 		// Code
-		byte[] code = getCode();
-		out.writeShort( this.codeAttribute.index() );
-		out.writeInt( code.length );
-		out.write( code );
+		Bytes code = getCode();
+		bytes.writeShort( this.codeAttribute.index() );
+		bytes.writeInt( code.size() );
+		bytes.write( code );
 	}
 
-	private byte[] getCode() throws IOException
+	private Bytes getCode() throws IOException
 	{
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		DataOutputStream out = new DataOutputStream( bytes );
+		Bytes bytes = new Bytes();
 
-		byte[] byteCode = getByteCode();
+		Bytes byteCode = getByteCode();
 
-		out.writeShort( 10 ); // TODO max_stack
-		out.writeShort( 10 ); // TODO max_locals
-		out.writeInt( byteCode.length ); // code_length
-		out.write( byteCode );
-		out.writeShort( 0 ); // TODO exception_table_length
-		out.writeShort( 0 ); // TODO attributes_length
+		bytes.writeShort( 10 ); // TODO max_stack
+		bytes.writeShort( 10 ); // TODO max_locals
+		bytes.writeInt( byteCode.size() ); // code_length
+		bytes.write( byteCode );
+		bytes.writeShort( 0 ); // TODO exception_table_length
+		bytes.writeShort( 0 ); // TODO attributes_length
 
-		out.flush();
-		return bytes.toByteArray();
+		return bytes;
 	}
 
-	private byte[] getByteCode() throws IOException
+	private Bytes getByteCode() throws IOException
 	{
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		DataOutputStream out = new DataOutputStream( bytes );
+		Bytes bytes = new Bytes();
 
 		for( Statement stat : this.statements )
-			stat.getByteCode( out );
+			stat.getByteCode( bytes );
 
-		out.flush();
-		return bytes.toByteArray();
+		return bytes;
 	}
 
 	public void return_( int i )
@@ -115,5 +109,10 @@ public class Method
 	{
 		local--;
 		return Types.toFieldDescriptor( this.parameters[ local ] );
+	}
+
+	public void for_( Statement initialization, Conditional termination, Statement increment, Statement... statements )
+	{
+		this.statements.add( new For( initialization, termination, increment, statements ) );
 	}
 }

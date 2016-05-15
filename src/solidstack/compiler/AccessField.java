@@ -1,9 +1,6 @@
 package solidstack.compiler;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-public class AccessField extends Expression
+public class AccessField implements Expression
 {
 	private Expression instance;
 	private String name;
@@ -25,11 +22,11 @@ public class AccessField extends Expression
 	}
 
 	@Override
-	public void getByteCode( DataOutputStream out ) throws IOException
+	public void getByteCode( Bytes bytes )
 	{
-		this.instance.getByteCode( out );
-		out.writeByte( 0xB4 );
-		out.writeShort( this.fieldref.index() );
+		this.instance.getByteCode( bytes );
+		bytes.writeByte( 0xB4 );
+		bytes.writeShort( this.fieldref.index() );
 	}
 
 	@Override

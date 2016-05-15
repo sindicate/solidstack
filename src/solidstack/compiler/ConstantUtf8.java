@@ -1,6 +1,5 @@
 package solidstack.compiler;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class ConstantUtf8 extends Constant
@@ -13,7 +12,7 @@ public class ConstantUtf8 extends Constant
 	}
 
 	@Override
-	public void write( DataOutputStream out ) throws IOException
+	public void write( Bytes out ) throws IOException
 	{
 		out.writeByte( 1 );
 		byte[] bytes = this.value.getBytes( "UTF-8" );

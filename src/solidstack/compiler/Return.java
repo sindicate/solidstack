@@ -1,8 +1,5 @@
 package solidstack.compiler;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class Return implements Statement
 {
 	private Integer value;
@@ -30,19 +27,19 @@ public class Return implements Statement
 	}
 
 	@Override
-	public void getByteCode( DataOutputStream out ) throws IOException
+	public void getByteCode( Bytes bytes )
 	{
 		if( this.expression != null )
 		{
-			this.expression.getByteCode( out );
-			out.writeByte( 0xAC ); // ireturn
+			this.expression.getByteCode( bytes );
+			bytes.writeByte( 0xAC ); // ireturn
 		}
 		else if( this.value == null )
-			out.writeByte( 0xB1 ); // return
+			bytes.writeByte( 0xB1 ); // return
 		else
 		{
-			out.writeByte( 0x03 ); // iconst_0
-			out.writeByte( 0xAC ); // ireturn
+			bytes.writeByte( 0x03 ); // iconst_0
+			bytes.writeByte( 0xAC ); // ireturn
 		}
 	}
 }

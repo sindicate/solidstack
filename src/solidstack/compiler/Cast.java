@@ -1,9 +1,6 @@
 package solidstack.compiler;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-public class Cast extends Expression
+public class Cast implements Expression
 {
 	private Expression value;
 	private String type;
@@ -23,11 +20,11 @@ public class Cast extends Expression
 	}
 
 	@Override
-	public void getByteCode( DataOutputStream out ) throws IOException
+	public void getByteCode( Bytes bytes )
 	{
-		this.value.getByteCode( out );
-		out.writeByte( 0xC0 );
-		out.writeShort( this.classInfo.index() );
+		this.value.getByteCode( bytes );
+		bytes.writeByte( 0xC0 );
+		bytes.writeShort( this.classInfo.index() );
 	}
 
 	@Override

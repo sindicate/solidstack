@@ -1,8 +1,5 @@
 package solidstack.compiler;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class CallSuper implements Statement
 {
 	private Expression instance;
@@ -26,10 +23,10 @@ public class CallSuper implements Statement
 	}
 
 	@Override
-	public void getByteCode( DataOutputStream out ) throws IOException
+	public void getByteCode( Bytes bytes )
 	{
-		this.instance.getByteCode( out );
-		out.writeByte( 0xB7 ); // invokespecial
-		out.writeShort( this.methodref.index() );
+		this.instance.getByteCode( bytes );
+		bytes.writeByte( 0xB7 ); // invokespecial
+		bytes.writeShort( this.methodref.index() );
 	}
 }

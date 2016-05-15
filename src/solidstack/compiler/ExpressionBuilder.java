@@ -1,5 +1,7 @@
 package solidstack.compiler;
 
+import solidstack.compiler.AccessLocal.TYPE;
+
 public class ExpressionBuilder
 {
 	private Method method;
@@ -9,9 +11,14 @@ public class ExpressionBuilder
 		this.method = method;
 	}
 
-	public AccessLocal var( int i )
+	public AccessLocal local( int local, TYPE type )
 	{
-		return new AccessLocal( this.method, i );
+		return new AccessLocal( this.method, local, type );
+	}
+
+	public Expression setLocal( int local, Expression value )
+	{
+		return new AssignLocal( local, value );
 	}
 
 	public AssignField setField( Expression instance, String name, String descriptor, Expression value )
@@ -47,5 +54,20 @@ public class ExpressionBuilder
 	public Expression cast( Expression call, String type )
 	{
 		return new Cast( call, type );
+	}
+
+	public Expression literal( int value )
+	{
+		return new LiteralInt( value );
+	}
+
+	public Conditional lessThan( Expression left, Expression right )
+	{
+		return new LessThan( left, right );
+	}
+
+	public Expression plus( Expression left, Expression right )
+	{
+		return new Plus( left, right );
 	}
 }

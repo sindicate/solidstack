@@ -1,7 +1,5 @@
 package solidstack.compiler;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,57 +80,54 @@ public class ClassBuilder
 		return result;
 	}
 
-	public byte[] compile()
+	public Bytes compile()
 	{
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		DataOutputStream out = new DataOutputStream( bytes );
+		Bytes bytes = new Bytes();
 		try
 		{
-			out.writeInt( 0xCAFEBABE ); // magic
-			out.writeShort( 0 ); // minor version
-			out.writeShort( 49 ); // major version
+			bytes.writeInt( 0xCAFEBABE ); // magic
+			bytes.writeShort( 0 ); // minor version
+			bytes.writeShort( 49 ); // major version
 
 			ConstantPool pool = collectConstants();
-			out.writeShort( pool.size() + 1 );
+			bytes.writeShort( pool.size() + 1 );
 			for( Constant constant : pool.constants() )
-				constant.write( out );
+				constant.write( bytes );
 
-			out.writeShort( 0x1001 ); // public & synthetic
-			out.writeShort( this.classInfo.index() ); // this_class
+			bytes.writeShort( 0x1001 ); // public & synthetic
+			bytes.writeShort( this.classInfo.index() ); // this_class
 
 			// super_class
-			out.writeShort( this.superClassInfo.index() ); // super_class
+			bytes.writeShort( this.superClassInfo.index() ); // super_class
 
 			// interfaces
 			if( this.interfacesInfo == null )
-				out.writeShort( 0 );
+				bytes.writeShort( 0 );
 			else
 			{
-				out.writeShort( this.interfaces.size() ); // interfaces_count
+				bytes.writeShort( this.interfaces.size() ); // interfaces_count
 				for( ConstantClass info : this.interfacesInfo )
-					out.writeShort( info.index() );
+					bytes.writeShort( info.index() );
 			}
 
 			// fields
-			out.writeShort( this.fields.size() );
+			bytes.writeShort( this.fields.size() );
 			for( Field field : this.fields )
-				field.write( out );
+				field.write( bytes );
 
 			// methods
-			out.writeShort( this.methods.size() );
+			bytes.writeShort( this.methods.size() );
 			for( Method method : this.methods )
-				method.write( out );
+				method.write( bytes );
 
 			// attributes
-			out.writeShort( 0 );
-
-			out.flush();
+			bytes.writeShort( 0 );
 		}
 		catch( IOException e )
 		{
 			throw new SystemException( e );
 		}
-		return bytes.toByteArray();
+		return bytes;
 	}
 
 	private ConstantPool collectConstants()

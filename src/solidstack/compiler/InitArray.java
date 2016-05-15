@@ -1,9 +1,6 @@
 package solidstack.compiler;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-public class InitArray extends Expression
+public class InitArray implements Expression
 {
 	private String type;
 	private Expression[] values;
@@ -23,18 +20,18 @@ public class InitArray extends Expression
 	}
 
 	@Override
-	public void getByteCode( DataOutputStream out ) throws IOException
+	public void getByteCode( Bytes bytes )
 	{
-		ByteCode.iconst( out, this.values.length );
-		out.writeByte( 0xBD ); // anewarray
-		out.writeShort( this.classInfo.index() );
+		ByteCode.iconst( bytes, this.values.length );
+		bytes.writeByte( 0xBD ); // anewarray
+		bytes.writeShort( this.classInfo.index() );
 		int i = 0;
 		for( Expression value : this.values )
 		{
-			out.writeByte( 0x59 ); // dup
-			ByteCode.iconst( out, i++ );
-			value.getByteCode( out );
-			out.writeByte( 0x53 ); // aastore
+			bytes.writeByte( 0x59 ); // dup
+			ByteCode.iconst( bytes, i++ );
+			value.getByteCode( bytes );
+			bytes.writeByte( 0x53 ); // aastore
 		}
 	}
 

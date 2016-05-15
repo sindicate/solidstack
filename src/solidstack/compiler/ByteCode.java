@@ -1,26 +1,24 @@
 package solidstack.compiler;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class ByteCode
 {
-	static public void iconst( DataOutputStream out, int i ) throws IOException
+	static public void iconst( Bytes bytes, int i )
 	{
-		switch( i )
+		if( i >= -1 && i <= 5 )
 		{
-			case -1: out.writeByte( 0x02 ); return;
-			case 0: out.writeByte( 0x03 ); return;
-			case 1: out.writeByte( 0x04 ); return;
-			case 2: out.writeByte( 0x05 ); return;
-			case 3: out.writeByte( 0x06 ); return;
-			case 4: out.writeByte( 0x07 ); return;
-			case 5: out.writeByte( 0x08 ); return;
+			bytes.writeByte( 0x03 + i ); // iconst_0 + the value
+			return;
 		}
 		if( i >= -128 && i < 128 )
 		{
-			out.writeByte( 0x10 ); // bipush
-			out.writeByte( i );
+			bytes.writeByte( 0x10 ); // bipush
+			bytes.writeByte( i );
+			return;
+		}
+		if( i >= -32768 && i < 32768 )
+		{
+			bytes.writeByte( 0x11 ); // sipush
+			bytes.writeShort( i );
 			return;
 		}
 		throw new UnsupportedOperationException();

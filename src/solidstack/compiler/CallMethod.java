@@ -1,9 +1,6 @@
 package solidstack.compiler;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-public class CallMethod extends Expression
+public class CallMethod implements Expression
 {
 	private Expression instance;
 	private String name;
@@ -42,13 +39,13 @@ public class CallMethod extends Expression
 	}
 
 	@Override
-	public void getByteCode( DataOutputStream out ) throws IOException
+	public void getByteCode( Bytes bytes )
 	{
-		this.instance.getByteCode( out );
+		this.instance.getByteCode( bytes );
 		for( Expression parameter : this.parameters )
-			parameter.getByteCode( out );
-		out.writeByte( 0xB6 );
-		out.writeShort( this.methodref.index() );
+			parameter.getByteCode( bytes );
+		bytes.writeByte( 0xB6 );
+		bytes.writeShort( this.methodref.index() );
 	}
 
 	@Override

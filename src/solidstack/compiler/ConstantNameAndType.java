@@ -1,6 +1,5 @@
 package solidstack.compiler;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class ConstantNameAndType extends Constant
@@ -15,11 +14,11 @@ public class ConstantNameAndType extends Constant
 	}
 
 	@Override
-	public void write( DataOutputStream out ) throws IOException
+	public void write( Bytes bytes ) throws IOException
 	{
-		out.writeByte( 12 );
-		out.writeShort( this.name.index() );
-		out.writeShort( this.descriptor.index() );
+		bytes.writeByte( 12 );
+		bytes.writeShort( this.name.index() );
+		bytes.writeShort( this.descriptor.index() );
 	}
 
 	@Override

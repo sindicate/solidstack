@@ -1,6 +1,5 @@
 package solidstack.compiler;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Field
@@ -43,13 +42,13 @@ public class Field
 		this.fieldref = pool.add( new ConstantFieldref( pool, this.cls.classInfo(), this.nameInfo, this.descriptor  ) );
 	}
 
-	public void write( DataOutputStream out ) throws IOException
+	public void write( Bytes bytes ) throws IOException
 	{
-		out.writeShort( this.privat ? 0x1002 : 0x1001 ); // public & synthetic
-		out.writeShort( this.nameInfo.index() ); // name_index
-		out.writeShort( this.descriptor.index() ); // descriptor_index
+		bytes.writeShort( this.privat ? 0x1002 : 0x1001 ); // public & synthetic
+		bytes.writeShort( this.nameInfo.index() ); // name_index
+		bytes.writeShort( this.descriptor.index() ); // descriptor_index
 
 		// attributes
-		out.writeShort( 0 ); // attributes_count
+		bytes.writeShort( 0 ); // attributes_count
 	}
 }

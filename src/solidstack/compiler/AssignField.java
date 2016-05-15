@@ -1,9 +1,6 @@
 package solidstack.compiler;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-public class AssignField extends Expression implements Statement
+public class AssignField implements Expression
 {
 	private ClassBuilder cls;
 	private Expression instance;
@@ -23,12 +20,12 @@ public class AssignField extends Expression implements Statement
 	}
 
 	@Override
-	public void getByteCode( DataOutputStream out ) throws IOException
+	public void getByteCode( Bytes bytes )
 	{
-		this.instance.getByteCode( out );
-		this.value.getByteCode( out );
-		out.writeByte( 0xB5 ); // putfield
-		out.writeShort( this.fieldref.index() );
+		this.instance.getByteCode( bytes );
+		this.value.getByteCode( bytes );
+		bytes.writeByte( 0xB5 ); // putfield
+		bytes.writeShort( this.fieldref.index() );
 	}
 
 	@Override
