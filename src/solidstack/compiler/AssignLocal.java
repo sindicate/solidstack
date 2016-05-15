@@ -1,6 +1,6 @@
 package solidstack.compiler;
 
-public class AssignLocal implements Expression
+public class AssignLocal implements Statement
 {
 	private int local;
 	private Expression value;
@@ -35,17 +35,5 @@ public class AssignLocal implements Expression
 	public void collectConstants( ConstantPool pool )
 	{
 		this.value.collectConstants( pool );
-	}
-
-	@Override
-	public ConstantClass classInfo()
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String getFieldDescriptor()
-	{
-		throw new UnsupportedOperationException();
 	}
 }

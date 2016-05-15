@@ -16,7 +16,7 @@ public class ExpressionBuilder
 		return new AccessLocal( this.method, local, type );
 	}
 
-	public Expression setLocal( int local, Expression value )
+	public AssignLocal setLocal( int local, Expression value )
 	{
 		return new AssignLocal( local, value );
 	}

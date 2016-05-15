@@ -1,6 +1,6 @@
 package solidstack.compiler;
 
-public class AssignField implements Expression
+public class AssignField implements Statement
 {
 	private ClassBuilder cls;
 	private Expression instance;
@@ -38,17 +38,5 @@ public class AssignField implements Expression
 		ConstantClass cls = this.instance.classInfo();
 		ConstantUtf8 descriptor = pool.add( new ConstantUtf8( this.descriptor ) );
 		this.fieldref = pool.add( new ConstantFieldref( pool, cls, name, descriptor ) );
-	}
-
-	@Override
-	public ConstantClass classInfo()
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String getFieldDescriptor()
-	{
-		throw new UnsupportedOperationException();
 	}
 }
