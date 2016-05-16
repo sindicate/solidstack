@@ -47,7 +47,7 @@ public class Class
 
 	public String name()
 	{
-		return this.info.name();
+		return Types.classDescriptorToClassName( this.info.name() );
 	}
 
 	public void write( Bytes bytes )

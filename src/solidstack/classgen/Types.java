@@ -50,6 +50,11 @@ public class Types
 		throw new UnsupportedOperationException( "Unknown primitive type [" + cls.getName() + "]" );
 	}
 
+	public static String classDescriptorToClassName( String descriptor )
+	{
+		return descriptor.replace( '/', '.' );
+	}
+
 	public static String fieldDescriptorToClassName( String descriptor )
 	{
 		Assert.isTrue( descriptor.charAt( 0 ) == 'L' );

@@ -17,9 +17,7 @@
 package solidstack.script.java;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -465,9 +463,7 @@ public class Types
 				{
 					throw new SystemException( e );
 				}
-				InvocationHandler handler = new FunctionObjectInvocationHandler( (FunctionObject)object, method );
-				ClassLoader loader = Thread.currentThread().getContextClassLoader();
-				return Proxy.newProxyInstance( loader, new Class[] { Comparator.class }, handler );
+				return Proxies.createProxy2( Comparator.class, method, (FunctionObject)object );
 			}
 
         // TODO Cast to class?

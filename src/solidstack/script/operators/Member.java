@@ -19,6 +19,7 @@ package solidstack.script.operators;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import funny.Symbol;
 import solidstack.lang.Assert;
 import solidstack.script.JavaException;
 import solidstack.script.Returning;
@@ -34,7 +35,6 @@ import solidstack.script.objects.Util;
 import solidstack.script.scopes.Scope;
 import solidstack.script.scopes.ScopeException;
 import solidstack.script.scopes.UndefinedException;
-import funny.Symbol;
 
 
 public class Member extends Operator
@@ -172,6 +172,7 @@ public class Member extends Operator
 		}
 		catch( Exception e )
 		{
+//			e.printStackTrace( System.err );
 			throw new ThrowException( e.getMessage() != null ? e.getMessage() : e.toString(), thread.cloneStack( getLocation() ) );
 //			throw new JavaException( e, thread.cloneStack( getLocation() ) ); // TODO Debug flag or something?
 		}
