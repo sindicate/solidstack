@@ -166,6 +166,6 @@ public class TestComparator implements Comparator
 	@Override
 	public int compare( Object o1, Object o2 )
 	{
-		return (Integer)this.function.call( o1, o2 );
+		return (Integer)solidstack.script.java.Types.convert( this.function.call( o1, o2 ), Integer.class );
 	}
 }

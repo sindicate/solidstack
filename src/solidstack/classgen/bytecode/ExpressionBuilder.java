@@ -46,6 +46,11 @@ public class ExpressionBuilder
 		return new CallMethod( instance, methodref, parameters );
 	}
 
+	public Expression callStatic( CMethodref methodref, Expression... parameters )
+	{
+		return new CallStaticMethod( methodref, parameters );
+	}
+
 	public Expression cast( Expression call, CClass type )
 	{
 		return new Cast( call, type );
@@ -54,6 +59,11 @@ public class ExpressionBuilder
 	public Expression literal( int value )
 	{
 		return new LiteralInt( value );
+	}
+
+	public Expression literal( CClass value )
+	{
+		return new LiteralClass( value );
 	}
 
 	public Conditional lessThan( Expression left, Expression right )

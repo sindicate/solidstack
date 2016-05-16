@@ -37,6 +37,7 @@ public class Proxies
 		CClass cFunctionObject = file.addClass( "solidstack/script/objects/FunctionObject" ); // TODO Add addClass(class)
 		CClass cInteger = file.addClass( "java/lang/Integer" );
 		CClass cComparator = file.addClass( "java/util/Comparator" );
+		CClass cTypes = file.addClass( "solidstack/script/java/Types" );
 
 		// The proxy class
 
@@ -73,6 +74,7 @@ public class Proxies
 		CMethodref methodCompare = file.addMethodref( cProxy, "compare", file.addMethodType( int.class, Object.class, Object.class ) );
 		CMethodref methodCall = file.addMethodref( cFunctionObject, "call", file.addMethodType( Object.class, Object[].class ) );
 		CMethodref methodIntValue = file.addMethodref( cInteger, "intValue", file.addMethodType( int.class ) );
+		CMethodref methodConvert = file.addMethodref( cTypes, "convert", file.addMethodType( Object.class, Object.class, Class.class ) );
 
 		// public int compare( Object o1, Object o2 )
 		//      return ( (Integer)this.function.call( new Object[] { o1, o2 } ) ).intValue()
@@ -80,10 +82,14 @@ public class Proxies
 		compare.return_(
 			eb.call(
 				eb.cast(
-					eb.call(
-						eb.field( eb.local( 0, TYPE.REF ), fieldFunction ),
-						methodCall,
-						eb.initArray( cObject, eb.local( 1, TYPE.REF ), eb.local( 2, TYPE.REF ) )
+					eb.callStatic(
+						methodConvert,
+						eb.call(
+							eb.field( eb.local( 0, TYPE.REF ), fieldFunction ),
+							methodCall,
+							eb.initArray( cObject, eb.local( 1, TYPE.REF ), eb.local( 2, TYPE.REF ) )
+						),
+						eb.literal( cInteger )
 					),
 					cInteger
 				),

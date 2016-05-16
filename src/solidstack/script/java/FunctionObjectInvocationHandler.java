@@ -21,7 +21,7 @@ public class FunctionObjectInvocationHandler implements InvocationHandler
 	public Object invoke( Object proxy, Method method, Object[] args ) throws Throwable
 	{
 		if( method.equals( this.method ) )
-			return this.function.call( args );
+			return Types.convert( this.function.call( args ), Integer.class );
 		throw new UnsupportedOperationException( "Method not supported: " + method );
 	}
 }

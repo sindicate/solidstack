@@ -4,16 +4,14 @@ import solidstack.classgen.Bytes;
 import solidstack.classgen.constants.CClass;
 import solidstack.classgen.constants.CMethodref;
 
-public class CallMethod implements Expression
+public class CallStaticMethod implements Expression
 {
 	private CMethodref methodref;
-	private Expression instance;
 	private Expression[] parameters;
 
 
-	public CallMethod( Expression instance, CMethodref methodref, Expression... parameters )
+	public CallStaticMethod( CMethodref methodref, Expression... parameters )
 	{
-		this.instance = instance;
 		this.methodref = methodref;
 		this.parameters = parameters;
 	}
@@ -27,10 +25,9 @@ public class CallMethod implements Expression
 	@Override
 	public void getByteCode( Bytes bytes )
 	{
-		this.instance.getByteCode( bytes );
 		for( Expression parameter : this.parameters )
 			parameter.getByteCode( bytes );
-		bytes.writeByte( 0xB6 ); // invokevirtual
+		bytes.writeByte( 0xB8 ); // invokestatic
 		bytes.writeShort( this.methodref.index() );
 	}
 
