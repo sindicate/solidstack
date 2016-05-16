@@ -7,7 +7,7 @@ public class ConstantNameAndType extends Constant
 	private ConstantUtf8 name;
 	private ConstantUtf8 descriptor;
 
-	public ConstantNameAndType( ConstantPool pool, ConstantUtf8 name, ConstantUtf8 descriptor )
+	public ConstantNameAndType( ConstantUtf8 name, ConstantUtf8 descriptor )
 	{
 		this.name = name;
 		this.descriptor = descriptor;
@@ -31,5 +31,20 @@ public class ConstantNameAndType extends Constant
 				return other.name == this.name && other.descriptor == this.descriptor;
 			}
 		return false;
+	}
+
+	public String name()
+	{
+		return this.name.value();
+	}
+
+	public int nameIndex()
+	{
+		return this.name.index();
+	}
+
+	public int typeIndex()
+	{
+		return this.descriptor.index();
 	}
 }

@@ -4,20 +4,20 @@ import solidstack.lang.Assert;
 
 public class Types
 {
-	static public String toFieldDescriptor( Class<?> cls )
+	static public String toFieldDescriptor( java.lang.Class<?> cls )
 	{
 		if( cls.isPrimitive() )
 			return toBaseType( cls );
 		if( cls.isArray() )
-			throw new UnsupportedOperationException( "arrays not supported yet" );
+			return "[" + toFieldDescriptor( cls.getComponentType() );
 		return "L" + cls.getName().replace( '.', '/' ) + ";";
 	}
 
-	public static String toMethodDescriptor( Class<?> ret, Class<?>... parameters )
+	public static String toMethodDescriptor( java.lang.Class<?> ret, java.lang.Class<?>... parameters )
 	{
 		StringBuilder descriptor = new StringBuilder();
 		descriptor.append( '(' );
-		for( Class<?> parameter : parameters )
+		for( java.lang.Class<?> parameter : parameters )
 			descriptor.append( toFieldDescriptor( parameter ) );
 		descriptor.append( ')' );
 		if( ret == null )
@@ -27,7 +27,7 @@ public class Types
 		return descriptor.toString();
 	}
 
-	static public String toBaseType( Class<?> cls )
+	static public String toBaseType( java.lang.Class<?> cls )
 	{
 		if( cls == int.class )
 			return "I";

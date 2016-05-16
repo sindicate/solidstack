@@ -22,11 +22,6 @@ public class LiteralInt implements Expression
 	}
 
 	@Override
-	public void collectConstants( ConstantPool pool )
-	{
-	}
-
-	@Override
 	public String getFieldDescriptor()
 	{
 		throw new UnsupportedOperationException();

@@ -30,10 +30,4 @@ public class AssignLocal implements Statement
 		bytes.writeByte( 0x36 ); // istore
 		bytes.writeByte( this.local );
 	}
-
-	@Override
-	public void collectConstants( ConstantPool pool )
-	{
-		this.value.collectConstants( pool );
-	}
 }

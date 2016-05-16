@@ -1,87 +1,101 @@
 package solidstack.compiler;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import solidstack.lang.Assert;
 import solidstack.lang.SystemException;
 
 public class ClassBuilder
 {
-	private String name;
-	private Class<?> superClass;
-	private List<Class<?>> interfaces;
-	private List<Method> methods = new ArrayList<Method>();
-	private List<Field> fields = new ArrayList<Field>();
+	private ConstantPool pool = new ConstantPool();
+	private Class cls;
 
-	private ConstantClass classInfo;
-	private ConstantClass superClassInfo;
-	private List<ConstantClass> interfacesInfo;
 
-	public ClassBuilder( String name, Class<?>... extend )
+	public ClassBuilder()
 	{
-		this.name = name;
-		for( Class<?> cls : extend )
-		{
-			if( cls.isInterface() )
-			{
-				if( this.interfaces == null )
-					this.interfaces = new ArrayList<Class<?>>();
-				this.interfaces.add( cls );
-			}
-			else
-			{
-				// TODO Check other types of Class
-				Assert.isNull( this.superClass );
-				this.superClass = cls;
-			}
-		}
 	}
 
-	public String name()
+	public ConstantUtf8 addConstantUtf8( String value )
 	{
-		return this.name;
+		return this.pool.addUtf8( value );
 	}
 
-	public ConstantClass classInfo()
+	public ConstantClass addConstantClass( String name )
 	{
-		Assert.notNull( this.classInfo );
-		return this.classInfo;
+		return this.pool.addClass( name );
 	}
 
-	public ConstantFieldref fieldref( String name )
+	public ConstantUtf8 addFieldType( java.lang.Class<?> type )
 	{
-		for( Field field : this.fields )
-		{
-			if( field.name().equals( name ) )
-				return field.fieldref();
-		}
-		Assert.fail();
-		return null;
+		return this.pool.addUtf8( Types.toFieldDescriptor( type ) );
 	}
 
-	public Method addMethod( String name, Class<?> ret, Class<?>... parameters )
+	public ConstantUtf8 addMethodType( java.lang.Class<?> result, java.lang.Class<?>... args )
 	{
-		Method result = new Method( this, name, ret, parameters );
-		this.methods.add( result );
-		return result;
+		return this.pool.addUtf8( Types.toMethodDescriptor( result, args ) );
 	}
 
-	public Method addConstructor( Class<?>... parameters )
+	public ConstantFieldref addConstantFieldref( ConstantClass classInfo, String name, ConstantUtf8 type )
 	{
-		return addMethod( "<init>", null, parameters );
+		return this.pool.addFieldref( classInfo, this.pool.addNameAndType( name, type ) );
 	}
 
-	public Field addField( String name, Class<?> type )
+	public ConstantMethodref addConstantMethodref( ConstantClass classInfo, String name, ConstantUtf8 type )
 	{
-		Field result = new Field( this, name, type );
-		this.fields.add( result );
-		return result;
+		return this.pool.addMethodref( classInfo, this.pool.addNameAndType( name, type ) );
 	}
+
+	public Class addClass( ConstantClass name )
+	{
+		return this.cls = new Class( name );
+	}
+
+//	public ClassBuilder( String name, Class<?>... extend )
+//	{
+//		this.name = name;
+//		for( Class<?> cls : extend )
+//		{
+//			if( cls.isInterface() )
+//			{
+//				if( this.interfaces == null )
+//					this.interfaces = new ArrayList<Class<?>>();
+//				this.interfaces.add( cls );
+//			}
+//			else
+//			{
+//				// TODO Check other types of Class
+//				Assert.isNull( this.superClass );
+//				this.superClass = cls;
+//			}
+//		}
+//	}
+
+//	public String name()
+//	{
+//		return this.name;
+//	}
+
+//	public ConstantClass classInfo()
+//	{
+//		Assert.notNull( this.classInfo );
+//		return this.classInfo;
+//	}
+
+//	public ConstantFieldref fieldref( String name )
+//	{
+//		for( Field field : this.fields )
+//		{
+//			if( field.name().equals( name ) )
+//				return field.fieldref();
+//		}
+//		Assert.fail();
+//		return null;
+//	}
 
 	public Bytes compile()
 	{
+		if( this.cls == null )
+			throw new CompilerException( "No class set" );
+
 		Bytes bytes = new Bytes();
 		try
 		{
@@ -89,36 +103,13 @@ public class ClassBuilder
 			bytes.writeShort( 0 ); // minor version
 			bytes.writeShort( 49 ); // major version
 
-			ConstantPool pool = collectConstants();
-			bytes.writeShort( pool.size() + 1 );
-			for( Constant constant : pool.constants() )
+			this.pool.addUtf8( "Code" ); // TODO Attribute names only if needed
+
+			bytes.writeShort( this.pool.size() + 1 );
+			for( Constant constant : this.pool.constants() )
 				constant.write( bytes );
 
-			bytes.writeShort( 0x1001 ); // public & synthetic
-			bytes.writeShort( this.classInfo.index() ); // this_class
-
-			// super_class
-			bytes.writeShort( this.superClassInfo.index() ); // super_class
-
-			// interfaces
-			if( this.interfacesInfo == null )
-				bytes.writeShort( 0 );
-			else
-			{
-				bytes.writeShort( this.interfaces.size() ); // interfaces_count
-				for( ConstantClass info : this.interfacesInfo )
-					bytes.writeShort( info.index() );
-			}
-
-			// fields
-			bytes.writeShort( this.fields.size() );
-			for( Field field : this.fields )
-				field.write( bytes );
-
-			// methods
-			bytes.writeShort( this.methods.size() );
-			for( Method method : this.methods )
-				method.write( bytes );
+			this.cls.write( bytes );
 
 			// attributes
 			bytes.writeShort( 0 );
@@ -130,33 +121,33 @@ public class ClassBuilder
 		return bytes;
 	}
 
-	private ConstantPool collectConstants()
-	{
-		ConstantPool pool = new ConstantPool();
-
-		// this_class
-		this.classInfo = pool.add( new ConstantClass( pool, this.name ) );
-
-		// super_class
-		// According to the Java 8 spec, this may be null or 0
-		this.superClassInfo = pool.add( new ConstantClass( pool, this.superClass != null ? this.superClass.getName() : "java.lang.Object" ) );
-
-		// interfaces
-		if( this.interfaces != null )
-		{
-			this.interfacesInfo = new ArrayList<ConstantClass>();
-			for( Class<?> interfac : this.interfaces )
-				this.interfacesInfo.add( pool.add( new ConstantClass( pool, interfac.getName() ) ) );
-		}
-
-		// fields
-		for( Field field : this.fields )
-			field.collectConstants( pool );
-
-		// methods
-		for( Method method : this.methods )
-			method.collectConstants( pool );
-
-		return pool;
-	}
+//	private ConstantPool collectConstants()
+//	{
+//		ConstantPool pool = new ConstantPool();
+//
+//		// this_class
+//		this.classInfo = pool.add( new ConstantClass( pool, this.name ) );
+//
+//		// super_class
+//		// According to the Java 8 spec, this may be null or 0
+//		this.superClassInfo = pool.add( new ConstantClass( pool, this.superClass != null ? this.superClass.getName() : "java.lang.Object" ) );
+//
+//		// interfaces
+//		if( this.interfaces != null )
+//		{
+//			this.interfacesInfo = new ArrayList<ConstantClass>();
+//			for( Class<?> interfac : this.interfaces )
+//				this.interfacesInfo.add( pool.add( new ConstantClass( pool, interfac.getName() ) ) );
+//		}
+//
+//		// fields
+//		for( Field field : this.fields )
+//			field.collectConstants( pool );
+//
+//		// methods
+//		for( Method method : this.methods )
+//			method.collectConstants( pool );
+//
+//		return pool;
+//	}
 }

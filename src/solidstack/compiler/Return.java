@@ -20,13 +20,6 @@ public class Return implements Statement
 	}
 
 	@Override
-	public void collectConstants( ConstantPool pool )
-	{
-		if( this.expression != null )
-			this.expression.collectConstants( pool );
-	}
-
-	@Override
 	public void getByteCode( Bytes bytes )
 	{
 		if( this.expression != null )

@@ -7,10 +7,10 @@ public class ConstantFieldref extends Constant
 	private ConstantClass classInfo;
 	private ConstantNameAndType nameAndType;
 
-	public ConstantFieldref( ConstantPool pool, ConstantClass cls, ConstantUtf8 name, ConstantUtf8 descriptor )
+	public ConstantFieldref( ConstantClass cls, ConstantNameAndType nameAndType )
 	{
 		this.classInfo = cls;
-		this.nameAndType = pool.add( new ConstantNameAndType( pool, name, descriptor ) );
+		this.nameAndType = nameAndType;
 	}
 
 	@Override
@@ -31,5 +31,20 @@ public class ConstantFieldref extends Constant
 				return other.classInfo == this.classInfo && other.nameAndType == this.nameAndType;
 			}
 		return false;
+	}
+
+	public String name()
+	{
+		return this.nameAndType.name();
+	}
+
+	public int nameIndex()
+	{
+		return this.nameAndType.nameIndex();
+	}
+
+	public int typeIndex()
+	{
+		return this.nameAndType.typeIndex();
 	}
 }

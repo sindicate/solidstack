@@ -7,19 +7,10 @@ public class CallSuper implements Statement
 
 	private ConstantMethodref methodref;
 
-	public CallSuper( Expression instance, String name )
+	public CallSuper( Expression instance, ConstantMethodref methodref )
 	{
 		this.instance = instance;
-		this.name = name;
-	}
-
-	@Override
-	public void collectConstants( ConstantPool pool )
-	{
-		ConstantUtf8 descriptor = pool.add( new ConstantUtf8( Types.toMethodDescriptor( null ) ) );
-		ConstantUtf8 name = pool.add( new ConstantUtf8( this.name ) );
-		ConstantClass cls = pool.add( new ConstantClass( pool, "java.lang.Object" ) );
-		this.methodref = pool.add( new ConstantMethodref( pool, cls, name, descriptor ) );
+		this.methodref = methodref;
 	}
 
 	@Override

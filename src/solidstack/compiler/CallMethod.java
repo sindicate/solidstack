@@ -9,33 +9,17 @@ public class CallMethod implements Expression
 
 	private ConstantMethodref methodref;
 
-	public CallMethod( Expression instance, String name, String descriptor, Expression... parameter )
+	public CallMethod( Expression instance, ConstantMethodref methodref, Expression... parameters )
 	{
 		this.instance = instance;
-		this.name = name;
-		this.descriptor = descriptor;
-		this.parameters = parameter;
+		this.methodref = methodref;
+		this.parameters = parameters;
 	}
 
 	@Override
 	public ConstantClass classInfo()
 	{
 		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void collectConstants( ConstantPool pool )
-	{
-		this.instance.collectConstants( pool );
-		for( Expression parameter : this.parameters )
-			parameter.collectConstants( pool );
-
-		ConstantUtf8 name = pool.add( new ConstantUtf8( this.name ) );
-		String fieldDescriptor = this.instance.getFieldDescriptor();
-		String className = Types.fieldDescriptorToClassName( fieldDescriptor );
-		ConstantClass cls = pool.add( new ConstantClass( pool, className ) );
-		ConstantUtf8 descriptor = pool.add( new ConstantUtf8( this.descriptor ) );
-		this.methodref = pool.add( new ConstantMethodref( pool, cls, name, descriptor ) );
 	}
 
 	@Override

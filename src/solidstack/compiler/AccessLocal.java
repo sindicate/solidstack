@@ -4,16 +4,14 @@ public class AccessLocal implements Expression
 {
 	static public enum TYPE { INT, REF }
 
-	private Method method;
 	private int local;
 	private TYPE type;
 
 
-	public AccessLocal( Method method, int local, TYPE type )
+	public AccessLocal( int local, TYPE type )
 	{
 		if( local < 0 )
 			throw new IllegalArgumentException();
-		this.method = method;
 		this.local = local;
 		this.type = type;
 	}
@@ -21,8 +19,8 @@ public class AccessLocal implements Expression
 	@Override
 	public ConstantClass classInfo()
 	{
-		if( this.local == 0 ) // TODO And non static
-			return this.method.classBuilder().classInfo();
+//		if( this.local == 0 ) // TODO And non static
+//			return this.method.classBuilder().classInfo();
 		throw new UnsupportedOperationException();
 	}
 
@@ -54,11 +52,6 @@ public class AccessLocal implements Expression
 				bytes.writeByte( this.local );
 				return;
 		}
-	}
-
-	@Override
-	public void collectConstants( ConstantPool pool )
-	{
 	}
 
 	@Override

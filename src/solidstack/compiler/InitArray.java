@@ -2,14 +2,13 @@ package solidstack.compiler;
 
 public class InitArray implements Expression
 {
-	private String type;
+	private ConstantClass classInfo;
 	private Expression[] values;
 
-	private ConstantClass classInfo;
 
-	public InitArray( String type, Expression... values )
+	public InitArray( ConstantClass type, Expression... values )
 	{
-		this.type = type;
+		this.classInfo = type;
 		this.values = values;
 	}
 
@@ -33,14 +32,6 @@ public class InitArray implements Expression
 			value.getByteCode( bytes );
 			bytes.writeByte( 0x53 ); // aastore
 		}
-	}
-
-	@Override
-	public void collectConstants( ConstantPool pool )
-	{
-		for( Expression value : this.values )
-			value.collectConstants( pool );
-		this.classInfo = pool.add( new ConstantClass( pool, this.type ) );
 	}
 
 	@Override

@@ -6,9 +6,9 @@ public class ConstantClass extends Constant
 {
 	private ConstantUtf8 utf8;
 
-	public ConstantClass( ConstantPool pool, String name )
+	public ConstantClass( ConstantUtf8 utf8 )
 	{
-		this.utf8 = pool.add( new ConstantUtf8( name.replace( '.', '/' ) ) );
+		this.utf8 = utf8;
 	}
 
 	@Override
@@ -28,5 +28,10 @@ public class ConstantClass extends Constant
 				return other.utf8 == this.utf8;
 			}
 		return false;
+	}
+
+	public String name()
+	{
+		return this.utf8.value();
 	}
 }

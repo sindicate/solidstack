@@ -31,4 +31,9 @@ public class ConstantUtf8 extends Constant
 			}
 		return false;
 	}
+
+	public String value()
+	{
+		return this.value;
+	}
 }

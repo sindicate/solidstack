@@ -35,13 +35,6 @@ public class LessThan implements Conditional
 	}
 
 	@Override
-	public void collectConstants( ConstantPool pool )
-	{
-		this.left.collectConstants( pool );
-		this.right.collectConstants( pool );
-	}
-
-	@Override
 	public String getFieldDescriptor()
 	{
 		throw new UnsupportedOperationException();

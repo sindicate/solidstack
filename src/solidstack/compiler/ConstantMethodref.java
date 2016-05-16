@@ -7,10 +7,10 @@ public class ConstantMethodref extends Constant
 	private ConstantClass classInfo;
 	private ConstantNameAndType nameAndType;
 
-	public ConstantMethodref( ConstantPool pool, ConstantClass cls, ConstantUtf8 name, ConstantUtf8 descriptor )
+	public ConstantMethodref( ConstantClass classInfo, ConstantNameAndType nameAndType )
 	{
-		this.classInfo = cls;
-		this.nameAndType = pool.add( new ConstantNameAndType( pool, name, descriptor ) );
+		this.classInfo = classInfo;
+		this.nameAndType = nameAndType;
 	}
 
 	@Override
@@ -31,5 +31,15 @@ public class ConstantMethodref extends Constant
 				return other.classInfo == this.classInfo && other.nameAndType == this.nameAndType;
 			}
 		return false;
+	}
+
+	public int nameIndex()
+	{
+		return this.nameAndType.nameIndex();
+	}
+
+	public int typeIndex()
+	{
+		return this.nameAndType.typeIndex();
 	}
 }

@@ -1,6 +1,5 @@
 package solidstack.compiler;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,21 +7,16 @@ public class Method
 {
 	private ClassBuilder cls;
 	private String name;
-	private Class<?> ret;
-	private Class<?>[] parameters;
 
 	private List<Statement> statements = new ArrayList<Statement>();
 
-	private ConstantUtf8 nameInfo;
-	private ConstantUtf8 descriptor;
-	private ConstantUtf8 codeAttribute;
+	private ConstantMethodref methodref;
 
-	public Method( ClassBuilder cls, String name, java.lang.Class<?> ret, java.lang.Class<?>... parameters )
+
+	public Method( ClassBuilder classFile, ConstantMethodref methodref )
 	{
-		this.cls = cls;
-		this.name = name;
-		this.ret = ret;
-		this.parameters = parameters;
+		this.cls = classFile;
+		this.methodref = methodref;
 	}
 
 	public ClassBuilder classBuilder()
@@ -30,36 +24,25 @@ public class Method
 		return this.cls;
 	}
 
-	public void collectConstants( ConstantPool pool )
-	{
-		this.nameInfo = pool.add( new ConstantUtf8( this.name ) );
-
-		String descriptor = Types.toMethodDescriptor( this.ret, this.parameters );
-		this.descriptor = pool.add( new ConstantUtf8( descriptor.toString() ) );
-
-		this.codeAttribute = pool.add( new ConstantUtf8( "Code" ) );
-
-		for( Statement stat : this.statements )
-			stat.collectConstants( pool );
-	}
-
-	public void write( Bytes bytes ) throws IOException
+	public void write( Bytes bytes )
 	{
 		bytes.writeShort( 0x1001 ); // public & synthetic
-		bytes.writeShort( this.nameInfo.index() ); // name_index
-		bytes.writeShort( this.descriptor.index() ); // descriptor_index
+		bytes.writeShort( this.methodref.nameIndex() ); // name_index
+		bytes.writeShort( this.methodref.typeIndex() ); // descriptor_index
 
 		// attributes
 		bytes.writeShort( 1 ); // attributes_count
 
+		ConstantUtf8 codeAttribute = this.cls.addConstantUtf8( "Code" );
+
 		// Code
 		Bytes code = getCode();
-		bytes.writeShort( this.codeAttribute.index() );
+		bytes.writeShort( codeAttribute.index() );
 		bytes.writeInt( code.size() );
 		bytes.write( code );
 	}
 
-	private Bytes getCode() throws IOException
+	private Bytes getCode()
 	{
 		Bytes bytes = new Bytes();
 
@@ -75,7 +58,7 @@ public class Method
 		return bytes;
 	}
 
-	private Bytes getByteCode() throws IOException
+	private Bytes getByteCode()
 	{
 		Bytes bytes = new Bytes();
 
@@ -103,12 +86,6 @@ public class Method
 	public void addStatement( Statement statement )
 	{
 		this.statements.add( statement );
-	}
-
-	public String fieldDescriptor( int local )
-	{
-		local--;
-		return Types.toFieldDescriptor( this.parameters[ local ] );
 	}
 
 	public void for_( Statement initialization, Conditional termination, Statement increment, Statement... statements )

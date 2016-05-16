@@ -2,15 +2,13 @@ package solidstack.compiler;
 
 public class Cast implements Expression
 {
-	private Expression value;
-	private String type;
-
 	private ConstantClass classInfo;
+	private Expression value;
 
-	public Cast( Expression value, String type )
+	public Cast( Expression value, ConstantClass type )
 	{
+		this.classInfo = type;
 		this.value = value;
-		this.type = type;
 	}
 
 	@Override
@@ -28,16 +26,9 @@ public class Cast implements Expression
 	}
 
 	@Override
-	public void collectConstants( ConstantPool pool )
-	{
-		this.value.collectConstants( pool );
-
-		this.classInfo = pool.add( new ConstantClass( pool, this.type ) );
-	}
-
-	@Override
 	public String getFieldDescriptor()
 	{
-		return Types.classNameToFieldDescriptor( this.type );
+		throw new UnsupportedOperationException();
+//		return Types.classNameToFieldDescriptor( this.type );
 	}
 }

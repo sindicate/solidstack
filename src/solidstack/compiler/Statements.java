@@ -16,11 +16,4 @@ public class Statements implements Statement
 		for( Statement statement : this.statements )
 			statement.getByteCode( bytes );
 	}
-
-	@Override
-	public void collectConstants( ConstantPool pool )
-	{
-		for( Statement statement : this.statements )
-			statement.collectConstants( pool );
-	}
 }

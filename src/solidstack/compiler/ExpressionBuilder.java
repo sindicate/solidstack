@@ -4,16 +4,13 @@ import solidstack.compiler.AccessLocal.TYPE;
 
 public class ExpressionBuilder
 {
-	private Method method;
-
-	public ExpressionBuilder( Method method )
+	public ExpressionBuilder()
 	{
-		this.method = method;
 	}
 
 	public AccessLocal local( int local, TYPE type )
 	{
-		return new AccessLocal( this.method, local, type );
+		return new AccessLocal( local, type );
 	}
 
 	public AssignLocal setLocal( int local, Expression value )
@@ -21,37 +18,32 @@ public class ExpressionBuilder
 		return new AssignLocal( local, value );
 	}
 
-	public AssignField setField( Expression instance, String name, String descriptor, Expression value )
+	public AssignField setField( Expression instance, ConstantFieldref field, Expression value )
 	{
-		return new AssignField( this.method.classBuilder(), instance, name, descriptor, value );
+		return new AssignField( instance, field, value );
 	}
 
-	public void statement( Statement statement )
+	public Statement callSuper( AccessLocal var, ConstantMethodref methodref )
 	{
-		this.method.addStatement( statement );
+		return new CallSuper( var, methodref );
 	}
 
-	public Statement callSuper( AccessLocal var, String name )
+	public Expression field( Expression instance, ConstantFieldref fieldref )
 	{
-		return new CallSuper( var, name );
+		return new AccessField( instance, fieldref );
 	}
 
-	public Expression field( Expression instance, String name, String descriptor )
-	{
-		return new AccessField( instance, name, descriptor );
-	}
-
-	public Expression initArray( String type, Expression... expression )
+	public Expression initArray( ConstantClass type, Expression... expression )
 	{
 		return new InitArray( type, expression );
 	}
 
-	public Expression call( Expression instance, String name, String descriptor, Expression... parameter )
+	public Expression call( Expression instance, ConstantMethodref methodref, Expression... parameters )
 	{
-		return new CallMethod( instance, name, descriptor, parameter );
+		return new CallMethod( instance, methodref, parameters );
 	}
 
-	public Expression cast( Expression call, String type )
+	public Expression cast( Expression call, ConstantClass type )
 	{
 		return new Cast( call, type );
 	}

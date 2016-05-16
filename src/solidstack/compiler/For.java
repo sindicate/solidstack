@@ -17,15 +17,6 @@ public class For implements Statement
 	}
 
 	@Override
-	public void collectConstants( ConstantPool pool )
-	{
-		this.initialization.collectConstants( pool );
-		this.termination.collectConstants( pool );
-		this.increment.collectConstants( pool );
-		this.statements.collectConstants( pool );
-	}
-
-	@Override
 	public void getByteCode( Bytes bytes )
 	{
 		// Initialization
