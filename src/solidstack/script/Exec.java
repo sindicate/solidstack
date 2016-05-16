@@ -3,7 +3,6 @@ package solidstack.script;
 import java.io.FileNotFoundException;
 
 import funny.Symbol;
-
 import solidstack.io.Resource;
 import solidstack.io.Resources;
 import solidstack.io.SourceException;
@@ -17,7 +16,7 @@ public class Exec
 {
 	// TODO Use user exceptions
 	// TODO System.exit() but without disturbing the unit tests. Maybe look at the stack trace to see.
-	public static void main( String... args )
+	static public void main( String... args )
 	{
 		if( args.length == 0 )
 		{
@@ -38,28 +37,31 @@ public class Exec
 			return;
 		}
 
-		Script script;
 		try
 		{
-			script = Script.compile( reader );
+			exec( reader, args );
 		}
 		catch( SourceException e )
 		{
 			System.err.println( e.getMessage() );
-			return;
-		}
-
-		DefaultScope scope = new DefaultScope();
-		scope.var( Symbol.apply( "args" ), args );
-
-		try
-		{
-			script.eval( scope );
 		}
 		catch( ScriptException e )
 		{
 			System.err.println( e.getMessage() );
-			return;
 		}
+		catch( Exception e )
+		{
+			e.printStackTrace( System.err );
+		}
+	}
+
+	static public Object exec( SourceReader source, String... args )
+	{
+		Script script = Script.compile( source );
+
+		DefaultScope scope = new DefaultScope();
+		scope.var( Symbol.apply( "args" ), args );
+
+		return script.eval( scope );
 	}
 }

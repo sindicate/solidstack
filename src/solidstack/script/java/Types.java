@@ -17,12 +17,16 @@
 package solidstack.script.java;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -32,6 +36,8 @@ import java.util.Map;
 import java.util.Set;
 
 import solidstack.lang.Assert;
+import solidstack.lang.SystemException;
+import solidstack.script.objects.FunctionObject;
 
 
 public class Types
@@ -208,10 +214,6 @@ public class Types
 		return list;
 	}
 
-//    // ATTENTION: The methods isAssignable & compare & calculateDistance & convert need to stay synchronized
-
-
-
 	/**
 	 * Returns -1 when not, 0 is nop, 1 is easy.
 	 *
@@ -219,7 +221,7 @@ public class Types
 	 * @param type
 	 * @return
 	 */
-	// SYNC isAssignableToType
+	// SYNC with convert
 	static public boolean assignable( Class<?> arg, Class<?> type )
 	{
 		if( arg == null )
@@ -236,10 +238,17 @@ public class Types
 					return true;
 		}
 
+		if( arg == FunctionObject.class )
+			if( type == Comparator.class ) // TODO Of course this needs to be discovered in another way
+			{
+				// TODO And we need to check the argument count
+				return true;
+			}
+
         return false;
 	}
 
-	// SYNC isAssignableToType()
+	// SYNC with assignable
 	static public Object convert( Object object, Class type )
 	{
 		if( type.isPrimitive() )
@@ -442,6 +451,24 @@ public class Types
 
 			return array;
 		}
+
+		if( object instanceof FunctionObject )
+			if( type == Comparator.class ) // TODO Of course this needs to be discovered in another way
+			{
+				// TODO Check the number of arguments
+				Method method;
+				try
+				{
+					method = Comparator.class.getMethod( "compare", Object.class, Object.class );
+				}
+				catch( NoSuchMethodException e )
+				{
+					throw new SystemException( e );
+				}
+				InvocationHandler handler = new FunctionObjectInvocationHandler( (FunctionObject)object, method );
+				ClassLoader loader = Thread.currentThread().getContextClassLoader();
+				return Proxy.newProxyInstance( loader, new Class[] { Comparator.class }, handler );
+			}
 
         // TODO Cast to class?
 
