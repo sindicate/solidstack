@@ -34,6 +34,13 @@ public class InterfaceTests
 //		}
 	}
 
+	@Test
+	static public void customInterface() throws FileNotFoundException
+	{
+		Object result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run( ()=>() );");
+		assertThat( result ).isNull();
+	}
+
 	static public Object exec( String script )
 	{
 		return Exec.exec( SourceReaders.forString( script ) );

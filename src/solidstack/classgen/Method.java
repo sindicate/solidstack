@@ -6,6 +6,7 @@ import java.util.List;
 import solidstack.classgen.bytecode.Conditional;
 import solidstack.classgen.bytecode.Expression;
 import solidstack.classgen.bytecode.For;
+import solidstack.classgen.bytecode.Pop;
 import solidstack.classgen.bytecode.Return;
 import solidstack.classgen.bytecode.Statement;
 import solidstack.classgen.constants.CMethodref;
@@ -99,5 +100,10 @@ public class Method
 	public void for_( Statement initialization, Conditional termination, Statement increment, Statement... statements )
 	{
 		this.statements.add( new For( initialization, termination, increment, statements ) );
+	}
+
+	public void pop()
+	{
+		this.statements.add( new Pop() );
 	}
 }

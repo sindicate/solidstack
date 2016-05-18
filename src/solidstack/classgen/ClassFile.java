@@ -1,11 +1,11 @@
 package solidstack.classgen;
 
-import solidstack.classgen.constants.Constant;
 import solidstack.classgen.constants.CClass;
 import solidstack.classgen.constants.CFieldref;
 import solidstack.classgen.constants.CMethodref;
-import solidstack.classgen.constants.ConstantPool;
 import solidstack.classgen.constants.CUtf8;
+import solidstack.classgen.constants.Constant;
+import solidstack.classgen.constants.ConstantPool;
 
 public class ClassFile
 {
@@ -25,6 +25,11 @@ public class ClassFile
 	public CClass addClass( String name )
 	{
 		return this.pool.addClass( name );
+	}
+
+	public CClass addClass( java.lang.Class<?> type )
+	{
+		return addClass( type.getName() );
 	}
 
 	public CUtf8 addFieldType( java.lang.Class<?> type )

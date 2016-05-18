@@ -18,6 +18,7 @@ package solidstack.script;
 
 import java.math.BigDecimal;
 
+import funny.Symbol;
 import solidstack.io.PushbackReader;
 import solidstack.io.SourceException;
 import solidstack.io.SourceLocation;
@@ -49,7 +50,6 @@ import solidstack.script.expressions.While;
 import solidstack.script.expressions.With;
 import solidstack.script.operators.Operator;
 import solidstack.script.operators.Spread;
-import funny.Symbol;
 
 
 /**
@@ -144,7 +144,12 @@ public class ScriptParser
 				case HASH:
 				case FUNCTION:
 					Expression right = parseAtom();
-					Assert.notNull( right );
+					if( right == null )
+					{
+						Token last = this.tokenizer.last();
+						// TODO Better to call parseAtom() with an indication that it must expect an atom
+						throw new SourceException( "Unexpected token '" + last + "'", last.getLocation() );
+					}
 					result = appendOperator( result, token.getValue(), right );
 					break;
 

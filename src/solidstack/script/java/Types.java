@@ -17,14 +17,12 @@
 package solidstack.script.java;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -34,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 
 import solidstack.lang.Assert;
-import solidstack.lang.SystemException;
 import solidstack.script.objects.FunctionObject;
 
 
@@ -237,11 +234,7 @@ public class Types
 		}
 
 		if( arg == FunctionObject.class )
-			if( type == Comparator.class ) // TODO Of course this needs to be discovered in another way
-			{
-				// TODO And we need to check the argument count
-				return true;
-			}
+			return Proxies.canProxy( type );
 
         return false;
 	}
@@ -451,20 +444,11 @@ public class Types
 		}
 
 		if( object instanceof FunctionObject )
-			if( type == Comparator.class ) // TODO Of course this needs to be discovered in another way
-			{
-				// TODO Check the number of arguments
-				Method method;
-				try
-				{
-					method = Comparator.class.getMethod( "compare", Object.class, Object.class );
-				}
-				catch( NoSuchMethodException e )
-				{
-					throw new SystemException( e );
-				}
-				return Proxies.createProxy2( Comparator.class, method, (FunctionObject)object );
-			}
+		{
+			Object result = Proxies.createProxy( (FunctionObject)object, type );
+			if( result != null )
+				return result;
+		}
 
         // TODO Cast to class?
 
