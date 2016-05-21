@@ -1,24 +1,21 @@
 package solidstack.classgen.bytecode;
 
 import solidstack.classgen.Bytes;
+import solidstack.classgen.Types.TYPE;
 
 public class Return implements Statement
 {
-	private Integer value;
 	private Expression expression;
+	private TYPE type;
 
 	public Return()
 	{
 	}
 
-	public Return( int value )
-	{
-		this.value = value; // TODO
-	}
-
-	public Return( Expression value )
+	public Return( Expression value, TYPE type )
 	{
 		this.expression = value;
+		this.type = type;
 	}
 
 	@Override
@@ -27,14 +24,20 @@ public class Return implements Statement
 		if( this.expression != null )
 		{
 			this.expression.getByteCode( bytes );
-			bytes.writeByte( 0xAC ); // ireturn
+			int b;
+			switch( this.type )
+			{
+				case INT: b = 0xAC; break; // ireturn
+				case LONG: b = 0xAD; break; // lreturn
+				case FLOAT: b = 0xAE; break; // freturn
+				case DOUBLE: b = 0xAF; break; // dreturn
+				case REF: b = 0xB0; break; // areturn
+				default:
+					throw new UnsupportedOperationException( this.type.toString() );
+			}
+			bytes.writeByte( b );
 		}
-		else if( this.value == null )
-			bytes.writeByte( 0xB1 ); // return
 		else
-		{
-			bytes.writeByte( 0x03 ); // iconst_0
-			bytes.writeByte( 0xAC ); // ireturn
-		}
+			bytes.writeByte( 0xB1 ); // return
 	}
 }

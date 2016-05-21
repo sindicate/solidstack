@@ -24,6 +24,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -551,6 +553,17 @@ public class DefaultClassExtensions
 	static public int size( String string )
 	{
 		return string.length();
+	}
+
+	static public <T extends Comparable<? super T>> void sort( List<T> list )
+	{
+		Collections.sort( list );
+	}
+
+	// TODO Java 8 has a List.sort
+	static public <T> void sort( List<T> list, Comparator<? super T> comparator )
+	{
+		Collections.sort( list, comparator );
 	}
 
 	static public final Pattern STRIPMARGIN_PATTERN = Pattern.compile( "(?m)^[ \\t]*\\|" ); // TODO Why not \s for whitespace?

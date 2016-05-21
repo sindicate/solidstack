@@ -265,7 +265,7 @@ public class CallResolver
 					index ++;
 				else
 					best2.remove( index + 1 );
-		}
+			}
 			else
 			{
 				if( moreSpecificThan( candidate2.getParameterTypes(), candidate2.isVararg(), candidate1.getParameterTypes(), candidate1.isVararg() ) )
@@ -277,6 +277,21 @@ public class CallResolver
 				else
 					index ++;
 			}
+		}
+
+		if( best2.size() == 1 )
+			return best2.get( 0 );
+
+		best = best2;
+
+		// Filter out extension candidates
+
+		best2 = new ArrayList( best );
+		for( Iterator iterator = best2.iterator(); iterator.hasNext(); )
+		{
+			MethodCall candidate = (MethodCall)iterator.next();
+			if( candidate.extMethod != null )
+				iterator.remove();
 		}
 
 		if( best2.size() == 1 )

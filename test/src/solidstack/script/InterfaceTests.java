@@ -23,22 +23,38 @@ public class InterfaceTests
 	@Test
 	static public void comparatorEqualsMethod() throws FileNotFoundException
 	{
-//		try
-//		{
-			exec( "var Test= loadClass(\"solidstack.script.ComparatorEqualsCall\"); var test=new Test(); test.sort( (i1,i2) => i1-i2 );" );
-//			failBecauseExceptionWasNotThrown( ScriptException.class );
-//		}
-//		catch( ScriptException e )
-//		{
-//			assertThat( e.getMessage() ).contains( "Method not supported" );
-//		}
+		// The ComparatorEqualsCall class will call the equals method instead of the compare method
+		exec( "var Test= loadClass(\"solidstack.script.ComparatorEqualsCall\"); var test=new Test(); test.sort( (i1,i2) => i1-i2 );" );
 	}
 
 	@Test
-	static public void customInterface() throws FileNotFoundException
+	static public void customInterfaceNonReturning() throws FileNotFoundException
 	{
-		Object result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run( ()=>() );");
+		// TODO Capture the output
+		Object result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run1( ()=>println(\"I'm here!\") );");
 		assertThat( result ).isNull();
+
+		result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run2( (name)=>println(s\"Hello ${name}!\"), \"René\" );");
+		assertThat( result ).isNull();
+	}
+
+	@Test
+	static public void customInterfaceReturning() throws FileNotFoundException
+	{
+		// This test conversion too (from Boolean to String)
+		Object result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run3( ()=>true );");
+		assertThat( result ).isInstanceOf( String.class );
+		assertThat( (String)result ).isEqualTo( "true" );
+
+		// This returns a Long
+		result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run4( ()=>123 );");
+		assertThat( result ).isInstanceOf( Long.class );
+		assertThat( (Long)result ).isEqualTo( 123 );
+
+		// This returns a long
+		result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run5( ()=>456 );");
+		assertThat( result ).isInstanceOf( Long.class );
+		assertThat( (Long)result ).isEqualTo( 456 );
 	}
 
 	static public Object exec( String script )

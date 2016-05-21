@@ -2,16 +2,16 @@ package solidstack.script.java;
 
 import java.io.FileOutputStream;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
 
 import solidstack.classgen.Bytes;
 import solidstack.classgen.ClassFile;
-import solidstack.classgen.Field;
 import solidstack.classgen.Loader;
-import solidstack.classgen.bytecode.AccessLocal.TYPE;
+import solidstack.classgen.Types.TYPE;
 import solidstack.classgen.bytecode.Expression;
 import solidstack.classgen.bytecode.ExpressionBuilder;
 import solidstack.classgen.constants.CClass;
@@ -21,25 +21,54 @@ import solidstack.lang.SystemException;
 import solidstack.script.ScriptException;
 import solidstack.script.objects.FunctionObject;
 
+
 public class Proxies
 {
+	static private final Map<Class<?>, Class<?>> boxes = new HashMap<Class<?>, Class<?>>();
+	static private final Map<Class<?>, TYPE> jvmTypes = new HashMap<Class<?>, TYPE>();
+
+	static
+	{
+		boxes.put( Boolean.TYPE, Boolean.class );
+		boxes.put( Byte.TYPE, Byte.class );
+		boxes.put( Character.TYPE, Character.class );
+		boxes.put( Short.TYPE, Short.class );
+		boxes.put( Integer.TYPE, Integer.class );
+		boxes.put( Long.TYPE, Long.class );
+		boxes.put( Float.TYPE, Float.class );
+		boxes.put( Double.TYPE, Double.class );
+
+		jvmTypes.put( Boolean.TYPE, TYPE.INT );
+		jvmTypes.put( Byte.TYPE, TYPE.INT );
+		jvmTypes.put( Character.TYPE, TYPE.INT );
+		jvmTypes.put( Short.TYPE, TYPE.INT );
+		jvmTypes.put( Integer.TYPE, TYPE.INT );
+		jvmTypes.put( Long.TYPE, TYPE.LONG );
+		jvmTypes.put( Float.TYPE, TYPE.FLOAT );
+		jvmTypes.put( Double.TYPE, TYPE.DOUBLE );
+	}
+
 	static public boolean canProxy( Class<?> type )
 	{
+		// Must be an interface
 		if( !type.isInterface() )
 			return false;
-		Method[] methods = type.getMethods();
-		int count = 0;
-		for( Method method : methods )
-			if( !Modifier.isStatic( method.getModifiers() ) && !method.isDefault() )
+
+		// Examine the non-static, non-default methods that are not implemented by java.lang.Object
+		boolean found = false;
+		for( Method method : type.getMethods() )
+			if( Modifier.isAbstract( method.getModifiers() ) ) // This excludes static and default methods
 				try
 				{
 					Object.class.getMethod( method.getName(), method.getParameterTypes() );
 				}
 				catch( NoSuchMethodException e )
 				{
-					count++;
+					if( found ) return false; // Already found one, so there are more than one
+					found = true;
 				}
-		return count == 1;
+
+		return found;
 	}
 
 	static public <T> T createProxy( FunctionObject function, Class<T> type )
@@ -47,10 +76,10 @@ public class Proxies
 		// TODO Linenumbers in the ScriptExceptions?
 		if( !type.isInterface() )
 			throw new ScriptException( type.getName() + " is not an interface" );
-		Method[] methods = type.getMethods();
+
 		Method m = null;
-		for( Method method : methods )
-			if( !Modifier.isStatic( method.getModifiers() ) && !method.isDefault() )
+		for( Method method : type.getMethods() )
+			if( Modifier.isAbstract( method.getModifiers() ) ) // This excludes static and default methods
 				try
 				{
 					Object.class.getMethod( method.getName(), method.getParameterTypes() );
@@ -61,22 +90,25 @@ public class Proxies
 						throw new ScriptException( "Interface is not a functional interface" );
 					m = method;
 				}
+
 		if( m == null )
 			throw new ScriptException( "Interface is not a functional interface" );
+
 		// TODO Varargs?
-		if( m.getParameterCount() != function.getParameters().length )
+		if( m.getParameterTypes().length != function.getParameters().length ) // TODO In Java 8 we have a getParameterCount()
 			throw new ScriptException( "Parameter count mismatch" );
-		return createProxy2( type, m, function );
+
+		return createProxy( type, m, function );
 	}
 
-	static public <T> T createProxy( Class<T> type, Method method, FunctionObject function )
+	static private <T> T createProxyOldWay( Class<T> type, Method method, FunctionObject function )
 	{
 		InvocationHandler handler = new FunctionObjectInvocationHandler( function, method );
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		return (T)Proxy.newProxyInstance( loader, new Class[] { type }, handler ); // Proxy classes get cached by the JVM
 	}
 
-	static public <T> T createProxy2( Class<T> type, Method method, FunctionObject function )
+	static private <T> T createProxy( Class<T> type, Method method, FunctionObject function )
 	{
 		// TODO Caching of the proxy classes
 
@@ -85,89 +117,87 @@ public class Proxies
 		CClass cProxy = file.addClass( "solidstack/proxy/Proxy" ); // TODO Give $name with counter
 		CClass cObject = file.addClass( Object.class );
 		CClass cFunctionObject = file.addClass( FunctionObject.class );
-		CClass cReturn = file.addClass( method.getReturnType() );
 		CClass cInterface = file.addClass( type );
 		CClass cTypes = file.addClass( Types.class );
-		CClass cInteger = file.addClass( Integer.class );
 
 		// The proxy class
 
+		// 'public class implements xxx'
 		solidstack.classgen.Class proxyClass = file.createClass( cProxy );
 		proxyClass.extend( cObject );
 		proxyClass.implement( cInterface );
 
 		// Fields
 
-		CFieldref fieldFunction = file.addFieldref( cProxy, "function", file.addFieldType( FunctionObject.class ) );
+		CFieldref fFunction = file.addFieldref( cProxy, "function", file.addFieldType( FunctionObject.class ) );
 
-		// private FunctionObject function
-		Field field = proxyClass.addField( fieldFunction );
-		field.setPrivate( true );
+		// 'private FunctionObject function'
+		proxyClass.addField( fFunction ).setPrivate( true );
 
 		// Constructor
 
-		CMethodref methodInit = file.addMethodref( cProxy, "<init>", file.addMethodType( void.class, FunctionObject.class ) );
-		CMethodref methodSuper = file.addMethodref( cObject, "<init>", file.addMethodType( void.class ) );
+		CMethodref mInit = file.addMethodref( cProxy, "<init>", file.addMethodType( void.class, FunctionObject.class ) );
+		CMethodref mSuper = file.addMethodref( cObject, "<init>", file.addMethodType( void.class ) );
 
 		ExpressionBuilder eb = new ExpressionBuilder();
 
-		// public <init>( FunctionObject f )
-		//     super()
-		//     this.function = f
-		//     return
-		solidstack.classgen.Method init = proxyClass.addMethod( file, methodInit );
-		init.statement( eb.callSuper( eb.local( 0, TYPE.REF ), methodSuper ) );
-		init.statement( eb.setField( eb.local( 0, TYPE.REF ), fieldFunction, eb.local( 1, TYPE.REF ) ) );
+		// 'public <init>( FunctionObject f )
+		//     super();
+		//     this.function = f;
+		//     return;'
+		solidstack.classgen.Method init = proxyClass.addMethod( file, mInit );
+		init.statement( eb.callSuper( eb.local( 0, TYPE.REF ), mSuper ) );
+		init.statement( eb.setField( eb.local( 0, TYPE.REF ), fFunction, eb.local( 1, TYPE.REF ) ) );
 		init.return_();
 
 		// Method
-		CMethodref methodThe = file.addMethodref( cProxy, method.getName(), file.addMethodType( method.getReturnType(), method.getParameterTypes() ) );
-		CMethodref methodCall = file.addMethodref( cFunctionObject, "call", file.addMethodType( Object.class, Object[].class ) );
-		CMethodref methodIntValue = file.addMethodref( cInteger, "intValue", file.addMethodType( int.class ) );
-		CMethodref methodConvert = file.addMethodref( cTypes, "convert", file.addMethodType( Object.class, Object.class, Class.class ) );
 
-		int count = method.getParameterCount();
+		CMethodref mImpl = file.addMethodref( cProxy, method.getName(), file.addMethodType( method.getReturnType(), method.getParameterTypes() ) );
+		CMethodref mCall = file.addMethodref( cFunctionObject, "call", file.addMethodType( Object.class, Object[].class ) );
+
+		solidstack.classgen.Method impl = proxyClass.addMethod( file, mImpl );
+
+		// Read pars from locals
+		int count = method.getParameterTypes().length; // TODO In Java 8 we have a getParameterCount()
 		Expression[] pars = new Expression[ count ];
 		for( int i = 0; i < count; i++ )
 			pars[ i ] = eb.local( i + 1, TYPE.REF );
 
+		// Call the function
 		Expression call = eb.call(
-			eb.field( eb.local( 0, TYPE.REF ), fieldFunction ),
-			methodCall,
+			eb.field( eb.local( 0, TYPE.REF ), fFunction ),
+			mCall,
 			eb.initArray( cObject, pars )
 		);
 
-		// public int compare( Object o1, Object o2 )
-		//      return ( (Integer)this.function.call( new Object[] { o1, o2 } ) ).intValue()
-		solidstack.classgen.Method compare = proxyClass.addMethod( file, methodThe );
-		if( method.getReturnType() != void.class )
+		Class<?> returnType = method.getReturnType();
+
+		if( returnType == void.class )
 		{
-			if( method.getReturnType() != int.class )
-				throw new UnsupportedOperationException( "Only int return type supported" );
-			compare.return_(
-				eb.call(
-					eb.cast(
-						eb.callStatic(
-							methodConvert,
-							call ,
-							eb.literal( cInteger )
-						),
-						cInteger
-					),
-					methodIntValue
-				)
-			);
+			// Call, pop the result and return
+			impl.pop( call, TYPE.REF );
+			impl.return_();
 		}
 		else
 		{
-			compare.statement( call );
-			compare.pop();
-			compare.return_();
+			if( returnType.isPrimitive() )
+			{
+				// Convert to box type, unbox and return
+				Class<?> boxType = boxes.get( returnType );
+				call = convert( call, boxType, file );
+				impl.return_( unbox( call, boxType, returnType, file ), jvmTypes.get( returnType ) );
+			}
+			else
+			{
+				// Convert and return
+				impl.return_( convert( call, returnType, file ), TYPE.REF );
+			}
 		}
 
-
+		// Generate the class file
 		Bytes compiled = file.generate();
 
+		// Write to file for testing
 		try {
 			FileOutputStream out = new FileOutputStream( "compiled.class" );
 			try {
@@ -179,16 +209,45 @@ public class Proxies
 			throw new SystemException( e );
 		}
 
+		// Load the class file
 		Loader loader = new Loader();
 		Class<?> loadedClass = loader.load( proxyClass.name(), compiled.toByteArray() );
 
+		// Instantiate the proxy object
 		try
 		{
 			return (T)loadedClass.getConstructor( FunctionObject.class ).newInstance( function );
 		}
-		catch( InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e )
+		catch( RuntimeException e )
+		{
+			throw e;
+		}
+		catch( Exception e )
 		{
 			throw new SystemException( e );
 		}
+	}
+
+	static private Expression convert( Expression exp, Class<?> type, ClassFile file )
+	{
+		// Add constants
+		CClass cTypes = file.addClass( Types.class );
+		CMethodref methodConvert = file.addMethodref( cTypes, "convert", file.addMethodType( Object.class, Object.class, Class.class ) );
+		CClass cType = file.addClass( type );
+
+		// Call convert and cast
+		ExpressionBuilder eb = new ExpressionBuilder();
+		return eb.cast( eb.callStatic( methodConvert, exp, eb.literal( cType ) ), cType );
+	}
+
+	static private Expression unbox( Expression exp, Class<?> box, Class<?> prim, ClassFile file )
+	{
+		// Add constants
+		CClass cBox = file.addClass( box );
+		CMethodref methodUnbox = file.addMethodref( cBox, prim.getName() + "Value", file.addMethodType( prim ) );
+
+		// Call unbox method
+		ExpressionBuilder eb = new ExpressionBuilder();
+		return eb.call( exp, methodUnbox );
 	}
 }

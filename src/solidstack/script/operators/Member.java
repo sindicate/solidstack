@@ -172,6 +172,7 @@ public class Member extends Operator
 		}
 		catch( Exception e )
 		{
+			// TODO Is it ok to lose the stacktrace here?
 //			e.printStackTrace( System.err );
 			throw new ThrowException( e.getMessage() != null ? e.getMessage() : e.toString(), thread.cloneStack( getLocation() ) );
 //			throw new JavaException( e, thread.cloneStack( getLocation() ) ); // TODO Debug flag or something?

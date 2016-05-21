@@ -11,7 +11,7 @@ import java.util.Comparator;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import solidstack.classgen.bytecode.AccessLocal.TYPE;
+import solidstack.classgen.Types.TYPE;
 import solidstack.classgen.bytecode.ExpressionBuilder;
 import solidstack.classgen.constants.CClass;
 import solidstack.classgen.constants.CFieldref;
@@ -78,7 +78,8 @@ public class CompilerTests
 					cInteger
 				),
 				methodIntValue
-			)
+			),
+			TYPE.INT
 		);
 
 		Bytes compiled = cb.generate();
@@ -146,7 +147,7 @@ public class CompilerTests
 			e.setLocal( 1, e.plus( e.local( 1, TYPE.INT ), e.literal( 1 ) ) ),
 			e.setLocal( 2, e.plus( e.local( 2, TYPE.INT ), e.local( 1, TYPE.INT ) ) )
 		);
-		method.return_( e.local( 2, TYPE.INT ) );
+		method.return_( e.local( 2, TYPE.INT ), TYPE.INT );
 
 		Bytes compiled = file.generate();
 

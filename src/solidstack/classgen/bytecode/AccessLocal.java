@@ -1,12 +1,12 @@
 package solidstack.classgen.bytecode;
 
 import solidstack.classgen.Bytes;
+import solidstack.classgen.Types.TYPE;
 import solidstack.classgen.constants.CClass;
+
 
 public class AccessLocal implements Expression
 {
-	static public enum TYPE { INT, REF }
-
 	private int local;
 	private TYPE type;
 

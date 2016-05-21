@@ -4,6 +4,8 @@ import solidstack.lang.Assert;
 
 public class Types
 {
+	static public enum TYPE { INT, LONG, FLOAT, DOUBLE, REF }
+
 	static public String toFieldDescriptor( java.lang.Class<?> cls )
 	{
 		if( cls.isPrimitive() )
