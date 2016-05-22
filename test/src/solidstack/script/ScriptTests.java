@@ -595,6 +595,8 @@ public class ScriptTests extends Util
 		test( "list = List( 0 ); map = Map( true -> 2 ); ( list( 0 ), map( true ), z ) = ( 3, 4, 5 ); list( 0 ) + map( true ) + z", 12 );
 
 		// TODO Key value tuples for named parameters?
+		// TODO Scala uses :_* for "sequence argument"
+		// TODO Is it possible to put the asterisk behind the parameter like in Scala?
 	}
 
 	@Test

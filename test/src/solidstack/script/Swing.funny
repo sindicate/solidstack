@@ -1,17 +1,24 @@
-var JFrame = loadClass( "javax.swing.JFrame" );
-var JButton = loadClass( "javax.swing.JButton" );
+var JButton = Class( "javax.swing.JButton" );
+var JFrame = Class( "javax.swing.JFrame" );
+var JList = Class( "javax.swing.JList" );
 
 with( var frame = new JFrame() )
 (
 	title = "Simple example";
 	defaultCloseOperation = JFrame.EXIT_ON_CLOSE;
 	setSize( 300, 200 );
-	
+
 	with( var button = new JButton( "Click here!" ) )
 	(
 		addActionListener( e => text = "Hallo zeg!" );
 	);
-
 	add( button );
+	
+	with( var list = new JList( Array( "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten" ) ) )
+	(
+		addListSelectionListener( e => if( !e.valueIsAdjusting ) println( "Someone selected something" ) );
+	);
+	add( list );
+	
 	visible = true;
 );
