@@ -22,8 +22,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,6 +38,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Vector;
 import java.util.regex.Pattern;
 
 import funny.Symbol;
@@ -200,6 +204,11 @@ public class DefaultClassExtensions
 		return new File( filePath );
 	}
 
+	static public Object[] static_apply( Array array, Object... objects )
+	{
+		return objects;
+	}
+
 	static public LinkedHashMap static_apply( LinkedHashMap map, Assoc... entries )
 	{
 		LinkedHashMap result = new LinkedHashMap();
@@ -274,6 +283,14 @@ public class DefaultClassExtensions
 	static public Set static_apply( Set set, Object... objects )
 	{
 		return new HashSet( Arrays.asList( objects ) );
+	}
+
+	static public Vector static_apply( Vector vector, Object... objects )
+	{
+		Vector result = new Vector();
+		for( Object object : objects )
+			result.addElement( object );
+		return result;
 	}
 
 	static public Object apply( List list, int index )
@@ -597,6 +614,17 @@ public class DefaultClassExtensions
 	static public int size( String string )
 	{
 		return string.length();
+	}
+
+	static public <T extends Comparable<? super T>> void sort( List<T> list )
+	{
+		Collections.sort( list );
+	}
+
+	// TODO Java 8 has a List.sort
+	static public <T> void sort( List<T> list, Comparator<? super T> comparator )
+	{
+		Collections.sort( list, comparator );
 	}
 
 	static public final Pattern STRIPMARGIN_PATTERN = Pattern.compile( "(?m)^[ \\t]*\\|" ); // TODO Why not \s for whitespace?

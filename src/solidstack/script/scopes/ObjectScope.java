@@ -30,25 +30,71 @@ import solidstack.script.java.MissingMethodException;
 import solidstack.script.objects.Type;
 import solidstack.script.objects.Util;
 
-public class ObjectScope extends AbstractScope
+public class ObjectScope implements Scope
 {
+	private Scope parent;
 	private Object object;
+
 
 	public ObjectScope( Object object )
 	{
 		this.object = object;
 	}
 
+	public ObjectScope( Object object, Scope parent )
+	{
+		this( object );
+		this.parent = parent;
+	}
+
+	@Override
+	public void setOrCreate( Symbol symbol, Object value )
+	{
+		try
+		{
+			set( symbol, value );
+		}
+		catch( UndefinedException e )
+		{
+			var( symbol, value );
+		}
+	}
+
+	@Override
+	public void set( Symbol symbol, Object value )
+	{
+		try
+		{
+			if( this.object instanceof Type )
+				Java.setStatic( ( (Type)this.object ).theClass(), symbol.toString(), value );
+			else
+				Java.set( this.object, symbol.toString(), value ); // TODO Use resolve() instead.
+		}
+		catch( InvocationTargetException e )
+		{
+			Throwable t = e.getCause();
+			if( t instanceof Returning )
+				throw (Returning)t;
+			throw new JavaException( t, ThreadContext.get().cloneStack( /* TODO getLocation() */ ) );
+		}
+		catch( MissingFieldException e )
+		{
+			if( this.parent == null )
+				throw new UndefinedException();
+			this.parent.set( symbol, value );
+		}
+	}
+
 	@Override
 	public void var( Symbol symbol, Object value )
 	{
-		throw new UnsupportedOperationException();
+		this.parent.var( symbol, value );
 	}
 
 	@Override
 	public void val( Symbol symbol, Object value )
 	{
-		throw new UnsupportedOperationException();
+		this.parent.val( symbol, value );
 	}
 
 	@Override
@@ -69,29 +115,8 @@ public class ObjectScope extends AbstractScope
 		}
 		catch( MissingFieldException e )
 		{
-			throw new UndefinedException();
-		}
-	}
-
-	@Override
-	protected void set0( Symbol symbol, Object value )
-	{
-		try
-		{
-			if( this.object instanceof Type )
-				Java.setStatic( ( (Type)this.object ).theClass(), symbol.toString(), value );
-			else
-				Java.set( this.object, symbol.toString(), value ); // TODO Use resolve() instead.
-		}
-		catch( InvocationTargetException e )
-		{
-			Throwable t = e.getCause();
-			if( t instanceof Returning )
-				throw (Returning)t;
-			throw new JavaException( t, ThreadContext.get().cloneStack( /* TODO getLocation() */ ) );
-		}
-		catch( MissingFieldException e )
-		{
+			if( this.parent != null )
+				return this.parent.get( symbol );
 			throw new UndefinedException();
 		}
 	}
@@ -118,6 +143,8 @@ public class ObjectScope extends AbstractScope
 		}
 		catch( MissingMethodException e )
 		{
+			if( this.parent != null )
+				return this.parent.apply( symbol, args );
 			throw new UndefinedException();
 		}
 		catch( Exception e )

@@ -51,12 +51,11 @@ public class With extends LocalizedExpression
 		Object object = this.object.evaluate( thread );
 		Scope scope;
 		if( object instanceof Scope )
-			scope = (Scope)object;
+			scope = new CombinedScope( (Scope)object, thread.getScope() );
 		else if( object instanceof Map )
-			scope = new MapScope( (Map)object );
+			scope = new MapScope( (Map)object, thread.getScope() );
 		else
-			scope = new ObjectScope( object );
-		scope = new CombinedScope( scope, thread.getScope() );
+			scope = new ObjectScope( object, thread.getScope() );
 		scope = thread.swapScope( scope );
 		try
 		{

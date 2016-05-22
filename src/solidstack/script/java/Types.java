@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import solidstack.lang.Assert;
+import solidstack.script.objects.FunctionObject;
 
 
 public class Types
@@ -208,10 +209,6 @@ public class Types
 		return list;
 	}
 
-//    // ATTENTION: The methods isAssignable & compare & calculateDistance & convert need to stay synchronized
-
-
-
 	/**
 	 * Returns -1 when not, 0 is nop, 1 is easy.
 	 *
@@ -219,7 +216,7 @@ public class Types
 	 * @param type
 	 * @return
 	 */
-	// SYNC isAssignableToType
+	// SYNC with convert
 	static public boolean assignable( Class<?> arg, Class<?> type )
 	{
 		if( arg == null )
@@ -236,10 +233,13 @@ public class Types
 					return true;
 		}
 
+		if( arg == FunctionObject.class )
+			return Proxies.canProxy( type );
+
         return false;
 	}
 
-	// SYNC isAssignableToType()
+	// SYNC with assignable
 	static public Object convert( Object object, Class type )
 	{
 		if( type.isPrimitive() )
@@ -441,6 +441,13 @@ public class Types
 					Array.set( array, idx, convert( iter.next(), elementType ) );
 
 			return array;
+		}
+
+		if( object instanceof FunctionObject )
+		{
+			Object result = Proxies.createProxy( (FunctionObject)object, type );
+			if( result != null )
+				return result;
 		}
 
         // TODO Cast to class?

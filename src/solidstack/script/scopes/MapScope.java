@@ -20,13 +20,47 @@ import java.util.Map;
 
 import funny.Symbol;
 
-public class MapScope extends AbstractScope
+public class MapScope implements Scope
 {
+	private Scope parent;
 	private Map<Object, Object> map;
+
 
 	public MapScope( Map<Object, Object> map )
 	{
 		this.map = map;
+	}
+
+	public MapScope( Map<Object, Object> map, Scope parent )
+	{
+		this.map = map;
+		this.parent = parent;
+	}
+
+	@Override
+	public void setOrCreate( Symbol symbol, Object value )
+	{
+		try
+		{
+			set( symbol, value );
+		}
+		catch( UndefinedException e )
+		{
+			var( symbol, value );
+		}
+	}
+
+	@Override
+	public void set( Symbol symbol, Object value )
+	{
+		if( this.map.containsKey( symbol.toString() ) )
+			this.map.put( symbol.toString(), value );
+		else
+		{
+			if( this.parent == null )
+				throw new UndefinedException();
+			this.parent.set( symbol, value );
+		}
 	}
 
 	@Override
@@ -44,20 +78,11 @@ public class MapScope extends AbstractScope
 	@Override
 	public Object get( Symbol symbol )
 	{
-		Object result = this.map.get( symbol.toString() );
-		if( result != null )
-			return result;
 		if( this.map.containsKey( symbol.toString() ) )
-			return null;
-		throw new UndefinedException();
-	}
-
-	@Override
-	protected void set0( Symbol symbol, Object value )
-	{
-		if( !this.map.containsKey( symbol.toString() ) ) // TODO Huh?
+			return this.map.get( symbol.toString() );
+		if( this.parent == null )
 			throw new UndefinedException();
-		this.map.put( symbol.toString(), value );
+		return this.parent.get( symbol );
 	}
 
 	public Object apply( Symbol symbol, Object... args )

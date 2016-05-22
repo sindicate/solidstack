@@ -19,6 +19,7 @@ package solidstack.script.scopes;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import funny.Symbol;
 import solidstack.script.JavaException;
 import solidstack.script.Returning;
 import solidstack.script.ThreadContext;
@@ -27,28 +28,59 @@ import solidstack.script.java.Java;
 import solidstack.script.objects.FunctionObject;
 import solidstack.script.objects.Type;
 import solidstack.script.objects.Util;
-import funny.Symbol;
 
 
 
 
-public class DefaultScope extends AbstractScope
+public class DefaultScope implements Scope
 {
 	static public final Symbol THIS = Symbol.apply( "this" );
 
-	protected Scope parent;
-
+	Scope parent;
 	private ValueMap<Value> values = new ValueMap<Value>();
+
 
 	public DefaultScope()
 	{
-		var( THIS, this );
 	}
 
 	public DefaultScope( Scope parent )
 	{
-		this();
 		this.parent = parent;
+	}
+
+	public DefaultScope withThis()
+	{
+		val( THIS, this );
+		return this;
+	}
+
+	@Override
+	// TODO In Java 8 this can be a default method in the interface
+	public void setOrCreate( Symbol symbol, Object value )
+	{
+		try
+		{
+			set( symbol, value );
+		}
+		catch( UndefinedException e )
+		{
+			var( symbol, value );
+		}
+	}
+
+	@Override
+	public void set( Symbol symbol, Object value )
+	{
+		Value ref = this.values.get( symbol );
+		if( ref == null )
+		{
+			if( this.parent == null )
+				throw new UndefinedException();
+			this.parent.set( symbol, value );
+		}
+		else
+			ref.set( value );
 	}
 
 	// For testing
@@ -81,18 +113,6 @@ public class DefaultScope extends AbstractScope
 	}
 
 	@Override
-	protected void set0( Symbol symbol, Object value )
-	{
-		Value ref = this.values.get( symbol );
-		if( ref == null )
-			throw new UndefinedException();
-		if( ref instanceof Variable )
-			( (Variable)ref ).set( value );
-		else
-			throw new ReadOnlyException();
-	}
-
-	@Override
 	public Object apply( Symbol symbol, Object... args )
 	{
 		Value ref = this.values.get( symbol );
@@ -111,6 +131,7 @@ public class DefaultScope extends AbstractScope
 		if( object instanceof FunctionObject )
 			return ( (FunctionObject)object ).call( ThreadContext.get(), args );
 
+		// TODO This Java stuff should this go to the Java package?
 		Object[] pars = Util.toJavaParameters( args );
 		try
 		{

@@ -69,7 +69,7 @@ public class Identifier extends LocalizedExpression
 
 	public Object assign( ThreadContext thread, Object value )
 	{
-		thread.getScope().set( this.symbol, value );
+		thread.getScope().setOrCreate( this.symbol, value );
 		return value;
 	}
 

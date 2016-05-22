@@ -31,13 +31,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Vector;
 
+import funny.Symbol;
+import funny.sql.JDBC;
 import solidstack.script.GlobalFunctions;
 import solidstack.script.functions.Return;
 import solidstack.script.objects.Tuple;
 import solidstack.script.objects.Type;
-import funny.Symbol;
-import funny.sql.JDBC;
 
 
 
@@ -48,7 +49,7 @@ public class GlobalScope extends DefaultScope
 
 	public GlobalScope()
 	{
-		super( new ObjectScope( new GlobalFunctions() ) );
+		super( new ObjectScope( new GlobalFunctions() ) ); // TODO Is this right?
 		reset();
 	}
 
@@ -108,6 +109,7 @@ public class GlobalScope extends DefaultScope
 		val( Symbol.apply( "Map" ), new Type( Map.class ) );
 		val( Symbol.apply( "Properties" ), new Type( Properties.class ) );
 		val( Symbol.apply( "Set" ), new Type( Set.class ) );
+		val( Symbol.apply( "Vector" ), new Type( Vector.class ) );
 
 		// java.reflect
 

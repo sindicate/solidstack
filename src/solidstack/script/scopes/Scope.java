@@ -29,6 +29,7 @@ public interface Scope
 	void val( Symbol symbol, Object value );
 
 	Object get( Symbol symbol );
+	void setOrCreate( Symbol symbol, Object value );
 	void set( Symbol symbol, Object value );
 
 	Object apply( Symbol symbol, Object... args );

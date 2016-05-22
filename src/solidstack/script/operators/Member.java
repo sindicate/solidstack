@@ -19,6 +19,7 @@ package solidstack.script.operators;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import funny.Symbol;
 import solidstack.lang.Assert;
 import solidstack.script.JavaException;
 import solidstack.script.Returning;
@@ -32,9 +33,7 @@ import solidstack.script.java.MissingFieldException;
 import solidstack.script.objects.Type;
 import solidstack.script.objects.Util;
 import solidstack.script.scopes.Scope;
-import solidstack.script.scopes.ScopeException;
 import solidstack.script.scopes.UndefinedException;
-import funny.Symbol;
 
 
 public class Member extends Operator
@@ -46,47 +45,40 @@ public class Member extends Operator
 
 	public Object evaluate( ThreadContext thread )
 	{
-		try
+		Object left = this.left.evaluate( thread );
+		Assert.isInstanceOf( this.right, Identifier.class );
+		Symbol right = ( (Identifier)this.right ).getSymbol();
+		if( left == null )
+			// TODO Use the Java exception hierarchy
+			throw new ThrowException( "null reference: member: " + right.toString(), thread.cloneStack( getLocation() ) );
+		if( left instanceof Scope ) // TODO This is part of the OO we want
 		{
-			Object left = this.left.evaluate( thread );
-			Assert.isInstanceOf( this.right, Identifier.class );
-			Symbol right = ( (Identifier)this.right ).getSymbol();
-			if( left == null )
-				// TODO Use the Java exception hierarchy
-				throw new ThrowException( "null reference: member: " + right.toString(), thread.cloneStack( getLocation() ) );
-			if( left instanceof Scope ) // TODO This is part of the OO we want
-			{
-				Scope scope = (Scope)left;
-				try
-				{
-					return scope.get( right );
-				}
-				catch( UndefinedException e )
-				{
-					throw new UndefinedPropertyException( right.toString(), thread.cloneStack( getLocation() ) );
-				}
-			}
-			if( left instanceof Map )
-				return ( (Map)left ).get( right.toString() );
+			Scope scope = (Scope)left;
 			try
 			{
-				if( left instanceof Type )
-					return Java.getStatic( ( (Type)left ).theClass(), right.toString() );
-				return Java.get( left, right.toString() );
+				return scope.get( right );
 			}
-			catch( InvocationTargetException e )
+			catch( UndefinedException e )
 			{
-				Throwable t = e.getCause();
-				if( t instanceof Returning )
-					throw (Returning)t;
-				throw new JavaException( t, thread.cloneStack( getLocation() ) );
-			}
-			catch( MissingFieldException e )
-			{
-				throw new ThrowException( e.getMessage(), thread.cloneStack( getLocation() ) );
+				throw new UndefinedPropertyException( right.toString(), thread.cloneStack( getLocation() ) );
 			}
 		}
-		catch( ScopeException e )
+		if( left instanceof Map )
+			return ( (Map)left ).get( right.toString() );
+		try
+		{
+			if( left instanceof Type )
+				return Java.getStatic( ( (Type)left ).theClass(), right.toString() );
+			return Java.get( left, right.toString() );
+		}
+		catch( InvocationTargetException e )
+		{
+			Throwable t = e.getCause();
+			if( t instanceof Returning )
+				throw (Returning)t;
+			throw new JavaException( t, thread.cloneStack( getLocation() ) );
+		}
+		catch( MissingFieldException e )
 		{
 			throw new ThrowException( e.getMessage(), thread.cloneStack( getLocation() ) );
 		}
@@ -105,7 +97,7 @@ public class Member extends Operator
 
 		if( object instanceof Scope )
 		{
-			( (Scope)object ).set( symbol, value );
+			( (Scope)object ).setOrCreate( symbol, value );
 			return value;
 		}
 
@@ -172,6 +164,8 @@ public class Member extends Operator
 		}
 		catch( Exception e )
 		{
+			// TODO Is it ok to lose the stacktrace here?
+//			e.printStackTrace( System.err );
 			throw new ThrowException( e.getMessage() != null ? e.getMessage() : e.toString(), thread.cloneStack( getLocation() ) );
 //			throw new JavaException( e, thread.cloneStack( getLocation() ) ); // TODO Debug flag or something?
 		}

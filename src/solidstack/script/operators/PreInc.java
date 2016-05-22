@@ -21,7 +21,7 @@ import solidstack.lang.Assert;
 import solidstack.script.ThreadContext;
 import solidstack.script.ThrowException;
 import solidstack.script.expressions.Expression;
-import solidstack.script.scopes.AbstractScope.Variable;
+import solidstack.script.scopes.Variable;
 
 
 public class PreInc extends Operator

@@ -50,7 +50,7 @@ public class ScriptTests extends Util
 	{
 		test( "println( \"Hello World!\" )", "Hello World!" );
 		DefaultScope scope = new DefaultScope();
-		scope.set( Symbol.apply( "var1" ), "Value" );
+		scope.setOrCreate( Symbol.apply( "var1" ), "Value" );
 		test( "var1", scope, "Value" );
 		test( "", null );
 	}
@@ -59,7 +59,7 @@ public class ScriptTests extends Util
 	static public void test2()
 	{
 		DefaultScope scope = new DefaultScope();
-		scope.set( Symbol.apply( "var1" ), 1 );
+		scope.setOrCreate( Symbol.apply( "var1" ), 1 );
 		test( "var1 + 1", scope, 2 );
 	}
 
@@ -257,14 +257,14 @@ public class ScriptTests extends Util
 	static public void javaMethods()
 	{
 		DefaultScope scope = new DefaultScope();
-		scope.set( Symbol.apply( "s" ), "sinterklaas" );
+		scope.setOrCreate( Symbol.apply( "s" ), "sinterklaas" );
 		test( "s.length()", scope, 11 );
 		test( "s.substring( 6 )", scope, "klaas" );
 		test( "s.substring( 1, 6 )", scope, "inter" );
 		test( "s.contains( \"kl\" )", scope, true );
 
 		TestObject1 o1 = new TestObject1();
-		scope.set( Symbol.apply( "o1" ), o1 );
+		scope.setOrCreate( Symbol.apply( "o1" ), o1 );
 		test( "o1.test()", scope, 0 );
 		test( "o1.test( 1.0 )", scope, 2 );
 		test( "o1.test( \"string\" )", scope, 3 );
@@ -279,7 +279,7 @@ public class ScriptTests extends Util
 //		test( "o1.test( a = 1, b = 2 )", scope, 8 ); TODO
 
 		TestObject2 o2 = new TestObject2();
-		scope.set( Symbol.apply( "o2" ), o2 );
+		scope.setOrCreate( Symbol.apply( "o2" ), o2 );
 		test( "o2.test( 1, 1 )", scope, 1 );
 	}
 
@@ -441,8 +441,10 @@ public class ScriptTests extends Util
 		test( "var a = 1;", 1 );
 
 		test( "( a = 1 ); a", 1 ); // The block has no scope of its own
-		test( "a = 1; ( var a = 2 ); a", 2 ); // The block has no scope of its own
+		test( "a = 1; ( var a = 2 ); a", 2 ); // The block has no scope of its own TODO This should fail
 		test( "a = 1; { var a = 2 }; a", 1 ); // The block has its own scope
+		test( "a = 1; ( a = 2 ); a", 2 ); // The block has its own scope
+		test( "a = 1; { a = 2 }; a", 2 ); // The block has its own scope, but var already exists
 
 		test( "( () => a = 1 )(); a", 1 ); // The function has no scope of its own
 		test( "a = 1; ( a => a = 2 )( a ); a;", 1 );
@@ -593,6 +595,8 @@ public class ScriptTests extends Util
 		test( "list = List( 0 ); map = Map( true -> 2 ); ( list( 0 ), map( true ), z ) = ( 3, 4, 5 ); list( 0 ) + map( true ) + z", 12 );
 
 		// TODO Key value tuples for named parameters?
+		// TODO Scala uses :_* for "sequence argument"
+		// TODO Is it possible to put the asterisk behind the parameter like in Scala?
 	}
 
 	@Test
@@ -765,7 +769,7 @@ public class ScriptTests extends Util
 	static public void errors()
 	{
 		DefaultScope scope = new DefaultScope();
-		scope.set( Symbol.apply( "o1" ), new TestObject1() );
+		scope.setOrCreate( Symbol.apply( "o1" ), new TestObject1() );
 
 		fail( "1 = 1", ScriptException.class, "Can't assign to a java.lang.Integer" );
 		fail( "loadClass( \"xxx\" )", ScriptException.class, "Class not found: xxx" );

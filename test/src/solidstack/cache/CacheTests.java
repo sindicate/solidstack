@@ -39,7 +39,7 @@ public class CacheTests
 	static final Logger log = LoggerFactory.getLogger( CacheTests.class );
 
 	@Test
-	static void test1()
+	static public void test1()
 	{
 		SimpleCache cache = new SimpleCache();
 		for( int i = 0; i < 100; i++ )

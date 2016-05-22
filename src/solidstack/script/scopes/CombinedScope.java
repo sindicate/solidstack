@@ -22,9 +22,10 @@ import funny.Symbol;
 
 
 
-public class CombinedScope extends AbstractScope
+public class CombinedScope implements Scope
 {
 	private Scope scope1, scope2;
+
 
 	public CombinedScope( Scope scope1, Scope scope2 )
 	{
@@ -33,8 +34,35 @@ public class CombinedScope extends AbstractScope
 	}
 
 	@Override
+	public void setOrCreate( Symbol symbol, Object value )
+	{
+		try
+		{
+			set( symbol, value );
+		}
+		catch( UndefinedException e )
+		{
+			var( symbol, value );
+		}
+	}
+
+	@Override
+	public void set( Symbol symbol, Object value )
+	{
+		try
+		{
+			this.scope1.set( symbol, value );
+		}
+		catch( UndefinedException e )
+		{
+			this.scope2.set( symbol, value );
+		}
+	}
+
+	@Override
 	public void var( Symbol symbol, Object value )
 	{
+		// Maybe make scope1 vs. scope2 configurable
 		this.scope1.var( symbol, value );
 	}
 
@@ -57,19 +85,6 @@ public class CombinedScope extends AbstractScope
 		}
 	}
 
-	@Override
-	public void set0( Symbol symbol, Object value )
-	{
-		try
-		{
-			this.scope1.set( symbol, value );
-		}
-		catch( UndefinedException e )
-		{
-			this.scope2.set( symbol, value );
-		}
-	}
-
 	public Object apply( Symbol symbol, Object... pars )
 	{
 		try
@@ -84,6 +99,13 @@ public class CombinedScope extends AbstractScope
 
 	public Object apply( Symbol symbol, Map args )
 	{
-		throw new UnsupportedOperationException();
+		try
+		{
+			return this.scope1.apply( symbol, args );
+		}
+		catch( UndefinedException e )
+		{
+			return this.scope2.apply( symbol, args );
+		}
 	}
 }

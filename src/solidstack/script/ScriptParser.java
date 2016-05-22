@@ -138,7 +138,12 @@ public class ScriptParser
 				case HASH:
 				case FUNCTION:
 					Expression right = parseAtom();
-					Assert.notNull( right );
+					if( right == null )
+					{
+						Token last = this.tokenizer.last();
+						// TODO Better to call parseAtom() with an indication that it must expect an atom
+						throw new SourceException( "Unexpected token '" + last + "'", last.getLocation() );
+					}
 					result = appendOperator( result, token.getValue(), right );
 					break;
 
