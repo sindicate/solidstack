@@ -42,17 +42,19 @@ public class DefaultScope implements Scope
 
 	public DefaultScope()
 	{
+		this( null, true );
 	}
 
 	public DefaultScope( Scope parent )
 	{
-		this.parent = parent;
+		this( parent, true );
 	}
 
-	public DefaultScope withThis()
+	DefaultScope( Scope parent, boolean withThis )
 	{
-		val( THIS, this );
-		return this;
+		this.parent = parent;
+		if( withThis )
+			val( THIS, this );
 	}
 
 	@Override

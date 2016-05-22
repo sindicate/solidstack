@@ -142,6 +142,11 @@ public class ScriptTokenizer
 		return token;
 	}
 
+	public Token last()
+	{
+		return this.window.last();
+	}
+
 	/**
 	 * Rewind to the previous token.
 	 */

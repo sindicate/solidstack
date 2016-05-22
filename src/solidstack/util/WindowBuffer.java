@@ -10,7 +10,7 @@ public class WindowBuffer<E>
 {
 	private int size;
 
-	private E[] ints;
+	private E[] elems;
 	private int reader;
 	private int writer;
 	private int mark = -1;
@@ -27,7 +27,7 @@ public class WindowBuffer<E>
 		if( capacity < 2 )
 			throw new IllegalArgumentException( "Capacity must be at least 2" );
 		this.size = capacity + 1;
-		this.ints = (E[])new Object[ this.size ];
+		this.elems = (E[])new Object[ this.size ];
 	}
 
 	/**
@@ -49,20 +49,31 @@ public class WindowBuffer<E>
 	{
 		if( !hasRemaining() )
 			throw new IllegalStateException( "Buffer underflow" );
-		E result = this.ints[ this.reader ];
+		E result = this.elems[ this.reader ];
 		this.reader = inc( this.reader );
 		return result;
 	}
 
 	/**
-	 * Returns the before last item that has been read or written.
+	 * Returns the last item that was read or written.
 	 *
-	 * @return The before last item that has been read or written.
+	 * @return The last item that was read or written.
+	 */
+	public E last()
+	{
+		// Can't detect if the buffer has sufficiently filled up here
+		return this.elems[ dec( this.reader ) ];
+	}
+
+	/**
+	 * Returns the before last item that was read or written.
+	 *
+	 * @return The before last item that was read or written.
 	 */
 	public E beforeLast()
 	{
 		// Can't detect if the buffer has sufficiently filled up here
-		return this.ints[ dec( dec( this.reader ) ) ];
+		return this.elems[ dec( dec( this.reader ) ) ];
 	}
 
 	/**
@@ -72,7 +83,7 @@ public class WindowBuffer<E>
 	 */
 	public void put( E item )
 	{
-		this.ints[ this.writer ] = item;
+		this.elems[ this.writer ] = item;
 		this.reader = this.writer = inc( this.writer );
 		if( this.mark == this.writer )
 			this.mark = -1;
@@ -88,7 +99,7 @@ public class WindowBuffer<E>
 		int r = dec( this.reader );
 		if( this.writer == r )
 			throw new IllegalStateException( "Buffer underflow" );
-		return this.ints[ this.reader = r ];
+		return this.elems[ this.reader = r ];
 	}
 
 	/**

@@ -23,9 +23,9 @@ public class ParameterScope extends DefaultScope
 {
 	public ParameterScope( Scope parent )
 	{
-		super( parent );
+		super( parent, false );
 		if( parent == null )
-			throw new NullPointerException( "parent is null" );
+			throw new NullPointerException( "parent can't be null" );
 	}
 
 	public void defParameter( Symbol symbol, Object value )
@@ -36,8 +36,6 @@ public class ParameterScope extends DefaultScope
 	@Override
 	public void var( Symbol symbol, Object value )
 	{
-		if( this.parent == null )
-			throw new NullPointerException( "????" );
 		this.parent.var( symbol, value );
 	}
 
