@@ -1,9 +1,8 @@
 package solidstack.classgen.bytecode;
 
-import solidstack.classgen.constants.CClass;
+import solidstack.classgen.Types.VMTYPE;
 
 public interface Expression extends Statement
 {
-	CClass classInfo();
-	String getFieldDescriptor();
+	VMTYPE vmType();
 }

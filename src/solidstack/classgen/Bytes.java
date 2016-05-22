@@ -33,7 +33,7 @@ public class Bytes
 
 	public void writeShort( int s )
 	{
-		if( s < -32768 || s > 32767 )
+		if( s < -0x8000 || s >= 0x8000 )
 			throw new IllegalArgumentException( Integer.toString( s ) );
 		writeByte( s >>> 8 & 0xFF ); // >>> has precedence
 		writeByte( s & 0xFF );
@@ -41,7 +41,7 @@ public class Bytes
 
 	public void writeShortAt( int pos, int s )
 	{
-		if( s < -32768 || s > 32767 )
+		if( s < -0x8000 || s >= 0x8000 )
 			throw new IllegalArgumentException( Integer.toString( s ) );
     	this.bytes[ pos++ ] = (byte)( s >>> 8 & 0xFF ); // >>> has precedence
     	this.bytes[ pos++ ] = (byte)( s & 0xFF );

@@ -1,6 +1,6 @@
 package solidstack.classgen.bytecode;
 
-import solidstack.classgen.Types.TYPE;
+import solidstack.classgen.Types.VMTYPE;
 import solidstack.classgen.constants.CClass;
 import solidstack.classgen.constants.CFieldref;
 import solidstack.classgen.constants.CMethodref;
@@ -12,7 +12,7 @@ public class ExpressionBuilder
 	{
 	}
 
-	public AccessLocal local( int local, TYPE type )
+	public AccessLocal local( int local, VMTYPE type )
 	{
 		return new AccessLocal( local, type );
 	}

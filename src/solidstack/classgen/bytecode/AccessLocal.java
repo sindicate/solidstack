@@ -1,17 +1,16 @@
 package solidstack.classgen.bytecode;
 
 import solidstack.classgen.Bytes;
-import solidstack.classgen.Types.TYPE;
-import solidstack.classgen.constants.CClass;
+import solidstack.classgen.Types.VMTYPE;
 
 
 public class AccessLocal implements Expression
 {
 	private int local;
-	private TYPE type;
+	private VMTYPE type;
 
 
-	public AccessLocal( int local, TYPE type )
+	public AccessLocal( int local, VMTYPE type )
 	{
 		if( local < 0 )
 			throw new IllegalArgumentException();
@@ -20,15 +19,13 @@ public class AccessLocal implements Expression
 	}
 
 	@Override
-	public CClass classInfo()
+	public VMTYPE vmType()
 	{
-//		if( this.local == 0 ) // TODO And non static
-//			return this.method.classBuilder().classInfo();
-		throw new UnsupportedOperationException();
+		return this.type;
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
 		if( this.local >= 256 )
 			throw new UnsupportedOperationException(); // TODO Wide
@@ -55,11 +52,5 @@ public class AccessLocal implements Expression
 				bytes.writeByte( this.local );
 				return;
 		}
-	}
-
-	@Override
-	public String getFieldDescriptor()
-	{
-		throw new UnsupportedOperationException();
 	}
 }

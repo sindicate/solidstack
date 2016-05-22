@@ -20,10 +20,10 @@ public class AssignField implements Statement
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
-		this.instance.getByteCode( bytes );
-		this.value.getByteCode( bytes );
+		this.instance.toByteCode( bytes );
+		this.value.toByteCode( bytes );
 		bytes.writeByte( 0xB5 ); // putfield
 		bytes.writeShort( this.fieldref.index() );
 	}

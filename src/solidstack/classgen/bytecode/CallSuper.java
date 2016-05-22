@@ -17,9 +17,9 @@ public class CallSuper implements Statement
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
-		this.instance.getByteCode( bytes );
+		this.instance.toByteCode( bytes );
 		bytes.writeByte( 0xB7 ); // invokespecial
 		bytes.writeShort( this.methodref.index() );
 	}

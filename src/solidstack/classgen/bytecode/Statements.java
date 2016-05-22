@@ -13,9 +13,9 @@ public class Statements implements Statement
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
 		for( Statement statement : this.statements )
-			statement.getByteCode( bytes );
+			statement.toByteCode( bytes );
 	}
 }

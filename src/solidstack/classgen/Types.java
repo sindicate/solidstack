@@ -4,7 +4,7 @@ import solidstack.lang.Assert;
 
 public class Types
 {
-	static public enum TYPE { INT, LONG, FLOAT, DOUBLE, REF }
+	static public enum VMTYPE { INT, LONG, FLOAT, DOUBLE, REF, VOID }
 
 	static public String toFieldDescriptor( java.lang.Class<?> cls )
 	{
@@ -15,7 +15,7 @@ public class Types
 		return "L" + cls.getName().replace( '.', '/' ) + ";";
 	}
 
-	public static String toMethodDescriptor( java.lang.Class<?> ret, java.lang.Class<?>... parameters )
+	static public String toMethodDescriptor( java.lang.Class<?> ret, java.lang.Class<?>... parameters )
 	{
 		StringBuilder descriptor = new StringBuilder();
 		descriptor.append( '(' );
@@ -52,21 +52,49 @@ public class Types
 		throw new UnsupportedOperationException( "Unknown primitive type [" + cls.getName() + "]" );
 	}
 
-	public static String classDescriptorToClassName( String descriptor )
+	static public String classDescriptorToClassName( String descriptor )
 	{
 		return descriptor.replace( '/', '.' );
 	}
 
-	public static String fieldDescriptorToClassName( String descriptor )
+	static public String fieldDescriptorToClassName( String descriptor )
 	{
 		Assert.isTrue( descriptor.charAt( 0 ) == 'L' );
 		String result = descriptor.substring( 1, descriptor.length() - 1 );
 		return result.replace( '/', '.' );
 	}
 
-	public static String classNameToFieldDescriptor( String className )
+	static public String classNameToFieldDescriptor( String className )
 	{
 		String result = "L" + className + ";";
 		return result.replace( '.', '/' );
+	}
+
+	static public VMTYPE methodDescriptorToVMType( String descriptor )
+	{
+		int pos = descriptor.indexOf( ')' );
+		if( pos < 0 )
+			throw new ClassGenException( ") not found" );
+		return fieldDescriptorToVMType( descriptor.substring( pos + 1 ) );
+	}
+
+	public static VMTYPE fieldDescriptorToVMType( String descriptor )
+	{
+		char t = descriptor.charAt( 0 );
+		switch( t )
+		{
+			case 'I':
+			case 'Z':
+			case 'C':
+			case 'B':
+			case 'S': return VMTYPE.INT;
+			case 'D': return VMTYPE.DOUBLE;
+			case 'J': return VMTYPE.LONG;
+			case 'F': return VMTYPE.FLOAT;
+			case 'V': return VMTYPE.VOID;
+			case '[':
+			case 'L': return VMTYPE.REF;
+		}
+		throw new ClassGenException( "Unexpected: " + t );
 	}
 }

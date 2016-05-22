@@ -47,4 +47,9 @@ public class CFieldref extends Constant
 	{
 		return this.nameAndType.typeIndex();
 	}
+
+	public CUtf8 type()
+	{
+		return this.nameAndType.type();
+	}
 }

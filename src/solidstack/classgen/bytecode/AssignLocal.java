@@ -20,9 +20,9 @@ public class AssignLocal implements Statement
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
-		this.value.getByteCode( bytes );
+		this.value.toByteCode( bytes );
 		if( this.local < 4 )
 		{
 			bytes.writeByte( 0x3B + this.local ); // istore_0

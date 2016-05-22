@@ -1,6 +1,7 @@
 package solidstack.classgen.bytecode;
 
 import solidstack.classgen.Bytes;
+import solidstack.classgen.Types.VMTYPE;
 import solidstack.classgen.constants.CClass;
 
 public class Cast implements Expression
@@ -15,23 +16,16 @@ public class Cast implements Expression
 	}
 
 	@Override
-	public CClass classInfo()
+	public VMTYPE vmType()
 	{
-		throw new UnsupportedOperationException();
+		return VMTYPE.REF; // I think there won't be primitive casts
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
-		this.value.getByteCode( bytes );
+		this.value.toByteCode( bytes );
 		bytes.writeByte( 0xC0 );
 		bytes.writeShort( this.classInfo.index() );
-	}
-
-	@Override
-	public String getFieldDescriptor()
-	{
-		throw new UnsupportedOperationException();
-//		return Types.classNameToFieldDescriptor( this.type );
 	}
 }

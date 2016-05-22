@@ -1,31 +1,28 @@
 package solidstack.classgen.bytecode;
 
 import solidstack.classgen.Bytes;
-import solidstack.classgen.Types.TYPE;
 
 public class Return implements Statement
 {
 	private Expression expression;
-	private TYPE type;
 
 	public Return()
 	{
 	}
 
-	public Return( Expression value, TYPE type )
+	public Return( Expression value )
 	{
 		this.expression = value;
-		this.type = type;
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
 		if( this.expression != null )
 		{
-			this.expression.getByteCode( bytes );
+			this.expression.toByteCode( bytes );
 			int b;
-			switch( this.type )
+			switch( this.expression.vmType() ) // TODO Or we could return the type from the getByteCode
 			{
 				case INT: b = 0xAC; break; // ireturn
 				case LONG: b = 0xAD; break; // lreturn
@@ -33,7 +30,7 @@ public class Return implements Statement
 				case DOUBLE: b = 0xAF; break; // dreturn
 				case REF: b = 0xB0; break; // areturn
 				default:
-					throw new UnsupportedOperationException( this.type.toString() );
+					throw new UnsupportedOperationException( this.expression.vmType().toString() );
 			}
 			bytes.writeByte( b );
 		}

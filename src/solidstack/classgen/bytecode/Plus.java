@@ -1,7 +1,7 @@
 package solidstack.classgen.bytecode;
 
 import solidstack.classgen.Bytes;
-import solidstack.classgen.constants.CClass;
+import solidstack.classgen.Types.VMTYPE;
 
 public class Plus implements Expression
 {
@@ -15,22 +15,16 @@ public class Plus implements Expression
 	}
 
 	@Override
-	public CClass classInfo()
+	public VMTYPE vmType()
 	{
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
-		this.left.getByteCode( bytes );
-		this.right.getByteCode( bytes );
+		this.left.toByteCode( bytes );
+		this.right.toByteCode( bytes );
 		bytes.writeByte( 0x60 ); // iadd
-	}
-
-	@Override
-	public String getFieldDescriptor()
-	{
-		throw new UnsupportedOperationException();
 	}
 }

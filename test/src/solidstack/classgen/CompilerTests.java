@@ -11,7 +11,7 @@ import java.util.Comparator;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import solidstack.classgen.Types.TYPE;
+import solidstack.classgen.Types.VMTYPE;
 import solidstack.classgen.bytecode.ExpressionBuilder;
 import solidstack.classgen.constants.CClass;
 import solidstack.classgen.constants.CFieldref;
@@ -55,8 +55,8 @@ public class CompilerTests
 		//     this.function = f
 		//     return
 		Method method = test.addMethod( cb, methodInit );
-		method.statement( e.callSuper( e.local( 0, TYPE.REF ), methodSuper ) );
-		method.statement( e.setField( e.local( 0, TYPE.REF ), fieldFunction, e.local( 1, TYPE.REF ) ) );
+		method.statement( e.callSuper( e.local( 0, VMTYPE.REF ), methodSuper ) );
+		method.statement( e.setField( e.local( 0, VMTYPE.REF ), fieldFunction, e.local( 1, VMTYPE.REF ) ) );
 		method.return_();
 
 		CUtf8 typeCompare = cb.addMethodType( int.class, Object.class, Object.class );
@@ -71,15 +71,14 @@ public class CompilerTests
 			e.call(
 				e.cast(
 					e.call(
-						e.field( e.local( 0, TYPE.REF ), fieldFunction ),
+						e.field( e.local( 0, VMTYPE.REF ), fieldFunction ),
 						methodCall,
-						e.initArray( cObject, e.local( 1, TYPE.REF ), e.local( 2, TYPE.REF ) )
+						e.initArray( cObject, e.local( 1, VMTYPE.REF ), e.local( 2, VMTYPE.REF ) )
 					),
 					cInteger
 				),
 				methodIntValue
-			),
-			TYPE.INT
+			)
 		);
 
 		Bytes compiled = cb.generate();
@@ -127,7 +126,7 @@ public class CompilerTests
 		//     super()
 		//     return
 		Method method = test.addMethod( file, methodInit );
-		method.statement( e.callSuper( e.local( 0, TYPE.REF ), methodSuperInit ) );
+		method.statement( e.callSuper( e.local( 0, VMTYPE.REF ), methodSuperInit ) );
 		method.return_();
 
 		CUtf8 typeTest = file.addMethodType( int.class );
@@ -143,11 +142,11 @@ public class CompilerTests
 		method.statement( e.setLocal( 2, e.literal( 0 ) ) );
 		method.for_(
 			e.setLocal( 1, e.literal( 0 ) ),
-			e.lessThan( e.local( 1, TYPE.INT ), e.literal( 10 ) ),
-			e.setLocal( 1, e.plus( e.local( 1, TYPE.INT ), e.literal( 1 ) ) ),
-			e.setLocal( 2, e.plus( e.local( 2, TYPE.INT ), e.local( 1, TYPE.INT ) ) )
+			e.lessThan( e.local( 1, VMTYPE.INT ), e.literal( 10 ) ),
+			e.setLocal( 1, e.plus( e.local( 1, VMTYPE.INT ), e.literal( 1 ) ) ),
+			e.setLocal( 2, e.plus( e.local( 2, VMTYPE.INT ), e.local( 1, VMTYPE.INT ) ) )
 		);
-		method.return_( e.local( 2, TYPE.INT ), TYPE.INT );
+		method.return_( e.local( 2, VMTYPE.INT ) );
 
 		Bytes compiled = file.generate();
 

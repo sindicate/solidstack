@@ -4,5 +4,5 @@ import solidstack.classgen.Bytes;
 
 public interface Statement
 {
-	void getByteCode( Bytes bytes );
+	void toByteCode( Bytes bytes );
 }

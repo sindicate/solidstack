@@ -3,7 +3,6 @@ package solidstack.classgen;
 import java.util.ArrayList;
 import java.util.List;
 
-import solidstack.classgen.Types.TYPE;
 import solidstack.classgen.bytecode.Conditional;
 import solidstack.classgen.bytecode.Expression;
 import solidstack.classgen.bytecode.For;
@@ -74,7 +73,7 @@ public class Method
 		Bytes bytes = new Bytes();
 
 		for( Statement stat : this.statements )
-			stat.getByteCode( bytes );
+			stat.toByteCode( bytes );
 
 		return bytes;
 	}
@@ -84,14 +83,14 @@ public class Method
 		this.statements.add( new Return() );
 	}
 
-	public void return_( Expression value, TYPE type )
+	public void return_( Expression value )
 	{
-		this.statements.add( new Return( value, type ) );
+		this.statements.add( new Return( value ) );
 	}
 
-	public void pop( Expression value, TYPE type )
+	public void pop( Expression value )
 	{
-		this.statements.add( new Pop( value, type ) );
+		this.statements.add( new Pop( value ) );
 	}
 
 	public void statement( Statement statement )

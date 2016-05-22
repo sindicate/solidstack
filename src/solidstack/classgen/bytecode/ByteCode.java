@@ -25,4 +25,18 @@ public class ByteCode
 		}
 		throw new UnsupportedOperationException();
 	}
+
+	static public void jump( Bytes bytes, int delta )
+	{
+		if( delta >= -0x8000 && delta < 0x8000 )
+		{
+			bytes.writeByte( 0xA7 ); // goto
+			bytes.writeShort( delta );
+		}
+		else
+		{
+			bytes.writeByte( 0xC8 ); // goto_w
+			bytes.writeInt( delta );
+		}
+	}
 }

@@ -1,6 +1,7 @@
 package solidstack.classgen.bytecode;
 
 import solidstack.classgen.Bytes;
+import solidstack.classgen.Types.VMTYPE;
 import solidstack.classgen.constants.CClass;
 
 public class LiteralClass implements Expression
@@ -13,13 +14,13 @@ public class LiteralClass implements Expression
 	}
 
 	@Override
-	public CClass classInfo()
+	public VMTYPE vmType()
 	{
-		throw new UnsupportedOperationException();
+		return VMTYPE.REF;
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
 		int i = this.value.index();
 		if( i > 255 )
@@ -27,11 +28,5 @@ public class LiteralClass implements Expression
 
 		bytes.writeByte( 0x12 ); // ldc
 		bytes.writeByte( i );
-	}
-
-	@Override
-	public String getFieldDescriptor()
-	{
-		throw new UnsupportedOperationException();
 	}
 }

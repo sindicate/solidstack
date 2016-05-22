@@ -47,4 +47,9 @@ public class CNameAndType extends Constant
 	{
 		return this.descriptor.index();
 	}
+
+	public CUtf8 type()
+	{
+		return this.descriptor;
+	}
 }

@@ -11,7 +11,7 @@ import java.util.Map;
 import solidstack.classgen.Bytes;
 import solidstack.classgen.ClassFile;
 import solidstack.classgen.Loader;
-import solidstack.classgen.Types.TYPE;
+import solidstack.classgen.Types.VMTYPE;
 import solidstack.classgen.bytecode.Expression;
 import solidstack.classgen.bytecode.ExpressionBuilder;
 import solidstack.classgen.constants.CClass;
@@ -25,7 +25,6 @@ import solidstack.script.objects.FunctionObject;
 public class Proxies
 {
 	static private final Map<Class<?>, Class<?>> boxes = new HashMap<Class<?>, Class<?>>();
-	static private final Map<Class<?>, TYPE> jvmTypes = new HashMap<Class<?>, TYPE>();
 
 	static
 	{
@@ -37,15 +36,6 @@ public class Proxies
 		boxes.put( Long.TYPE, Long.class );
 		boxes.put( Float.TYPE, Float.class );
 		boxes.put( Double.TYPE, Double.class );
-
-		jvmTypes.put( Boolean.TYPE, TYPE.INT );
-		jvmTypes.put( Byte.TYPE, TYPE.INT );
-		jvmTypes.put( Character.TYPE, TYPE.INT );
-		jvmTypes.put( Short.TYPE, TYPE.INT );
-		jvmTypes.put( Integer.TYPE, TYPE.INT );
-		jvmTypes.put( Long.TYPE, TYPE.LONG );
-		jvmTypes.put( Float.TYPE, TYPE.FLOAT );
-		jvmTypes.put( Double.TYPE, TYPE.DOUBLE );
 	}
 
 	static public boolean canProxy( Class<?> type )
@@ -146,8 +136,8 @@ public class Proxies
 		//     this.function = f;
 		//     return;'
 		solidstack.classgen.Method init = proxyClass.addMethod( file, mInit );
-		init.statement( eb.callSuper( eb.local( 0, TYPE.REF ), mSuper ) );
-		init.statement( eb.setField( eb.local( 0, TYPE.REF ), fFunction, eb.local( 1, TYPE.REF ) ) );
+		init.statement( eb.callSuper( eb.local( 0, VMTYPE.REF ), mSuper ) );
+		init.statement( eb.setField( eb.local( 0, VMTYPE.REF ), fFunction, eb.local( 1, VMTYPE.REF ) ) );
 		init.return_();
 
 		// Method
@@ -161,11 +151,11 @@ public class Proxies
 		int count = method.getParameterTypes().length; // TODO In Java 8 we have a getParameterCount()
 		Expression[] pars = new Expression[ count ];
 		for( int i = 0; i < count; i++ )
-			pars[ i ] = eb.local( i + 1, TYPE.REF );
+			pars[ i ] = eb.local( i + 1, VMTYPE.REF );
 
 		// Call the function
 		Expression call = eb.call(
-			eb.field( eb.local( 0, TYPE.REF ), fFunction ),
+			eb.field( eb.local( 0, VMTYPE.REF ), fFunction ),
 			mCall,
 			eb.initArray( cObject, pars )
 		);
@@ -175,7 +165,7 @@ public class Proxies
 		if( returnType == void.class )
 		{
 			// Call, pop the result and return
-			impl.pop( call, TYPE.REF );
+			impl.pop( call );
 			impl.return_();
 		}
 		else
@@ -185,12 +175,12 @@ public class Proxies
 				// Convert to box type, unbox and return
 				Class<?> boxType = boxes.get( returnType );
 				call = convert( call, boxType, file );
-				impl.return_( unbox( call, boxType, returnType, file ), jvmTypes.get( returnType ) );
+				impl.return_( unbox( call, boxType, returnType, file ) );
 			}
 			else
 			{
 				// Convert and return
-				impl.return_( convert( call, returnType, file ), TYPE.REF );
+				impl.return_( convert( call, returnType, file ) );
 			}
 		}
 

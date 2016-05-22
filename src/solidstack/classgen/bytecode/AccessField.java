@@ -1,16 +1,15 @@
 package solidstack.classgen.bytecode;
 
 import solidstack.classgen.Bytes;
-import solidstack.classgen.constants.CClass;
+import solidstack.classgen.Types;
+import solidstack.classgen.Types.VMTYPE;
 import solidstack.classgen.constants.CFieldref;
 
 public class AccessField implements Expression
 {
 	private Expression instance;
-	private String name;
-	private String descriptor;
-
 	private CFieldref fieldref;
+
 
 	public AccessField( Expression instance, CFieldref fieldref )
 	{
@@ -19,22 +18,16 @@ public class AccessField implements Expression
 	}
 
 	@Override
-	public CClass classInfo()
+	public VMTYPE vmType()
 	{
-		throw new UnsupportedOperationException();
+		return Types.fieldDescriptorToVMType( this.fieldref.type().value() );
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
-		this.instance.getByteCode( bytes );
+		this.instance.toByteCode( bytes );
 		bytes.writeByte( 0xB4 );
 		bytes.writeShort( this.fieldref.index() );
-	}
-
-	@Override
-	public String getFieldDescriptor()
-	{
-		return this.descriptor;
 	}
 }

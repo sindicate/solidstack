@@ -19,25 +19,23 @@ public class For implements Statement
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
 		// Initialization
-		this.initialization.getByteCode( bytes );
+		this.initialization.toByteCode( bytes );
 
 		// Conditional jump to below
 		int continu = bytes.size();
 		Jump jump = this.termination.getJump( bytes );
 
 		// All the statements
-		this.statements.getByteCode( bytes );
+		this.statements.toByteCode( bytes );
 
 		// The iteration
-		this.increment.getByteCode( bytes );
+		this.increment.toByteCode( bytes );
 
 		// Jump to the 'continu' above
-		int pc = bytes.size();
-		bytes.writeByte( 0xA7 ); // goto
-		bytes.writeShort( continu - pc );
+		ByteCode.jump( bytes, continu - bytes.size() );
 
 		// Link the conditional jump above with the current position
 		jump.link( bytes.size() );

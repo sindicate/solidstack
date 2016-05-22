@@ -1,6 +1,7 @@
 package solidstack.classgen.bytecode;
 
 import solidstack.classgen.Bytes;
+import solidstack.classgen.Types.VMTYPE;
 import solidstack.classgen.constants.CClass;
 
 public class InitArray implements Expression
@@ -16,13 +17,13 @@ public class InitArray implements Expression
 	}
 
 	@Override
-	public CClass classInfo()
+	public VMTYPE vmType()
 	{
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
 		ByteCode.iconst( bytes, this.values.length );
 		bytes.writeByte( 0xBD ); // anewarray
@@ -32,14 +33,8 @@ public class InitArray implements Expression
 		{
 			bytes.writeByte( 0x59 ); // dup
 			ByteCode.iconst( bytes, i++ );
-			value.getByteCode( bytes );
+			value.toByteCode( bytes );
 			bytes.writeByte( 0x53 ); // aastore
 		}
-	}
-
-	@Override
-	public String getFieldDescriptor()
-	{
-		throw new UnsupportedOperationException();
 	}
 }

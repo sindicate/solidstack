@@ -1,7 +1,8 @@
 package solidstack.classgen.bytecode;
 
 import solidstack.classgen.Bytes;
-import solidstack.classgen.constants.CClass;
+import solidstack.classgen.Types;
+import solidstack.classgen.Types.VMTYPE;
 import solidstack.classgen.constants.CMethodref;
 
 public class CallMethod implements Expression
@@ -19,24 +20,18 @@ public class CallMethod implements Expression
 	}
 
 	@Override
-	public CClass classInfo()
+	public VMTYPE vmType()
 	{
-		throw new UnsupportedOperationException();
+		return Types.methodDescriptorToVMType( this.methodref.type().value() );
 	}
 
 	@Override
-	public void getByteCode( Bytes bytes )
+	public void toByteCode( Bytes bytes )
 	{
-		this.instance.getByteCode( bytes );
+		this.instance.toByteCode( bytes );
 		for( Expression parameter : this.parameters )
-			parameter.getByteCode( bytes );
+			parameter.toByteCode( bytes );
 		bytes.writeByte( 0xB6 ); // invokevirtual
 		bytes.writeShort( this.methodref.index() );
-	}
-
-	@Override
-	public String getFieldDescriptor()
-	{
-		throw new UnsupportedOperationException();
 	}
 }
