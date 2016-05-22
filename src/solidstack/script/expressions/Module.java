@@ -67,7 +67,7 @@ public class Module extends LocalizedExpression
 		{
 			// Create module scope and define globally
 			DefaultScope module = new DefaultScope();
-			GlobalScope.instance.set( Symbol.apply( name ), module );
+			GlobalScope.instance.setOrCreate( Symbol.apply( name ), module );
 			module.var( Symbol.apply( "initialized" ), false ); // TODO Make constant symbol (any others?)
 
 			// Continue processing with the module scope

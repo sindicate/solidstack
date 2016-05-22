@@ -32,12 +32,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import funny.Symbol;
+import funny.sql.JDBC;
 import solidstack.script.GlobalFunctions;
 import solidstack.script.functions.Return;
 import solidstack.script.objects.Tuple;
 import solidstack.script.objects.Type;
-import funny.Symbol;
-import funny.sql.JDBC;
 
 
 
@@ -48,7 +48,7 @@ public class GlobalScope extends DefaultScope
 
 	public GlobalScope()
 	{
-		super( new ObjectScope( new GlobalFunctions() ) );
+		super( new ObjectScope( new GlobalFunctions() ) ); // TODO Is this right?
 		reset();
 	}
 

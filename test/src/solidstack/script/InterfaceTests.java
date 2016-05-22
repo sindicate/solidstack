@@ -31,10 +31,10 @@ public class InterfaceTests
 	static public void customInterfaceNonReturning() throws FileNotFoundException
 	{
 		// TODO Capture the output
-		Object result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run1( ()=>println(\"I'm here!\") );");
+		Object result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run1( ()=>println(\"I'm here!\") );" );
 		assertThat( result ).isNull();
 
-		result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run2( (name)=>println(s\"Hello ${name}!\"), \"René\" );");
+		result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run2( (name)=>println(s\"Hello ${name}!\"), \"René\" );" );
 		assertThat( result ).isNull();
 	}
 
@@ -42,17 +42,17 @@ public class InterfaceTests
 	static public void customInterfaceReturning() throws FileNotFoundException
 	{
 		// This test conversion too (from Boolean to String)
-		Object result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run3( ()=>true );");
+		Object result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run3( ()=>true );" );
 		assertThat( result ).isInstanceOf( String.class );
 		assertThat( (String)result ).isEqualTo( "true" );
 
 		// This returns a Long
-		result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run4( ()=>123 );");
+		result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run4( ()=>123 );" );
 		assertThat( result ).isInstanceOf( Long.class );
 		assertThat( (Long)result ).isEqualTo( 123 );
 
 		// This returns a long
-		result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run5( ()=>456 );");
+		result = exec( "var c=loadClass(\"solidstack.script.CustomInterfaceConsumer\"); var i=new c(); i.run5( ()=>456 );" );
 		assertThat( result ).isInstanceOf( Long.class );
 		assertThat( (Long)result ).isEqualTo( 456 );
 	}

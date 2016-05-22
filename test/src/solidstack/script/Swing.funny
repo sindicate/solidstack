@@ -1,0 +1,17 @@
+var JFrame = loadClass( "javax.swing.JFrame" );
+var JButton = loadClass( "javax.swing.JButton" );
+
+with( var frame = new JFrame() )
+(
+	title = "Simple example";
+	defaultCloseOperation = JFrame.EXIT_ON_CLOSE;
+	setSize( 300, 200 );
+	
+	with( var button = new JButton( "Click here!" ) )
+	(
+		addActionListener( e => text = "Hallo zeg!" );
+	);
+
+	add( button );
+	visible = true;
+);
