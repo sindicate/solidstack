@@ -36,6 +36,11 @@ public class JSONObject implements Iterable< Map.Entry< String, Object > >
 		}
 	}
 
+	public int size()
+	{
+		return this.values.size();
+	}
+
 	public void set( String name, Object value )
 	{
 		this.values.put( name, value );
@@ -105,6 +110,7 @@ public class JSONObject implements Iterable< Map.Entry< String, Object > >
 		return result;
 	}
 
+	@Override
 	public Iterator< Map.Entry< String, Object >> iterator()
 	{
 		return this.values.entrySet().iterator();

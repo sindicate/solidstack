@@ -225,6 +225,7 @@ public class JSONWriter
 				case 0x1D: out.write( "\\u001D" ); break;
 				case 0x1E: out.write( "\\u001E" ); break;
 				case 0x1F: out.write( "\\u001F" ); break;
+				// TODO What about 0x80 - 0x9F?
 				// According to ECMA-262 the characters below are not allowed too
 				case 0x2028: out.write( "\\u2028" ); break; // Line separator
 				case 0x2029: out.write( "\\u2029" ); break; // Paragraph separator

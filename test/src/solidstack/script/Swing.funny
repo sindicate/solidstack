@@ -1,24 +1,74 @@
+// Inspired by: https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial/uiswing/examples/components/ListDemoProject/src/components/ListDemo.java
+
 var JButton = Class( "javax.swing.JButton" );
 var JFrame = Class( "javax.swing.JFrame" );
 var JList = Class( "javax.swing.JList" );
+var JPanel = Class( "javax.swing.JPanel" );
+var BorderLayout = Class( "java.awt.BorderLayout" );
+var ListSelectionModel = Class( "javax.swing.ListSelectionModel" );
+var JScrollPane = Class( "javax.swing.JScrollPane" );
+var BoxLayout = Class( "javax.swing.BoxLayout" );
+var BorderFactory = Class( "javax.swing.BorderFactory" );
+var Box = Class( "javax.swing.Box" );
+var JSeparator = Class( "javax.swing.JSeparator" );
+var SwingConstants = Class( "javax.swing.SwingConstants" );
+var JTextField = Class( "javax.swing.JTextField" );
 
-with( var frame = new JFrame() )
+
+with( var list = new JList( Array( "Jane Doe", "John Smith", "Kathy Green" ) ) )
 (
-	title = "Simple example";
-	defaultCloseOperation = JFrame.EXIT_ON_CLOSE;
-	setSize( 300, 200 );
+	selectionMode = ListSelectionModel.SINGLE_SELECTION;
+	selectedIndex = 0;
+	addListSelectionListener( e => if( !e.valueIsAdjusting ) fireButton.enabled = selectedIndex >= 0; );
+	visibleRowCount = 5;
+);
 
-	with( var button = new JButton( "Click here!" ) )
-	(
-		addActionListener( e => text = "Hallo zeg!" );
-	);
-	add( button );
-	
-	with( var list = new JList( Array( "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten" ) ) )
-	(
-		addListSelectionListener( e => if( !e.valueIsAdjusting ) println( "Someone selected something" ) );
-	);
-	add( list );
-	
+var name = list.model.getElementAt( list.selectedIndex ).toString();
+
+var pane = new JScrollPane( list );
+
+with( var hireButton = new JButton( "Hire" ) )
+(
+	actionCommand = "Hire";
+	addActionListener( e => () );
+	enabled = false;
+);
+
+with( var fireButton = new JButton( "Fire" ) )
+(
+	actionCommand = "Fire";
+	addActionListener( e => () );
+);
+
+with( var employeeName = new JTextField( 10 ) )
+(
+	addActionListener( e => () );
+	//document.addDocumentListener( e => () ); This one fails, needs 3 functions for 1 interface, use Scope for this, names matching the method names in the interface
+);
+
+with( var buttonPane = new JPanel() )
+(
+	layout = new BoxLayout( buttonPane, BoxLayout.LINE_AXIS );
+	add( fireButton );
+	add( Box.createHorizontalStrut( 5 ) );
+	add( new JSeparator( SwingConstants.VERTICAL ) );
+	add( Box.createHorizontalStrut( 5 ) );
+	add( employeeName );
+	add( hireButton );
+	border = BorderFactory.createEmptyBorder( 5, 5, 5, 5 );
+);
+
+with( var panel = new JPanel( new BorderLayout() ) )
+(
+	opaque = true;
+	add( pane, BorderLayout.CENTER );
+	add( buttonPane, BorderLayout.PAGE_END );
+);
+
+with( var frame = new JFrame( "ListDemo" ) )
+(
+	defaultCloseOperation = JFrame.EXIT_ON_CLOSE;
+	add( panel );
+	pack();
 	visible = true;
 );

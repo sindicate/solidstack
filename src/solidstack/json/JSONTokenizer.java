@@ -29,6 +29,7 @@ import solidstack.json.JSONTokenizer.Token.TYPE;
  *
  * @author René M. de Bloois
  */
+// TODO Rename to scanner
 public class JSONTokenizer
 {
 	/**
@@ -64,7 +65,7 @@ public class JSONTokenizer
 
 		while( true )
 		{
-			int ch = this.in.read();
+			int ch = this.in.read(); // TODO Put in in a local
 			if( ch == -1 )
 				return Token.EOF;
 			switch( ch )
