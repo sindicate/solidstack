@@ -65,7 +65,7 @@ public class ReaderSourceReader implements SourceReader
 	 */
 	public ReaderSourceReader( Reader reader )
 	{
-		this( reader, new SourceLocation( null, 1 ), null );
+		this( reader, SourceLocation.forText( null, 1 ), null );
 	}
 
 	/**

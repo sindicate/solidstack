@@ -31,7 +31,7 @@ public class SourceException extends RuntimeException
 	private SourceLocation location;
 
 	/**
-	 * Constructor.
+	 * Constructs a new SourceException.
 	 *
 	 * @param message The message.
 	 * @param location The file location where the problem is located.
@@ -42,15 +42,20 @@ public class SourceException extends RuntimeException
 		this.location = location;
 	}
 
+	public void setLocation( SourceLocation location )
+	{
+		this.location = location;
+	}
+
 	@Override
 	public String getMessage()
 	{
-		return super.getMessage() + ", at " + this.location;
+		if( this.location != null )
+			return super.getMessage() + ", at " + this.location;
+		return super.getMessage();
 	}
 
 	/**
-	 * Returns the file location where the problem is located.
-	 *
 	 * @return The file location where the problem is located.
 	 */
 	public SourceLocation getLocation()
