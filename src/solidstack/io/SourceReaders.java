@@ -166,4 +166,9 @@ public class SourceReaders
 	{
 		return new StringSourceReader( text );
 	}
+
+	static public SourceInputStream forBinaryResource( Resource resource ) throws FileNotFoundException
+	{
+		return new SourceInputStream( new BufferedInputStream( resource.newInputStream() ), resource, 0 );
+	}
 }

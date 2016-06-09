@@ -26,15 +26,25 @@ public class SourceLocation
 {
 	private Resource resource;
 	private int lineNumber;
+	private long column;
 
-	/**
-	 * @param resource The resource.
-	 * @param lineNumber The line number.
-	 */
-	public SourceLocation( Resource resource, int lineNumber )
+
+	// TODO Add column number
+	static public SourceLocation forText( Resource resource, int lineNumber )
+	{
+		return new SourceLocation( resource, lineNumber, -1 );
+	}
+
+	static public SourceLocation forBinary( Resource resource, long column )
+	{
+		return new SourceLocation( resource, -1, column );
+	}
+
+	private SourceLocation( Resource resource, int lineNumber, long column )
 	{
 		this.resource = resource;
 		this.lineNumber = lineNumber;
+		this.column = column;
 	}
 
 	/**
@@ -45,11 +55,18 @@ public class SourceLocation
 		return this.resource;
 	}
 
+	public boolean isTextLocation()
+	{
+		return this.lineNumber >= 0;
+	}
+
 	/**
 	 * @return The line number.
 	 */
 	public int getLineNumber()
 	{
+		if( this.lineNumber < 0 )
+			throw new UnsupportedOperationException( "lineNumber not supported for binary files" );
 		return this.lineNumber;
 	}
 
@@ -58,9 +75,10 @@ public class SourceLocation
 	 */
 	public SourceLocation previousLine()
 	{
-		if( this.lineNumber <= 0 )
+		int l = getLineNumber();
+		if( l <= 0 )
 			throw new FatalIOException( "There is no previous line" );
-		return new SourceLocation( this.resource, this.lineNumber - 1 );
+		return SourceLocation.forText( this.resource, l - 1 );
 	}
 
 	/**
@@ -68,7 +86,8 @@ public class SourceLocation
 	 */
 	public SourceLocation nextLine()
 	{
-		return new SourceLocation( this.resource, this.lineNumber + 1 );
+		int l = getLineNumber();
+		return SourceLocation.forText( this.resource, l + 1 );
 	}
 
 	/**
@@ -77,14 +96,19 @@ public class SourceLocation
 	 */
 	public SourceLocation lineNumber( int lineNumber )
 	{
-		return new SourceLocation( this.resource, lineNumber );
+		return SourceLocation.forText( this.resource, lineNumber );
 	}
 
 	@Override
 	public String toString()
 	{
+		StringBuilder result = new StringBuilder();
+		if( this.lineNumber >= 0 )
+			result.append( "line " ).append( this.lineNumber );
+		else
+			result.append( "position " ).append( this.column );
 		if( this.resource != null )
-			return "line " + this.lineNumber + " of file " + this.resource;
-		return "line " + this.lineNumber;
+			result.append( " of file " ).append( this.resource );
+		return result.toString();
 	}
 }

@@ -59,7 +59,7 @@ public class StringSourceReader implements SourceReader
 	 */
 	public StringSourceReader( String string )
 	{
-		this( string, new SourceLocation( null, 1 ) );
+		this( string, SourceLocation.forText( null, 1 ) );
 	}
 
 	/**

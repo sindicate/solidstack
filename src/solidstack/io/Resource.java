@@ -155,7 +155,7 @@ public class Resource
 	 */
 	public SourceLocation getLocation()
 	{
-		return new SourceLocation( this, 1 );
+		return SourceLocation.forText( this, 1 );
 	}
 
 	/**
