@@ -22,8 +22,10 @@ import java.util.regex.Pattern;
 import solidstack.javac.CompilerClassLoader;
 import solidstack.lang.Assert;
 import solidstack.lang.SystemException;
+import solidstack.template.EncodingWriter;
 import solidstack.template.JSPLikeTemplateParser.ParseEvent;
 import solidstack.template.TemplateCompilerContext;
+import solidstack.template.java.scope.Scope;
 
 
 /**
@@ -62,8 +64,8 @@ public class JavaTemplateCompiler
 		if( context.getImports() != null )
 			for( String imprt : context.getImports() )
 				buffer.append( "import " ).append( imprt ).append( ';' );
-		buffer.append( "public class " ).append( name ).append( " extends solidstack.template.java.JavaTemplate" );
-		buffer.append( "{ public void execute(solidstack.template.EncodingWriter out,solidstack.template.java.scope.Scope scope){" );
+		buffer.append( "public class " ).append( name ).append( " extends " ).append( JavaTemplate.class.getName() );
+		buffer.append( "{public void execute(" ).append( EncodingWriter.class.getName() ).append( " out," ).append( Scope.class.getName() ).append( " scope){" );
 
 		boolean text = false;
 		boolean plus = false;
