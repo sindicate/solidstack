@@ -18,10 +18,10 @@ package solidstack.template.java;
 
 import java.util.Map;
 
+import solidstack.script.scopes.MapScope;
+import solidstack.script.scopes.Scope;
 import solidstack.template.EncodingWriter;
 import solidstack.template.Template;
-import solidstack.template.java.scope.DefaultScope;
-import solidstack.template.java.scope.Scope;
 
 
 /**
@@ -34,8 +34,9 @@ abstract public class JavaTemplate extends Template
 	@Override
 	public void apply( Object params, EncodingWriter writer )
 	{
+		// TODO Add page scope & parameter scope
 		if( params instanceof Map<?, ?> )
-			execute( writer, new DefaultScope( (Map<String, Object>)params ) );
+			execute( writer, new MapScope( (Map<String, Object>)params ) );
 		else if( params instanceof Scope )
 			execute( writer, (Scope)params );
 		else

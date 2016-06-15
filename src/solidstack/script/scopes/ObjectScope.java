@@ -48,7 +48,7 @@ public class ObjectScope implements Scope
 	}
 
 	@Override
-	public void setOrCreate( Symbol symbol, Object value )
+	public <T> void setOrVar( Symbol symbol, T value )
 	{
 		try
 		{
@@ -61,7 +61,7 @@ public class ObjectScope implements Scope
 	}
 
 	@Override
-	public void set( Symbol symbol, Object value )
+	public <T> void set( Symbol symbol, T value )
 	{
 		try
 		{
@@ -72,6 +72,7 @@ public class ObjectScope implements Scope
 		}
 		catch( InvocationTargetException e )
 		{
+			// TODO Do we want this here? Should it be in Java class? And the Returning does not work yet.
 			Throwable t = e.getCause();
 			if( t instanceof Returning )
 				throw (Returning)t;
@@ -86,25 +87,49 @@ public class ObjectScope implements Scope
 	}
 
 	@Override
-	public void var( Symbol symbol, Object value )
+	public <T> void var( Symbol symbol, T value )
 	{
 		this.parent.var( symbol, value );
 	}
 
 	@Override
-	public void val( Symbol symbol, Object value )
+	public <T> void val( Symbol symbol, T value )
 	{
 		this.parent.val( symbol, value );
 	}
 
 	@Override
-	public Object get( Symbol symbol )
+	public <T> T find( Symbol symbol )
 	{
 		try
 		{
 			if( this.object instanceof Type )
-				return Java.getStatic( ( (Type)this.object ).theClass(), symbol.toString() );
-			return Java.get( this.object, symbol.toString() ); // TODO Use resolve() instead.
+				return (T)Java.getStatic( ( (Type)this.object ).theClass(), symbol.toString() );
+			return (T)Java.get( this.object, symbol.toString() ); // TODO Use resolve() instead.
+		}
+		catch( InvocationTargetException e )
+		{
+			Throwable t = e.getCause();
+			if( t instanceof Returning )
+				throw (Returning)t;
+			throw new JavaException( t, ThreadContext.get().cloneStack( /* TODO getLocation() */ ) );
+		}
+		catch( MissingFieldException e )
+		{
+			if( this.parent != null )
+				return this.parent.get( symbol );
+			return null;
+		}
+	}
+
+	@Override
+	public <T> T get( Symbol symbol )
+	{
+		try
+		{
+			if( this.object instanceof Type )
+				return (T)Java.getStatic( ( (Type)this.object ).theClass(), symbol.toString() );
+			return (T)Java.get( this.object, symbol.toString() ); // TODO Use resolve() instead.
 		}
 		catch( InvocationTargetException e )
 		{
@@ -121,14 +146,17 @@ public class ObjectScope implements Scope
 		}
 	}
 
-	public Object apply( Symbol symbol, Object... args )
+	@Override
+	public <T> T apply( Symbol symbol, Object... args )
 	{
+		// TODO Could be that there is a FunctionObject in a property
+
 		args = Util.toJavaParameters( args );
 		try
 		{
 			if( this.object instanceof Type )
-				return Java.invokeStatic( ( (Type)this.object ).theClass(), symbol.toString(), args );
-			return Java.invoke( this.object, symbol.toString(), args );
+				return (T)Java.invokeStatic( ( (Type)this.object ).theClass(), symbol.toString(), args );
+			return (T)Java.invoke( this.object, symbol.toString(), args );
 		}
 		catch( InvocationTargetException e )
 		{
@@ -154,8 +182,58 @@ public class ObjectScope implements Scope
 		}
 	}
 
-	public Object apply( Symbol symbol, Map args )
+	@Override
+	public <T> T apply( Symbol symbol, Map<String, Object> args )
 	{
+		// TODO This can be supported if it returns a FunctionObject
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public <T> T find( String name )
+	{
+		return find( Symbol.apply( name ) );
+	}
+
+	@Override
+	public <T> void var( String name, T value )
+	{
+		this.parent.var( name, value );
+	}
+
+	@Override
+	public <T> void val( String name, T value )
+	{
+		this.parent.val( name, value );
+	}
+
+	@Override
+	public <T> T get( String name )
+	{
+		return get( Symbol.apply( name ) );
+	}
+
+	@Override
+	public <T> void setOrVar( String name, T value )
+	{
+		setOrVar( Symbol.apply( name ), value );
+	}
+
+	@Override
+	public <T> void set( String name, T value )
+	{
+		set( Symbol.apply( name ), value );
+	}
+
+	@Override
+	public <T> T apply( String name, Object... args )
+	{
+		return apply( Symbol.apply( name ), args );
+	}
+
+	@Override
+	public <T> T apply( String name, Map<String, Object> args )
+	{
+		return apply( Symbol.apply( name ), args );
 	}
 }

@@ -21,6 +21,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import solidstack.script.JavaException;
+import solidstack.script.Returning;
+import solidstack.script.ThreadContext;
+import solidstack.script.ThrowException;
+import solidstack.script.objects.FunctionObject;
+import solidstack.script.objects.Type;
+import solidstack.script.objects.Util;
+
 
 /**
  * Contains methods to call methods an objects, get or set fields on objects.
@@ -172,6 +180,52 @@ public class Java
 			throw new MissingMethodException( context );
 		addArgs( call, args );
 		return call.invoke();
+	}
+
+	static public <T> T applyTo( Object object, Object... args )
+	{
+		if( object == null )
+			throw new ThrowException( "Object is null", ThreadContext.get().cloneStack() );
+
+		if( object instanceof FunctionObject )
+			return (T)( (FunctionObject)object ).call( ThreadContext.get(), args );
+
+		// TODO This Java stuff should this go to the Java package?
+		Object[] pars = Util.toJavaParameters( args );
+		try
+		{
+			if( object instanceof Type )
+				return (T)Java.invokeStatic( ( (Type)object ).theClass(), "apply", pars );
+			return (T)Java.invoke( object, "apply", pars );
+		}
+		catch( InvocationTargetException e )
+		{
+			Throwable t = e.getCause();
+			if( t instanceof Returning )
+				throw (Returning)t;
+			throw new JavaException( t, ThreadContext.get().cloneStack() );
+		}
+		catch( Returning e )
+		{
+			throw e;
+		}
+		catch( Exception e )
+		{
+			throw new ThrowException( e.getMessage() != null ? e.getMessage() : e.toString(),
+					ThreadContext.get().cloneStack() );
+//			throw new JavaException( e, thread.cloneStack( getLocation() ) ); // TODO Debug flag or something?
+		}
+	}
+
+	static public <T> T applyTo( Object object, Map args )
+	{
+		if( object == null )
+			throw new ThrowException( "object is null", ThreadContext.get().cloneStack() );
+
+		if( object instanceof FunctionObject )
+			return (T)( (FunctionObject)object ).call( ThreadContext.get(), args );
+
+		throw new UnsupportedOperationException( object.getClass().getName() );
 	}
 
 	/**

@@ -70,6 +70,7 @@ public class CompilerClassLoader extends DynamicClassLoader
 
 		CompilationTask task = compiler.getTask( null, this.fileManager, null, null, null, Arrays.asList( javaFile ) );
 		Assert.isTrue( task.call() );
+		// FIXME Need to capture the compile errors
 
 		List<ClassFile> classes = this.fileManager.end();
 		for( ClassFile classFile : classes )

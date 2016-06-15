@@ -4,11 +4,11 @@ import funny.Symbol;
 import solidstack.script.scopes.ValueMap.Entry;
 
 
-public class Value extends Entry
+public class Value<T> extends Entry
 {
-	Object value;
+	T value;
 
-	Value( Symbol symbol, Object value )
+	Value( Symbol symbol, T value )
 	{
 		super( symbol );
 
@@ -16,12 +16,12 @@ public class Value extends Entry
 		this.value = value;
 	}
 
-	public Object get()
+	public T get()
 	{
 		return this.value;
 	}
 
-	public void set( Object value )
+	public void set( T value )
 	{
 		throw new ImmutableException( getKey() );
 	}

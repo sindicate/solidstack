@@ -18,12 +18,12 @@ package solidstack.script.expressions;
 
 import java.util.Map;
 
+import funny.Symbol;
 import solidstack.io.SourceLocation;
 import solidstack.script.ThreadContext;
 import solidstack.script.UndefinedPropertyException;
 import solidstack.script.scopes.GlobalScope;
 import solidstack.script.scopes.UndefinedException;
-import funny.Symbol;
 
 
 public class Identifier extends LocalizedExpression
@@ -43,11 +43,13 @@ public class Identifier extends LocalizedExpression
 		return this.symbol;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		try
@@ -69,7 +71,7 @@ public class Identifier extends LocalizedExpression
 
 	public Object assign( ThreadContext thread, Object value )
 	{
-		thread.getScope().setOrCreate( this.symbol, value );
+		thread.getScope().setOrVar( this.symbol, value );
 		return value;
 	}
 
@@ -100,6 +102,7 @@ public class Identifier extends LocalizedExpression
 		}
 		catch( UndefinedException e )
 		{
+			// TODO Move this to the scope hierarchy
 			try
 			{
 				return GlobalScope.instance.apply( this.symbol, args );
@@ -111,6 +114,7 @@ public class Identifier extends LocalizedExpression
 		}
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( this.symbol );

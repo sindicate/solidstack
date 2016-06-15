@@ -16,20 +16,10 @@
 
 package solidstack.script.scopes;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import funny.Symbol;
-import solidstack.script.JavaException;
-import solidstack.script.Returning;
-import solidstack.script.ThreadContext;
-import solidstack.script.ThrowException;
 import solidstack.script.java.Java;
-import solidstack.script.objects.FunctionObject;
-import solidstack.script.objects.Type;
-import solidstack.script.objects.Util;
-
-
 
 
 public class DefaultScope implements Scope
@@ -37,7 +27,7 @@ public class DefaultScope implements Scope
 	static public final Symbol THIS = Symbol.apply( "this" );
 
 	Scope parent;
-	private ValueMap<Value> values = new ValueMap<Value>();
+	private ValueMap<Value<?>> values = new ValueMap<Value<?>>();
 
 
 	public DefaultScope()
@@ -59,7 +49,7 @@ public class DefaultScope implements Scope
 
 	@Override
 	// TODO In Java 8 this can be a default method in the interface
-	public void setOrCreate( Symbol symbol, Object value )
+	public <T> void setOrVar( Symbol symbol, T value )
 	{
 		try
 		{
@@ -72,9 +62,9 @@ public class DefaultScope implements Scope
 	}
 
 	@Override
-	public void set( Symbol symbol, Object value )
+	public <T> void set( Symbol symbol, T value )
 	{
-		Value ref = this.values.get( symbol );
+		Value<T> ref = (Value<T>)this.values.get( symbol );
 		if( ref == null )
 		{
 			if( this.parent == null )
@@ -92,21 +82,32 @@ public class DefaultScope implements Scope
 	}
 
 	@Override
-	public void var( Symbol symbol, Object value )
+	public <T> void var( Symbol symbol, T value )
 	{
-		this.values.put( new Variable( symbol, value ) );
+		this.values.put( new Variable<T>( symbol, value ) );
 	}
 
 	@Override
-	public void val( Symbol symbol, Object value )
+	public <T> void val( Symbol symbol, T value )
 	{
-		this.values.put( new Value( symbol, value ) );
+		this.values.put( new Value<T>( symbol, value ) );
 	}
 
 	@Override
-	public Object get( Symbol symbol )
+	public <T> T find( Symbol symbol )
 	{
-		Value ref = this.values.get( symbol );
+		Value<T> ref = (Value<T>)this.values.get( symbol );
+		if( ref != null )
+			return ref.get();
+		if( this.parent != null )
+			return this.parent.get( symbol );
+		return null;
+	}
+
+	@Override
+	public <T> T get( Symbol symbol )
+	{
+		Value<T> ref = (Value<T>)this.values.get( symbol );
 		if( ref != null )
 			return ref.get();
 		if( this.parent != null )
@@ -115,69 +116,72 @@ public class DefaultScope implements Scope
 	}
 
 	@Override
-	public Object apply( Symbol symbol, Object... args )
+	public <T> T apply( Symbol symbol, Object... args )
 	{
-		Value ref = this.values.get( symbol );
+		Value<?> ref = this.values.get( symbol );
 		if( ref != null )
-			return apply( ref.get(), args );
+			return Java.applyTo( ref.get(), args );
 		if( this.parent != null )
 			return this.parent.apply( symbol, args );
 		throw new UndefinedException();
-	}
-
-	static Object apply( Object object, Object... args )
-	{
-		if( object == null )
-			throw new ThrowException( "Function is null", ThreadContext.get().cloneStack() );
-
-		if( object instanceof FunctionObject )
-			return ( (FunctionObject)object ).call( ThreadContext.get(), args );
-
-		// TODO This Java stuff should this go to the Java package?
-		Object[] pars = Util.toJavaParameters( args );
-		try
-		{
-			if( object instanceof Type )
-				return Java.invokeStatic( ( (Type)object ).theClass(), "apply", pars );
-			return Java.invoke( object, "apply", pars );
-		}
-		catch( InvocationTargetException e )
-		{
-			Throwable t = e.getCause();
-			if( t instanceof Returning )
-				throw (Returning)t;
-			throw new JavaException( t, ThreadContext.get().cloneStack() );
-		}
-		catch( Returning e )
-		{
-			throw e;
-		}
-		catch( Exception e )
-		{
-			throw new ThrowException( e.getMessage() != null ? e.getMessage() : e.toString(), ThreadContext.get().cloneStack() );
-//			throw new JavaException( e, thread.cloneStack( getLocation() ) ); // TODO Debug flag or something?
-		}
 	}
 
 	@Override
-	public Object apply( Symbol symbol, Map args )
+	public <T> T apply( Symbol symbol, Map<String, Object> args )
 	{
-		Value ref = this.values.get( symbol );
+		Value<?> ref = this.values.get( symbol );
 		if( ref != null )
-			return apply( ref.get(), args );
+			return Java.applyTo( ref.get(), args );
 		if( this.parent != null )
 			return this.parent.apply( symbol, args );
 		throw new UndefinedException();
 	}
 
-	static Object apply( Object object, Map args )
+	@Override
+	public <T> T find( String name )
 	{
-		if( object == null )
-			throw new ThrowException( "Function is null", ThreadContext.get().cloneStack() );
+		return find( Symbol.apply( name ) );
+	}
 
-		if( object instanceof FunctionObject )
-			return ( (FunctionObject)object ).call( ThreadContext.get(), args );
+	@Override
+	public <T> T get( String name )
+	{
+		return get( Symbol.apply( name ) );
+	}
 
-		throw new UnsupportedOperationException();
+	@Override
+	public <T> void setOrVar( String name, T value )
+	{
+		setOrVar( Symbol.apply( name ), value );
+	}
+
+	@Override
+	public <T> void set( String name, T value )
+	{
+		set( Symbol.apply( name ), value );
+	}
+
+	@Override
+	public <T> void var( String name, T value )
+	{
+		var( Symbol.apply( name ), value );
+	}
+
+	@Override
+	public <T> void val( String name, T value )
+	{
+		val( Symbol.apply( name ), value );
+	}
+
+	@Override
+	public <T> T apply( String name, Object... args )
+	{
+		return apply( Symbol.apply( name ), args );
+	}
+
+	@Override
+	public <T> T apply( String name, Map<String, Object> args )
+	{
+		return apply( Symbol.apply( name ), args );
 	}
 }

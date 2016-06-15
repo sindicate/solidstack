@@ -97,7 +97,7 @@ public class Member extends Operator
 
 		if( object instanceof Scope )
 		{
-			( (Scope)object ).setOrCreate( symbol, value );
+			( (Scope)object ).setOrVar( symbol, value );
 			return value;
 		}
 

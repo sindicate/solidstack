@@ -55,7 +55,7 @@ public class FunnyTemplate extends Template
 		// TODO Is this what we want?
 		Scope scope = new ObjectScope( helper );
 		if( params instanceof Map<?, ?> )
-			scope = new MapScope( (Map<Object, Object>)params, scope );
+			scope = new MapScope( (Map<String, Object>)params, scope );
 		else
 			scope = new ObjectScope( params, scope ); // TODO Test
 		scope = new DefaultScope( scope );

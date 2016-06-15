@@ -22,10 +22,10 @@ import java.util.regex.Pattern;
 import solidstack.javac.CompilerClassLoader;
 import solidstack.lang.Assert;
 import solidstack.lang.SystemException;
+import solidstack.script.scopes.Scope;
 import solidstack.template.EncodingWriter;
 import solidstack.template.JSPLikeTemplateParser.ParseEvent;
 import solidstack.template.TemplateCompilerContext;
-import solidstack.template.java.scope.Scope;
 
 
 /**
@@ -46,6 +46,7 @@ public class JavaTemplateCompiler
 	public void generateScript( TemplateCompilerContext context )
 	{
 		// TODO This may give conflicts when more than one TemplateLoader is used. This must be the complete path.
+		// TODO Add the <%! so that you can define extra methods, or not?
 		Matcher matcher = PATH_PATTERN.matcher( context.getPath() );
 		Assert.isTrue( matcher.matches() );
 		String path = matcher.group( 1 );
@@ -65,7 +66,7 @@ public class JavaTemplateCompiler
 			for( String imprt : context.getImports() )
 				buffer.append( "import " ).append( imprt ).append( ';' );
 		buffer.append( "public class " ).append( name ).append( " extends " ).append( JavaTemplate.class.getName() );
-		buffer.append( "{public void execute(" ).append( EncodingWriter.class.getName() ).append( " out," ).append( Scope.class.getName() ).append( " scope){" );
+		buffer.append( "{public void execute(" ).append( EncodingWriter.class.getName() ).append( " out," ).append( Scope.class.getName() ).append( " param){" );
 
 		boolean text = false;
 		boolean plus = false;

@@ -21,7 +21,6 @@ import java.util.Map;
 import funny.Symbol;
 
 
-
 public class CombinedScope implements Scope
 {
 	private Scope scope1, scope2;
@@ -34,7 +33,7 @@ public class CombinedScope implements Scope
 	}
 
 	@Override
-	public void setOrCreate( Symbol symbol, Object value )
+	public <T> void setOrVar( Symbol symbol, T value )
 	{
 		try
 		{
@@ -47,7 +46,7 @@ public class CombinedScope implements Scope
 	}
 
 	@Override
-	public void set( Symbol symbol, Object value )
+	public <T> void set( Symbol symbol, T value )
 	{
 		try
 		{
@@ -60,20 +59,34 @@ public class CombinedScope implements Scope
 	}
 
 	@Override
-	public void var( Symbol symbol, Object value )
+	public <T> void var( Symbol symbol, T value )
 	{
-		// Maybe make scope1 vs. scope2 configurable
+		// TODO Maybe make scope1 vs. scope2 configurable
+		// TODO Or maybe make scopes lockable
 		this.scope1.var( symbol, value );
 	}
 
 	@Override
-	public void val( Symbol symbol, Object value )
+	public <T> void val( Symbol symbol, T value )
 	{
 		this.scope1.val( symbol, value );
 	}
 
 	@Override
-	public Object get( Symbol symbol )
+	public <T> T find( Symbol symbol )
+	{
+		try
+		{
+			return this.scope1.get( symbol );
+		}
+		catch( UndefinedException e )
+		{
+			return this.scope2.find( symbol );
+		}
+	}
+
+	@Override
+	public <T> T get( Symbol symbol )
 	{
 		try
 		{
@@ -85,7 +98,8 @@ public class CombinedScope implements Scope
 		}
 	}
 
-	public Object apply( Symbol symbol, Object... pars )
+	@Override
+	public <T> T apply( Symbol symbol, Object... pars )
 	{
 		try
 		{
@@ -97,7 +111,8 @@ public class CombinedScope implements Scope
 		}
 	}
 
-	public Object apply( Symbol symbol, Map args )
+	@Override
+	public <T> T apply( Symbol symbol, Map<String, Object> args )
 	{
 		try
 		{
@@ -107,5 +122,53 @@ public class CombinedScope implements Scope
 		{
 			return this.scope2.apply( symbol, args );
 		}
+	}
+
+	@Override
+	public <T> T find( String name )
+	{
+		return find( Symbol.apply( name ) );
+	}
+
+	@Override
+	public <T> T get( String name )
+	{
+		return get( Symbol.apply( name ) );
+	}
+
+	@Override
+	public <T> void setOrVar( String name, T value )
+	{
+		setOrVar( Symbol.apply( name ), value );
+	}
+
+	@Override
+	public <T> void set( String name, T value )
+	{
+		set( Symbol.apply( name ), value );
+	}
+
+	@Override
+	public <T> void var( String name, T value )
+	{
+		var( Symbol.apply( name ), value );
+	}
+
+	@Override
+	public <T> void val( String name, T value )
+	{
+		val( Symbol.apply( name ), value );
+	}
+
+	@Override
+	public <T> T apply( String name, Object... args )
+	{
+		return apply( Symbol.apply( name ), args );
+	}
+
+	@Override
+	public <T> T apply( String name, Map<String, Object> args )
+	{
+		return apply( Symbol.apply( name ), args );
 	}
 }

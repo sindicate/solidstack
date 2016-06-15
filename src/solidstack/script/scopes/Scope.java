@@ -25,13 +25,31 @@ import funny.Symbol;
 
 public interface Scope
 {
-	void var( Symbol symbol, Object value );
-	void val( Symbol symbol, Object value );
+	// By symbol
 
-	Object get( Symbol symbol );
-	void setOrCreate( Symbol symbol, Object value );
-	void set( Symbol symbol, Object value );
+	<T> void var( Symbol symbol, T value );
+	<T> void val( Symbol symbol, T value );
 
-	Object apply( Symbol symbol, Object... args );
-	Object apply( Symbol symbol, Map args );
+	<T> T find( Symbol symbol );
+	<T> T get( Symbol symbol );
+
+	<T> void setOrVar( Symbol symbol, T value );
+	<T> void set( Symbol symbol, T value );
+
+	<T> T apply( Symbol symbol, Object... args );
+	<T> T apply( Symbol symbol, Map<String, Object> args );
+
+	// By name
+
+	<T> void var( String name, T value );
+	<T> void val( String name, T value );
+
+	<T> T find( String name );
+	<T> T get( String name );
+
+	<T> void setOrVar( String name, T value );
+	<T> void set( String name, T value );
+
+	<T> T apply( String name, Object... args );
+	<T> T apply( String name, Map<String, Object> args );
 }

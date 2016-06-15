@@ -50,7 +50,7 @@ public class ScriptTests extends Util
 	{
 		test( "println( \"Hello World!\" )", "Hello World!" );
 		DefaultScope scope = new DefaultScope();
-		scope.setOrCreate( Symbol.apply( "var1" ), "Value" );
+		scope.setOrVar( Symbol.apply( "var1" ), "Value" );
 		test( "var1", scope, "Value" );
 		test( "", null );
 	}
@@ -59,7 +59,7 @@ public class ScriptTests extends Util
 	static public void test2()
 	{
 		DefaultScope scope = new DefaultScope();
-		scope.setOrCreate( Symbol.apply( "var1" ), 1 );
+		scope.setOrVar( Symbol.apply( "var1" ), 1 );
 		test( "var1 + 1", scope, 2 );
 	}
 
@@ -140,17 +140,17 @@ public class ScriptTests extends Util
 		DefaultScope scope = new DefaultScope();
 
 		test( "a = 1", scope, 1 );
-		Assert.assertEquals( scope.get( Symbol.apply( "a" ) ), 1 );
+		Assert.assertEquals( (int)(Integer)scope.get( Symbol.apply( "a" ) ), 1 );
 
 		test( "a = b = 1", scope, 1 );
-		Assert.assertEquals( scope.get( Symbol.apply( "a" ) ), 1 );
-		Assert.assertEquals( scope.get( Symbol.apply( "b" ) ), 1 );
+		Assert.assertEquals( (int)(Integer)scope.get( Symbol.apply( "a" ) ), 1 );
+		Assert.assertEquals( (int)(Integer)scope.get( Symbol.apply( "b" ) ), 1 );
 
 		test( "1 + ( a = 1 )", scope, 2 );
-		Assert.assertEquals( scope.get( Symbol.apply( "a" ) ), 1 );
+		Assert.assertEquals( (int)(Integer)scope.get( Symbol.apply( "a" ) ), 1 );
 
 		test( "1 + ( a = 1 ) + a", scope, 3 );
-		Assert.assertEquals( scope.get( Symbol.apply( "a" ) ), 1 );
+		Assert.assertEquals( (int)(Integer)scope.get( Symbol.apply( "a" ) ), 1 );
 	}
 
 	@Test
@@ -257,14 +257,14 @@ public class ScriptTests extends Util
 	static public void javaMethods()
 	{
 		DefaultScope scope = new DefaultScope();
-		scope.setOrCreate( Symbol.apply( "s" ), "sinterklaas" );
+		scope.setOrVar( Symbol.apply( "s" ), "sinterklaas" );
 		test( "s.length()", scope, 11 );
 		test( "s.substring( 6 )", scope, "klaas" );
 		test( "s.substring( 1, 6 )", scope, "inter" );
 		test( "s.contains( \"kl\" )", scope, true );
 
 		TestObject1 o1 = new TestObject1();
-		scope.setOrCreate( Symbol.apply( "o1" ), o1 );
+		scope.setOrVar( Symbol.apply( "o1" ), o1 );
 		test( "o1.test()", scope, 0 );
 		test( "o1.test( 1.0 )", scope, 2 );
 		test( "o1.test( \"string\" )", scope, 3 );
@@ -279,7 +279,7 @@ public class ScriptTests extends Util
 //		test( "o1.test( a = 1, b = 2 )", scope, 8 ); TODO
 
 		TestObject2 o2 = new TestObject2();
-		scope.setOrCreate( Symbol.apply( "o2" ), o2 );
+		scope.setOrVar( Symbol.apply( "o2" ), o2 );
 		test( "o2.test( 1, 1 )", scope, 1 );
 	}
 
@@ -769,7 +769,7 @@ public class ScriptTests extends Util
 	static public void errors()
 	{
 		DefaultScope scope = new DefaultScope();
-		scope.setOrCreate( Symbol.apply( "o1" ), new TestObject1() );
+		scope.setOrVar( Symbol.apply( "o1" ), new TestObject1() );
 
 		fail( "1 = 1", ScriptException.class, "Can't assign to a java.lang.Integer" );
 		fail( "loadClass( \"xxx\" )", ScriptException.class, "Class not found: xxx" );
@@ -780,7 +780,7 @@ public class ScriptTests extends Util
 		fail( "f = ( a ) => (); f()", ScriptException.class, "Not enough parameters" );
 		fail( "f = () => (); f( 1 )", ScriptException.class, "Too many parameters" );
 		fail( "f()", ScriptException.class, "'f' undefined" );
-		fail( "f = null; f()", ScriptException.class, "Function is null" );
+		fail( "f = null; f()", ScriptException.class, "Object is null" );
 		fail( "f = 1; f()", ScriptException.class, "No such method: java.lang.Integer.apply()" );
 //		fail( "a = ( 1, 2 )", ScriptException.class, "Can't assign tuples to variables" );
 //		fail( "f = null; f[]", ScriptException.class, "Null can't be indexed" );
