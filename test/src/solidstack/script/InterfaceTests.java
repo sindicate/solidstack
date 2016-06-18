@@ -1,6 +1,6 @@
 package solidstack.script;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.FileNotFoundException;
 import java.util.Arrays;
