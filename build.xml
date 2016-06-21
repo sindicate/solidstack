@@ -158,6 +158,7 @@
 		<jarjar compress="yes" destfile="${dist.home}/solidstack.jar">
 			<zipfileset dir="${build.home}/classes" />
 			<zipfileset dir="." includes="LICENSE.txt,NOTICE.txt,CHANGELOG.TXT" prefix="META-INF" />
+			<zipfileset src="lib/commons-primitives-1.0.jar" excludes="META-INF/**" />
 			<keep pattern="solidstack.**" />
 			<manifest>
 				<attribute name="Implementation-Title" value="SolidStack" />
@@ -211,7 +212,7 @@
 			[query] = solidstack.query.* excluding solidstack.query.jpa.* solidstack.query.hibernate.*
 			[template] = solidstack.template.* excluding solidstack.template.groovy.* solidstack.template.javascript.* solidstack.template.funny.*
 			check solidstack.cache.*               dependentOnlyOn java.* javax.* solidstack.* org.slf4j.*
-			check solidstack.io.*                  dependentOnlyOn java.* javax.* solidstack.*
+			check solidstack.io.*                  dependentOnlyOn java.* javax.* solidstack.* org.apache.commons.*
 			check solidstack.lang.*                dependentOnlyOn java.* javax.* solidstack.*
 			check [query]                          dependentOnlyOn java.* javax.* solidstack.* org.slf4j.*
 			check solidstack.query.jpa.*           dependentOnlyOn java.* javax.* solidstack.*
