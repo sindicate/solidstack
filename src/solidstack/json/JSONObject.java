@@ -16,7 +16,6 @@
 
 package solidstack.json;
 
-import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -46,17 +45,17 @@ public class JSONObject implements Iterable< Map.Entry< String, Object > >
 		this.values.put( name, value );
 	}
 
-	public BigDecimal findNumber( String name )
+	public Number findNumber( String name )
 	{
 		Object result = this.values.get( name );
-		if( result == null || result instanceof BigDecimal )
-			return (BigDecimal)result;
-		throw new ClassCastException( "Attribute '" + name + "' is not a BigDecimal" );
+		if( result == null || result instanceof Number )
+			return (Number)result;
+		throw new ClassCastException( "Attribute '" + name + "' is not a Number" );
 	}
 
-	public BigDecimal getNumber( String name )
+	public Number getNumber( String name )
 	{
-		BigDecimal result = findNumber( name );
+		Number result = findNumber( name );
 		if( result == null )
 			throw new NullPointerException( "Missing attribute '" + name + "'" );
 		return result;
