@@ -22,8 +22,8 @@ import solidstack.io.Resource;
 import solidstack.io.SourceException;
 import solidstack.io.SourceLocation;
 import solidstack.io.SourceReader;
-import solidstack.json.JSONTokenizer.Token;
-import solidstack.json.JSONTokenizer.Token.TYPE;
+import solidstack.json.JSONScanner.Token;
+import solidstack.json.JSONScanner.Token.TYPE;
 
 
 /**
@@ -42,7 +42,7 @@ public class JSONParser
 	/**
 	 * The source of tokens.
 	 */
-	private JSONTokenizer tokenizer;
+	private JSONScanner tokenizer;
 
 	// Parsing state
 	protected STATE state = STATE.BEFOREVALUE;
@@ -59,10 +59,10 @@ public class JSONParser
 	 *
 	 * @param reader The source of the JSON data.
 	 */
-	public JSONParser( SourceReader reader )
+	public JSONParser( SourceReader reader, boolean emptyLineIsEOF )
 	{
 		this.reader = reader;
-		this.tokenizer = new JSONTokenizer( reader );
+		this.tokenizer = new JSONScanner( reader, emptyLineIsEOF );
 	}
 
 	public EVENT next()
@@ -71,7 +71,7 @@ public class JSONParser
 		this.name = null;
 		this.value = null;
 
-		JSONTokenizer tokenizer = this.tokenizer;
+		JSONScanner tokenizer = this.tokenizer;
 		Token token = tokenizer.get();
 
 		while( true )

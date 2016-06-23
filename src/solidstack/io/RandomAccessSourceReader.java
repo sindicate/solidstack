@@ -136,7 +136,6 @@ public class RandomAccessSourceReader implements SourceReader
 	{
 		if( this.reader != null )
 			this.reader.close();
-		this.reader = null;
 	}
 
 	/**
@@ -148,8 +147,6 @@ public class RandomAccessSourceReader implements SourceReader
 	// FIXME Create a unit test for this
 	public void gotoLine( int lineNumber )
 	{
-		if( this.reader == null )
-			throw new FatalIOException( "Reader is closed" );
 		if( lineNumber < 1 )
 			throw new IllegalArgumentException( "lineNumber must be greater than zero" );
 

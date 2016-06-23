@@ -34,10 +34,20 @@ public class JSONReader extends JSONParser
 	 *
 	 * @param reader The source of the JSON data.
 	 */
-	// TODO Resource instead of SourceReader
 	public JSONReader( SourceReader reader )
 	{
-		super( reader );
+		this( reader, false );
+	}
+
+	/**
+	 * Constructor.
+	 *
+	 * @param reader The source of the JSON data.
+	 */
+	// TODO Resource instead of SourceReader
+	public JSONReader( SourceReader reader, boolean emptyLineIsEOF )
+	{
+		super( reader, emptyLineIsEOF );
 	}
 
 	/**

@@ -75,6 +75,7 @@ public class SourceReaders
 	 * @return A source reader for the given resource.
 	 * @throws FileNotFoundException When the resource is not found.
 	 */
+	// FIXME Use CharSet
 	static public SourceReader forResource( Resource resource, EncodingDetector detector, String defaultEncoding ) throws FileNotFoundException
 	{
 		if( resource.supportsReader() )

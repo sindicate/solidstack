@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 import solidstack.io.SourceException;
 import solidstack.io.SourceLocation;
 import solidstack.io.SourceReader;
-import solidstack.json.JSONTokenizer.Token.TYPE;
+import solidstack.json.JSONScanner.Token.TYPE;
 
 
 /**
@@ -30,12 +30,16 @@ import solidstack.json.JSONTokenizer.Token.TYPE;
  * @author René M. de Bloois
  */
 // TODO Rename to scanner
-public class JSONTokenizer
+public class JSONScanner
 {
 	/**
 	 * The reader used to read from and push back characters.
 	 */
 	protected SourceReader in;
+
+	private boolean emptyLineIsEOF;
+	private boolean startOfLine;
+	private boolean eof;
 
 	/**
 	 * Buffer for the result.
@@ -48,9 +52,11 @@ public class JSONTokenizer
 	 *
 	 * @param in The input.
 	 */
-	public JSONTokenizer( SourceReader in )
+	public JSONScanner( SourceReader in, boolean emptyLineIsEOF )
 	{
 		this.in = in;
+		this.emptyLineIsEOF = emptyLineIsEOF;
+		this.startOfLine = true;
 	}
 
 	/**
@@ -60,22 +66,41 @@ public class JSONTokenizer
 	 */
 	public Token get()
 	{
+		if( this.eof )
+			return Token.EOF;
+
 		StringBuilder result = this.result;
 		result.setLength( 0 );
+		SourceReader in = this.in;
 
 		while( true )
 		{
-			int ch = this.in.read(); // TODO Put in in a local
-			if( ch == -1 )
-				return Token.EOF;
+			int ch = in.read(); // TODO Put in in a local
 			switch( ch )
 			{
+				case -1:
+					this.eof = true;
+					return Token.EOF;
 				// Whitespace
 				case ' ':
 				case '\t':
-				case '\n':
-				case '\r':
+				case '\r': // Does not occur
 					continue;
+				case '\n':
+					if( this.emptyLineIsEOF )
+					{
+						if( this.startOfLine )
+						{
+							this.eof = true;
+							return Token.EOF;
+						}
+						this.startOfLine = true;
+					}
+					continue;
+			}
+			this.startOfLine = false;
+			switch( ch )
+			{
 				case ',':
 					return Token.VALUE_SEPARATOR;
 				case ':':
@@ -91,16 +116,16 @@ public class JSONTokenizer
 				case '"':
 					while( true )
 					{
-						ch = this.in.read();
+						ch = in.read();
 						if( ch == -1 )
-							throw new SourceException( "Missing \"", this.in.getLocation() );
+							throw new SourceException( "Missing \"", in.getLocation() );
 						if( ch == '"' )
 							break;
 						if( ch == '\\' )
 						{
-							ch = this.in.read();
+							ch = in.read();
 							if( ch == -1 )
-								throw new SourceException( "Incomplete escape sequence", this.in.getLocation() );
+								throw new SourceException( "Incomplete escape sequence", in.getLocation() );
 							switch( ch )
 							{
 								case 'b': ch = '\b'; break;
@@ -114,15 +139,15 @@ public class JSONTokenizer
 									char[] codePoint = new char[ 4 ];
 									for( int i = 0; i < 4; i++ )
 									{
-										ch = this.in.read();
+										ch = in.read();
 										codePoint[ i ] = (char)ch;
 										if( !( ch >= '0' && ch <= '9' ) )
-											throw new SourceException( "Illegal escape sequence: \\u" + String.valueOf( codePoint, 0, i + 1 ), this.in.getLocation() );
+											throw new SourceException( "Illegal escape sequence: \\u" + String.valueOf( codePoint, 0, i + 1 ), in.getLocation() );
 									}
 									ch = Integer.valueOf( String.valueOf( codePoint ), 16 );
 									break;
 								default:
-									throw new SourceException( "Illegal escape sequence: \\" + ( ch >= 0 ? (char)ch : "" ), this.in.getLocation() );
+									throw new SourceException( "Illegal escape sequence: \\" + ( ch >= 0 ? (char)ch : "" ), in.getLocation() );
 							}
 						}
 						result.append( (char)ch );
@@ -131,47 +156,47 @@ public class JSONTokenizer
 				case '+':
 				case '-':
 					result.append( (char)ch );
-					ch = this.in.read();
+					ch = in.read();
 					if( !( ch >= '0' && ch <= '9' ) )
-						throw new SourceException( "Invalid number", this.in.getLocation() );
+						throw new SourceException( "Invalid number", in.getLocation() );
 					//$FALL-THROUGH$
 				case '0': case '1': case '2': case '3': case '4':
 				case '5': case '6': case '7': case '8': case '9':
 					while( ch >= '0' && ch <= '9' )
 					{
 						result.append( (char)ch );
-						ch = this.in.read();
+						ch = in.read();
 					}
 					if( ch == '.' )
 					{
 						result.append( (char)ch );
-						ch = this.in.read();
+						ch = in.read();
 						if( !( ch >= '0' && ch <= '9' ) )
-							throw new SourceException( "Invalid number", this.in.getLocation() );
+							throw new SourceException( "Invalid number", in.getLocation() );
 						while( ch >= '0' && ch <= '9' )
 						{
 							result.append( (char)ch );
-							ch = this.in.read();
+							ch = in.read();
 						}
 					}
 					if( ch == 'E' || ch == 'e' )
 					{
 						result.append( (char)ch );
-						ch = this.in.read();
+						ch = in.read();
 						if( ch == '+' || ch == '-' )
 						{
 							result.append( (char)ch );
-							ch = this.in.read();
+							ch = in.read();
 						}
 						if( !( ch >= '0' && ch <= '9' ) )
-							throw new SourceException( "Invalid number", this.in.getLocation() );
+							throw new SourceException( "Invalid number", in.getLocation() );
 						while( ch >= '0' && ch <= '9' )
 						{
 							result.append( (char)ch );
-							ch = this.in.read();
+							ch = in.read();
 						}
 					}
-					this.in.rewind();
+					in.rewind();
 					return new Token( TYPE.NUMBER, new BigDecimal( result.toString() ) );
 				case 'a': case 'b': case 'c': case 'd': case 'e':
 				case 'f': case 'g': case 'h': case 'i': case 'j':
@@ -182,9 +207,9 @@ public class JSONTokenizer
 					while( ch >= 'a' && ch <= 'z' )
 					{
 						result.append( (char)ch );
-						ch = this.in.read();
+						ch = in.read();
 					}
-					this.in.rewind();
+					in.rewind();
 
 					String keyword = result.toString();
 					if( keyword.equals( "false" ) )
@@ -194,9 +219,9 @@ public class JSONTokenizer
 					if( keyword.equals( "true" ) )
 						return Token.TRUE;
 
-					throw new SourceException( "Unexpected keyword " + keyword, this.in.getLocation() );
+					throw new SourceException( "Unexpected keyword " + keyword, in.getLocation() );
 				default:
-					throw new SourceException( "Unexpected character '" + (char)ch + "'", this.in.getLocation() );
+					throw new SourceException( "Unexpected character '" + (char)ch + "'", in.getLocation() );
 			}
 		}
 	}

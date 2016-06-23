@@ -161,7 +161,7 @@ public class ReaderSourceReader implements SourceReader
 	public int readRaw()
 	{
 		if( this.reader == null )
-			throw new IllegalStateException( "Closed" );
+			throw new FatalIOException( "Closed" );
 
 		this.lastLocation = this.location;
 		try
