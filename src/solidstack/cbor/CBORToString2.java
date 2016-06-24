@@ -24,7 +24,7 @@ import java.io.Writer;
 
 import solidstack.cbor.Token.TYPE;
 import solidstack.io.FatalIOException;
-import solidstack.io.SourceInputStream;
+import solidstack.io.InputStreamSourceInputStream;
 
 public class CBORToString2
 {
@@ -38,12 +38,12 @@ public class CBORToString2
 
 	public CBORToString2( byte[] bytes )
 	{
-		this( new CBORScanner( new SourceInputStream( new ByteArrayInputStream( bytes ), null, 0 ) ) );
+		this( new CBORScanner( new InputStreamSourceInputStream( new ByteArrayInputStream( bytes ), null, 0 ) ) );
 	}
 
 	public CBORToString2( InputStream in )
 	{
-		this( new CBORScanner( new SourceInputStream( in, null, 0 ) ) );
+		this( new CBORScanner( new InputStreamSourceInputStream( in, null, 0 ) ) );
 	}
 
 	@Override

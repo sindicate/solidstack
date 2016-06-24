@@ -24,7 +24,8 @@ import java.io.Writer;
 
 import solidstack.cbor.Token.TYPE;
 import solidstack.io.FatalIOException;
-import solidstack.io.SourceInputStream;
+import solidstack.io.InputStreamSourceInputStream;
+import solidstack.io.SourceLocation;
 
 public class CBORToString
 {
@@ -38,12 +39,12 @@ public class CBORToString
 
 	public CBORToString( byte[] bytes )
 	{
-		this( new CBORParser( new SourceInputStream( new ByteArrayInputStream( bytes ), null, 0 ) ) );
+		this( new CBORParser( new InputStreamSourceInputStream( new ByteArrayInputStream( bytes ), null, 0 ) ) );
 	}
 
 	public CBORToString( InputStream in )
 	{
-		this( new CBORParser( new SourceInputStream( in, null, 0 ) ) );
+		this( new CBORParser( new InputStreamSourceInputStream( in, null, 0 ) ) );
 	}
 
 	@Override
@@ -87,7 +88,7 @@ public class CBORToString
 
 	private void toString( Token token, CBORParser in, Writer out, int indent ) throws IOException
 	{
-		long pos = in.getPos();
+		SourceLocation loc = in.getLocation();
 
 		if( indent > 0 )
 		{
@@ -166,7 +167,7 @@ public class CBORToString
 			case UINT:
 				if( token.hasTag( 0x19 ) )
 				{
-					Object string = in.getFromNamespace( token.length(), pos );
+					Object string = in.getFromNamespace( token.length(), loc );
 					if( string instanceof String )
 					{
 						out.append( ": \"" );

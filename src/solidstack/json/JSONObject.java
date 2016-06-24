@@ -109,6 +109,11 @@ public class JSONObject implements Iterable< Map.Entry< String, Object > >
 		return result;
 	}
 
+	public boolean has( String name )
+	{
+		return this.values.containsKey( name );
+	}
+
 	@Override
 	public Iterator< Map.Entry< String, Object >> iterator()
 	{

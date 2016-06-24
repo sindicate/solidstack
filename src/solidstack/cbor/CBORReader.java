@@ -23,6 +23,7 @@ import java.util.Date;
 import solidstack.cbor.Token.TYPE;
 import solidstack.io.DiskBuffer;
 import solidstack.io.SourceInputStream;
+import solidstack.io.SourceLocation;
 import solidstack.json.JSONArray;
 import solidstack.json.JSONObject;
 
@@ -32,6 +33,8 @@ public class CBORReader
 	static private enum STATE { IBYTES, ITEXT, ARRAYMAP };
 
 	private CBORParser in;
+
+	private Token buffer;
 
 	// TODO Lazy init
 	private DiskBuffer disk = new DiskBuffer( "cborbuffer" );
@@ -48,16 +51,40 @@ public class CBORReader
 		this.disk.close();
 	}
 
+	public SourceLocation getLocation()
+	{
+		return this.in.getLocation();
+	}
+
 	public Token get()
 	{
+		if( this.buffer != null )
+		{
+			Token result = this.buffer;
+			this.buffer = null;
+			return result;
+		}
 		return this.in.get();
+	}
+
+	public void push( Token token )
+	{
+		// TODO Check null
+		this.buffer = token;
+	}
+
+	public Token peek()
+	{
+		if( this.buffer != null )
+			return this.buffer;
+		return this.buffer = this.in.get();
 	}
 
 	public Object read()
 	{
 		CBORParser in = this.in;
-		long pos = in.getPos();
-		Token t = in.get();
+		SourceLocation loc = in.getLocation();
+		Token t = get();
 		TYPE type = t.type();
 		switch( type )
 		{
@@ -100,8 +127,10 @@ public class CBORReader
 
 			case UINT:
 				if( t.hasTag( 0x19 ) )
-					return this.in.getFromNamespace( t.length(), pos );
-				if( t.hasTag( 0x01 ) )
+					return this.in.getFromNamespace( t.length(), loc );
+				//$FALL-THROUGH$
+			case NINT:
+				if( t.hasTag( 0x01 ) ) // TODO And also float major 7:25/26/27
 					return new Date( t.longValue() );
 				return t.longValue();
 

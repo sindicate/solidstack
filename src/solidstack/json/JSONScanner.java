@@ -75,7 +75,7 @@ public class JSONScanner
 
 		while( true )
 		{
-			int ch = in.read(); // TODO Put in in a local
+			int ch = in.read();
 			switch( ch )
 			{
 				case -1:

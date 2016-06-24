@@ -84,6 +84,8 @@ public class SimpleToken implements Token
 	@Override
 	public long longValue()
 	{
+		if( this.type == TYPE.NINT )
+			return -( this.value + 1 ); // TODO overflow exception?
 		return this.value;
 	}
 
@@ -102,6 +104,7 @@ public class SimpleToken implements Token
 	@Override
 	public int length()
 	{
+		// TODO Check for UINT
 		if( this.value < 0 || this.value > Integer.MAX_VALUE )
 			throw new CBORException( "Invalid length: " + this.value );
 		return (int)this.value;

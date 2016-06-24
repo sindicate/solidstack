@@ -104,9 +104,13 @@ public class SourceLocation
 	{
 		StringBuilder result = new StringBuilder();
 		if( this.lineNumber >= 0 )
+		{
 			result.append( "line " ).append( this.lineNumber );
+			if( this.column >= 0 )
+				result.append( ", char " ).append( this.column );
+		}
 		else
-			result.append( "position " ).append( this.column );
+			result.append( "byte " ).append( this.column );
 		if( this.resource != null )
 			result.append( " of file " ).append( this.resource );
 		return result.toString();

@@ -46,9 +46,9 @@ public class CBORScanner
 		return this.in.getResource();
 	}
 
-	public long getPos()
+	public SourceLocation getLocation()
 	{
-		return this.in.getPos();
+		return this.in.getLocation();
 	}
 
 	public SimpleToken get()
@@ -56,7 +56,7 @@ public class CBORScanner
 		SourceInputStream in = this.in;
 		try
 		{
-			long pos = in.getPos();
+			SourceLocation loc = in.getLocation();
 
 			int b = in.read();
 			if( b == -1 )
@@ -74,21 +74,21 @@ public class CBORScanner
 					case 5: return Token.IMAP;
 					case 7: return Token.BREAK;
 					default:
-						throw new SourceException( "Unsupported additional info 31 for major type: " + major, SourceLocation.forBinary( in.getResource(), pos ) );
+						throw new SourceException( "Unsupported additional info 31 for major type: " + major, loc );
 				}
 
 			switch( major )
 			{
-				case 0: return readUInt( in, pos, minor, TYPE.UINT );
-				case 1: return readUInt( in, pos, minor, TYPE.NINT );
-				case 2: return readUInt( in, pos, minor, TYPE.BYTES );
-				case 3: return readUInt( in, pos, minor, TYPE.TEXT );
-				case 4: return readUInt( in, pos, minor, TYPE.ARRAY );
-				case 5: return readUInt( in, pos, minor, TYPE.MAP );
-				case 6: return readUInt( in, pos, minor, TYPE.TAG );
-				case 7: return readSimple( in, pos, minor, TYPE.TAG );
+				case 0: return readUInt( in, loc, minor, TYPE.UINT );
+				case 1: return readUInt( in, loc, minor, TYPE.NINT );
+				case 2: return readUInt( in, loc, minor, TYPE.BYTES );
+				case 3: return readUInt( in, loc, minor, TYPE.TEXT );
+				case 4: return readUInt( in, loc, minor, TYPE.ARRAY );
+				case 5: return readUInt( in, loc, minor, TYPE.MAP );
+				case 6: return readUInt( in, loc, minor, TYPE.TAG );
+				case 7: return readSimple( in, loc, minor, TYPE.TAG );
 				default:
-					throw new SourceException( "Unsupported major type: " + major, SourceLocation.forBinary( in.getResource(), pos ) );
+					throw new SourceException( "Unsupported major type: " + major, loc );
 			}
 		}
 		catch( IOException e )
@@ -107,9 +107,9 @@ public class CBORScanner
 			while( read < remaining )
 			{
 				if( read < 0 )
-					throw new SourceException( "Unexpected EOF", SourceLocation.forBinary( in.getResource(), in.getPos() ) );
+					throw new SourceException( "Unexpected EOF", in.getLocation() );
 				if( read == 0 )
-					throw new SourceException( "Zero bytes read", SourceLocation.forBinary( in.getResource(), in.getPos() ) );
+					throw new SourceException( "Zero bytes read", in.getLocation() );
 				remaining -= read;
 				read = in.read( bytes, bytes.length - remaining, remaining );
 			}
@@ -127,7 +127,7 @@ public class CBORScanner
 		return new String( result, CBORWriter.UTF8 );
 	}
 
-	static private SimpleToken readSimple( SourceInputStream in, long pos, int minor, TYPE type ) throws IOException
+	static private SimpleToken readSimple( SourceInputStream in, SourceLocation loc, int minor, TYPE type ) throws IOException
 	{
 		switch( minor )
 		{
@@ -140,16 +140,16 @@ public class CBORScanner
 			case 27: return SimpleToken.forFloatD( Double.longBitsToDouble( readUInt8( in ) ) );
 			case 31: return Token.BREAK;
 			default:
-				throw new SourceException( "Unsupported additional info: " + minor, SourceLocation.forBinary( in.getResource(), pos ) );
+				throw new SourceException( "Unsupported additional info: " + minor, loc );
 		}
 	}
 
-	static private SimpleToken readUInt( SourceInputStream in, long pos, int minor, TYPE type ) throws IOException
+	static private SimpleToken readUInt( SourceInputStream in, SourceLocation loc, int minor, TYPE type ) throws IOException
 	{
-		return SimpleToken.forType( type, readUInt( in, pos, minor ) );
+		return SimpleToken.forType( type, readUInt( in, loc, minor ) );
 	}
 
-	static private long readUInt( SourceInputStream in, long pos, int minor ) throws IOException
+	static private long readUInt( SourceInputStream in, SourceLocation loc, int minor ) throws IOException
 	{
 		switch( minor )
 		{
@@ -162,7 +162,7 @@ public class CBORScanner
 			case 26: return readUInt4( in );
 			case 27: return readUInt8( in );
 			default:
-				throw new SourceException( "Unsupported additional info: " + minor, SourceLocation.forBinary( in.getResource(), pos ) );
+				throw new SourceException( "Unsupported additional info: " + minor, loc );
 		}
 	}
 
@@ -170,7 +170,7 @@ public class CBORScanner
 	{
 		int result = in.read();
 		if( result == -1 )
-			throw new SourceException( "Unexpected EOF", SourceLocation.forBinary( in.getResource(), in.getPos() ) );
+			throw new SourceException( "Unexpected EOF", in.getLocation() );
 		return result;
 	}
 

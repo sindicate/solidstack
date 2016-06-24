@@ -64,16 +64,16 @@ public class CBORParser
 		return this.in.getResource();
 	}
 
-	public long getPos()
+	public SourceLocation getLocation()
 	{
-		return this.in.getPos();
+		return this.in.getLocation();
 	}
 
-	public Object getFromNamespace( int index, long pos )
+	public Object getFromNamespace( int index, SourceLocation loc )
 	{
 		ByteString result = this.index.get( index );
 		if( result == null )
-			throw new SourceException( "Illegal string ref: " + index, SourceLocation.forBinary( this.in.getResource(), pos ) );
+			throw new SourceException( "Illegal string ref: " + index, loc );
 		return result.toJava();
 	}
 
@@ -93,15 +93,15 @@ public class CBORParser
 			if( value == 0x102 )
 			{
 				List<Token> parameters = new ArrayList<Token>();
-				long pos = in.getPos();
+				SourceLocation loc = in.getLocation();
 				t = in.get();
 				if( t.type != TYPE.UINT )
-					throw new SourceException( "Expected an UINT, not: " + t.type, SourceLocation.forBinary( this.in.getResource(), pos ) );
+					throw new SourceException( "Expected an UINT, not: " + t.type, loc );
 				parameters.add( t );
-				pos = in.getPos();
+				loc = in.getLocation();
 				t = in.get();
 				if( t.type != TYPE.UINT && t.type != TYPE.NULL )
-					throw new SourceException( "Expected an UINT or NULL, not: " + t.type, SourceLocation.forBinary( this.in.getResource(), pos ) );
+					throw new SourceException( "Expected an UINT or NULL, not: " + t.type, loc );
 				parameters.add( t );
 				tag.setParameters( parameters.toArray( new Token[ parameters.size() ] ) );
 			}
@@ -117,14 +117,14 @@ public class CBORParser
 		if( this.state == STATE.BYTES || this.state == STATE.TEXT )
 			throw new IllegalStateException( "Bytes or text is waiting to be read" );
 
-		long pos = this.in.getPos();
+		SourceLocation loc = this.in.getLocation();
 
 		Token t = get0();
 		switch( t.type() )
 		{
 			case MAP:
 			case ARRAY:
-				checkNotIString( t, pos );
+				checkNotIString( t, loc );
 				decRemaining();
 				pushState( STATE.ARRAYMAP );
 				this.remaining = t.longValue() * ( t.type() == TYPE.MAP ? 2 : 1 );
@@ -133,13 +133,13 @@ public class CBORParser
 
 			case EOF:
 				if( this.state != null )
-					throw newSourceException( t, pos );
+					throw newSourceException( t, loc );
 				return t;
 
 			case IARRAY:
 			case IMAP:
 				// TODO Must count even amount of items if MAP
-				checkNotIString( t, pos );
+				checkNotIString( t, loc );
 				decRemaining();
 				pushState( STATE.IARRAYMAP );
 				newNamespace( t );
@@ -147,7 +147,7 @@ public class CBORParser
 
 			case BYTES:
 				if( this.state == STATE.ITEXT )
-					throw newSourceException( t, pos );
+					throw newSourceException( t, loc );
 				decRemaining();
 				pushState( STATE.BYTES );
 				this.remaining = t.longValue();
@@ -156,7 +156,7 @@ public class CBORParser
 
 			case TEXT:
 				if( this.state == STATE.IBYTES )
-					throw newSourceException( t, pos );
+					throw newSourceException( t, loc );
 				decRemaining();
 				pushState( STATE.TEXT );
 				this.remaining = t.longValue();
@@ -164,29 +164,30 @@ public class CBORParser
 				return t;
 
 			case IBYTES:
-				checkNotIString( t, pos );
+				checkNotIString( t, loc );
 				decRemaining();
 				pushState( STATE.IBYTES );
 				return t;
 
 			case ITEXT:
-				checkNotIString( t, pos );
+				checkNotIString( t, loc );
 				decRemaining();
 				pushState( STATE.ITEXT );
 				return t;
 
 			case UINT:
+			case NINT:
 			case DFLOAT:
 			case BOOL:
 			case NULL:
-				checkNotIString( t, pos );
+				checkNotIString( t, loc );
 				decRemaining();
 				return t;
 
 			case BREAK:
 				decRemaining();
 				if( this.state != STATE.IARRAYMAP && this.state != STATE.IBYTES && this.state != STATE.ITEXT )
-					throw newSourceException( t, pos );
+					throw newSourceException( t, loc );
 				popState();
 				return t;
 
@@ -195,15 +196,15 @@ public class CBORParser
 		}
 	}
 
-	private void checkNotIString( Token token, long pos )
+	private void checkNotIString( Token token, SourceLocation loc )
 	{
 		if( this.state == STATE.ITEXT || this.state == STATE.IBYTES )
-			throw newSourceException( token, pos );
+			throw newSourceException( token, loc );
 	}
 
-	private SourceException newSourceException( Token token, long pos )
+	private SourceException newSourceException( Token token, SourceLocation loc )
 	{
-		return new SourceException( "Unexpected " + token + " in parser state: " + this.state, SourceLocation.forBinary( this.in.getResource(), pos ) );
+		return new SourceException( "Unexpected " + token + " in parser state: " + this.state, loc );
 	}
 
 	private void decRemaining()
@@ -233,7 +234,7 @@ public class CBORParser
 	public void readBytes( byte[] bytes )
 	{
 		if( this.state != STATE.BYTES )
-			throw new SourceException( "Can't read bytes in parser state: " + this.state, SourceLocation.forBinary( this.in.getResource(), this.in.getPos() ) );
+			throw new SourceException( "Can't read bytes in parser state: " + this.state, this.in.getLocation() );
 		this.in.readBytes( bytes );
 		// TODO Check remaining
 		popState();
@@ -244,7 +245,7 @@ public class CBORParser
 	public String readString( int len )
 	{
 		if( this.state != STATE.TEXT )
-			throw new SourceException( "Can't read text in parser state: " + this.state, SourceLocation.forBinary( this.in.getResource(), this.in.getPos() ) );
+			throw new SourceException( "Can't read text in parser state: " + this.state, this.in.getLocation() );
 		byte[] bytes = new byte[ len ];
 		this.in.readBytes( bytes );
 		// TODO Check remaining
@@ -264,14 +265,14 @@ public class CBORParser
 	public InputStream getInputStream()
 	{
 		if( this.state != STATE.ITEXT && this.state != STATE.IBYTES )
-			throw new SourceException( "Can't stream bytes in parser state: " + this.state, SourceLocation.forBinary( this.in.getResource(), this.in.getPos() ) );
+			throw new SourceException( "Can't stream bytes in parser state: " + this.state, this.in.getLocation() );
 		return new BytesInputStream();
 	}
 
 	public Reader getReader()
 	{
 		if( this.state != STATE.ITEXT )
-			throw new SourceException( "Can't stream text in parser state: " + this.state, SourceLocation.forBinary( this.in.getResource(), this.in.getPos() ) );
+			throw new SourceException( "Can't stream text in parser state: " + this.state, this.in.getLocation() );
 		return new InputStreamReader( new BytesInputStream(), CBORWriter.UTF8 );
 	}
 
