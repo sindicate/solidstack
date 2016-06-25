@@ -3,14 +3,14 @@ package solidstack.io;
 import java.io.IOException;
 
 
-public class HexInputStream extends SourceInputStream
+public class HexSourceReaderInputStream extends SourceInputStream
 {
 	private SourceReader reader;
 	private boolean startOfLine;
 	private boolean eof;
 
 
-	public HexInputStream( SourceReader reader )
+	public HexSourceReaderInputStream( SourceReader reader )
 	{
 		this.reader = reader;
 		this.startOfLine = true;

@@ -267,10 +267,12 @@ public class DiskBuffer
 		@Override
 		public int read( byte[] b, int off, int len ) throws IOException
 		{
+			if( len == 0 )
+				return 0;
 			if( len > this.size )
 				len = this.size;
 			if( len <= 0 )
-				return 0;
+				return -1;
 			this.size -= len;
 
 			int l = len;
