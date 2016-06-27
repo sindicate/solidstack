@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import org.testng.Assert;
@@ -60,7 +61,7 @@ public class Reload
 		Assert.assertTrue( in.read() >= 0 );
 		in.close();
 
-		resource = Resources.getResource( "http://solidbase.org" );
+		resource = Resources.getResource( "http://google.com" );
 		Assert.assertTrue( resource instanceof URIResource );
 		Assert.assertEquals( resource.getURL().getProtocol(), "http" );
 		try
@@ -71,7 +72,7 @@ public class Reload
 		}
 		catch( FatalIOException e )
 		{
-			if( e.getCause() instanceof ConnectException || e.getCause() instanceof UnknownHostException )
+			if( e.getCause() instanceof ConnectException || e.getCause() instanceof UnknownHostException || e.getCause() instanceof SocketTimeoutException )
 				System.out.println( "Couldn't test http protocol: " + e.getCause().getMessage() );
 			else
 				throw e;

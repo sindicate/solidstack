@@ -225,17 +225,17 @@
 			check solidstack.xml.*                 dependentOnlyOn java.* javax.* solidstack.*
 	    </dependencyCheck>
 		<delete file="cobertura.ser" />
-		<testng classpathref="test.classpath" outputDir="${build.home}/testreports" haltOnFailure="true" verbose="3"
-			usedefaultlisteners="false" listeners="org.testng.reporters.JUnitReportReporter">
+		<testng classpathref="test.classpath" outputDir="${build.home}/testreports" haltOnFailure="true" verbose="2">
 			<classfileset dir="${build.home}/testclasses" />
+			<reporter classname="solidstack.test.TestListener"/>
 		</testng>
-		<testng classpathref="test-hibernate3.classpath" outputDir="${build.home}/testreports-hibernate3" haltOnFailure="true" verbose="3"
-			usedefaultlisteners="false" listeners="org.testng.reporters.JUnitReportReporter">
+		<testng classpathref="test-hibernate3.classpath" outputDir="${build.home}/testreports-hibernate3" haltOnFailure="true" verbose="2">
 			<classfileset dir="${build.home}/testclasses" includes="solidstack/query/hibernate/Hibernate3Tests.class" />
+			<reporter classname="solidstack.test.TestListener"/>
 		</testng>
-		<testng classpathref="test-jpa1.classpath" outputDir="${build.home}/testreports-jpa1" haltOnFailure="true" verbose="3"
-			usedefaultlisteners="true" listeners="org.testng.reporters.JUnitReportReporter">
+		<testng classpathref="test-jpa1.classpath" outputDir="${build.home}/testreports-jpa1" haltOnFailure="true" verbose="2">
 			<classfileset dir="${build.home}/testclasses" includes="solidstack/query/jpa/JPA1Tests.class" />
+			<reporter classname="solidstack.test.TestListener"/>
 		</testng>
 	</target>
 
