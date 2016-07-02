@@ -81,7 +81,7 @@ public class ObjectScope implements Scope
 		catch( MissingFieldException e )
 		{
 			if( this.parent == null )
-				throw new UndefinedException();
+				throw new UndefinedException( symbol.toString() );
 			this.parent.set( symbol, value );
 		}
 	}
@@ -142,7 +142,7 @@ public class ObjectScope implements Scope
 		{
 			if( this.parent != null )
 				return this.parent.get( symbol );
-			throw new UndefinedException();
+			throw new UndefinedException( symbol.toString() );
 		}
 	}
 
@@ -173,7 +173,7 @@ public class ObjectScope implements Scope
 		{
 			if( this.parent != null )
 				return this.parent.apply( symbol, args );
-			throw new UndefinedException();
+			throw new UndefinedException( symbol.toString() );
 		}
 		catch( Exception e )
 		{

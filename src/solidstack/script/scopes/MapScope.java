@@ -61,7 +61,7 @@ public class MapScope implements Scope
 		else
 		{
 			if( this.parent == null )
-				throw new UndefinedException();
+				throw new UndefinedException( symbol.toString() );
 			this.parent.set( symbol, value );
 		}
 	}
@@ -97,7 +97,7 @@ public class MapScope implements Scope
 			return (T)this.map.get( name );
 		if( this.parent != null )
 			return this.parent.get( symbol );
-		throw new UndefinedException();
+		throw new UndefinedException( symbol.toString() );
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public class MapScope implements Scope
 			return (T)this.map.get( name );
 		if( this.parent != null )
 			return this.parent.get( name );
-		throw new UndefinedException();
+		throw new UndefinedException( name );
 	}
 
 	@Override
@@ -153,7 +153,7 @@ public class MapScope implements Scope
 		else
 		{
 			if( this.parent == null )
-				throw new UndefinedException();
+				throw new UndefinedException( name );
 			this.parent.set( name, value );
 		}
 	}

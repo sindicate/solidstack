@@ -10,6 +10,7 @@ public class HexSourceReaderInputStream extends SourceInputStream
 	private boolean eof;
 
 
+	// TODO Use a EndAtEmptyLineSourceReader
 	public HexSourceReaderInputStream( SourceReader reader )
 	{
 		this.reader = reader;

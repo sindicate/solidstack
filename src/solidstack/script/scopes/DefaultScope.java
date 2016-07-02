@@ -68,7 +68,7 @@ public class DefaultScope implements Scope
 		if( ref == null )
 		{
 			if( this.parent == null )
-				throw new UndefinedException();
+				throw new UndefinedException( symbol.toString() );
 			this.parent.set( symbol, value );
 		}
 		else
@@ -112,7 +112,7 @@ public class DefaultScope implements Scope
 			return ref.get();
 		if( this.parent != null )
 			return this.parent.get( symbol );
-		throw new UndefinedException();
+		throw new UndefinedException( symbol.toString() );
 	}
 
 	@Override
@@ -123,7 +123,7 @@ public class DefaultScope implements Scope
 			return Java.applyTo( ref.get(), args );
 		if( this.parent != null )
 			return this.parent.apply( symbol, args );
-		throw new UndefinedException();
+		throw new UndefinedException( symbol.toString() );
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public class DefaultScope implements Scope
 			return Java.applyTo( ref.get(), args );
 		if( this.parent != null )
 			return this.parent.apply( symbol, args );
-		throw new UndefinedException();
+		throw new UndefinedException( symbol.toString() );
 	}
 
 	@Override
