@@ -1,5 +1,5 @@
 /*--
- * Copyright 2012 René M. de Bloois
+ * Copyright 2012 RenÃ© M. de Bloois
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import solidstack.util.WindowBuffer;
 /**
  * This is a tokenizer for CSV. It maintains the current line number, and it ignores whitespace.
  *
- * @author René M. de Bloois
+ * @author RenÃ© M. de Bloois
  */
 public class ScriptTokenizer
 {
@@ -160,7 +160,7 @@ public class ScriptTokenizer
 		StringBuilder result = clearBuffer();
 		SourceReader in = this.in;
 
-		while( true )
+		start: while( true )
 		{
 			int ch;
 
@@ -174,32 +174,27 @@ public class ScriptTokenizer
 
 			SourceLocation location = in.getLocation();
 
+			// Identifier
+			if( Character.isJavaIdentifierStart( ch ) )
+			{
+				do
+				{
+					result.append( (char)ch );
+					ch = in.read();
+				}
+				while( Character.isJavaIdentifierPart( ch ) );
+				in.rewind();
+				String value = result.toString();
+				TokenType type = RESERVED_WORDS.get( value );
+				if( type != null )
+					return new Token( type, location, value );
+				if( ch == '"' )
+					return new Token( TokenType.PSTRING, location, value );
+				return new Token( TokenType.IDENTIFIER, location, value );
+			}
+
 			switch( ch )
 			{
-				// Identifier
-				// TODO Scala's identifiers are formed with operator characters: These consist of all printable ASCII characters \u0020 - \u007F which are in none of the sets above, mathematical symbols (Sm) and other symbols (So).
-				case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g': case 'h': case 'i': case 'j':
-				case 'k': case 'l': case 'm': case 'n': case 'o': case 'p': case 'q': case 'r': case 's': case 't':
-				case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
-				case 'A': case 'B': case 'C': case 'D': case 'E': case 'F': case 'G': case 'H': case 'I': case 'J':
-				case 'K': case 'L': case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T':
-				case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
-				case '_': case '$':
-					do
-					{
-						result.append( (char)ch );
-						ch = in.read();
-					}
-					while( ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '$' || ch == '_' );
-					in.rewind();
-					String value = result.toString();
-					TokenType type = RESERVED_WORDS.get( value );
-					if( type != null )
-						return new Token( type, location, value );
-					if( ch == '"' )
-						return new Token( TokenType.PSTRING, location, value );
-					return new Token( TokenType.IDENTIFIER, location, value );
-
 				// String
 				case '"':
 					in.mark();
@@ -388,7 +383,7 @@ public class ScriptTokenizer
 						do
 							ch = in.read();
 						while( ch != '\n' && ch != -1 );
-						break;
+						continue start;
 					}
 					if( ch2 == '*' )
 					{
@@ -406,44 +401,43 @@ public class ScriptTokenizer
 								in.rewind();
 							}
 						}
-						break;
+						continue start;
 					}
 					in.rewind();
-
-				// Operators
-				// $FALL-THROUGH$
-				case '!': case '#': case '%': case '&': case '*': case '+': case '-': case ':':
-				case '<': case '=': case '>': case '?': case '@': case '\\': case '^': case '|': case '~':
-					do
-					{
-						result.append( (char)ch );
-						ch = in.read();
-					}
-					while( isOperatorChar( ch ) );
-					in.rewind();
-					value = result.toString();
-					type = RESERVED_WORDS.get( value );
-					if( type != null )
-						return new Token( type, location, value );
-					return new Token( TokenType.OPERATOR, location, value );
-
-				default:
-					throw new SourceException( "Unexpected character '" + (char)ch + "'", in.getLocation() );
 			}
+
+			if( !isOperatorChar( ch ) )
+				throw new SourceException( "Unexpected character '" + (char)ch + "'", in.getLocation() );
+
+			do
+			{
+				result.append( (char)ch );
+				ch = in.read();
+			}
+			while( isOperatorChar( ch ) );
+			in.rewind();
+			String value = result.toString();
+			TokenType type = RESERVED_WORDS.get( value );
+			if( type != null )
+				return new Token( type, location, value );
+			return new Token( TokenType.OPERATOR, location, value );
 		}
 	}
 
 	static private boolean isOperatorChar( int ch )
 	{
-		switch( ch )
-		{
-			case '!': case '#': case '%': case '&': case '*': case '+': case '-': case '/':
-			case ':': case '<': case '=': case '>': case '?': case '@': case '\\': case '^':
-			case '|': case '~':
-				return true;
-			default:
-				return false;
-		}
+		if( ch > 0x20 && ch < 0x7F )
+			switch( ch )
+			{
+				case '!': case '#': case '%': case '&': case '*': case '+': case '-': case '.': case '/': case ':':
+				case '<': case '=': case '>': case '?': case '@': case '\\': case '^': case '|': case '~':
+					return true;
+				default:
+					return false;
+			}
+
+		int type = Character.getType( ch );
+		return type == Character.MATH_SYMBOL || type == Character.OTHER_SYMBOL;
 	}
 
 	/**

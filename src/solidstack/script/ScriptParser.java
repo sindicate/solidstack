@@ -398,7 +398,7 @@ public class ScriptParser
 	{
 		if( token.eq( "s" ) )
 			return parsePString( new ProcessedStringTokenizer( in, true ), token.getLocation() );
-		throw new SourceException( "Only 's' is currently allowed", token.getLocation() );
+		throw new SourceException( "Only 's' is currently allowed, not " + token, token.getLocation() );
 	}
 
 	static private Expression parsePString( ProcessedStringTokenizer t, SourceLocation location )
