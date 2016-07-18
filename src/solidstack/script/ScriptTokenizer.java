@@ -155,7 +155,7 @@ public class ScriptTokenizer
 		this.window.rewind();
 	}
 
-	private Token readToken()
+	protected Token readToken()
 	{
 		StringBuilder result = clearBuffer();
 		SourceReader in = this.in;
@@ -191,28 +191,41 @@ public class ScriptTokenizer
 						ch = in.read();
 					}
 					while( ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '$' || ch == '_' );
+					in.rewind();
 					String value = result.toString();
 					TokenType type = RESERVED_WORDS.get( value );
 					if( type != null )
-					{
-						in.rewind();
 						return new Token( type, location, value );
-					}
 					if( ch == '"' )
 						return new Token( TokenType.PSTRING, location, value );
-					in.rewind();
 					return new Token( TokenType.IDENTIFIER, location, value );
 
 				// String
 				case '"':
+					in.mark();
+					boolean triple = in.read() == '"' && in.read() == '"';
+					if( !triple )
+						in.reset();
 					while( true )
 					{
 						switch( ch = in.read() )
 						{
 							case -1: throw new SourceException( "Missing \"", in.getLocation() );
-							case '"': return new Token( TokenType.STRING, location, result.toString() );
-							case '\n': throw new SourceException( "Unexpected LF", in.getLocation() );
-							case '\r': throw new SourceException( "Unexpected CR", in.getLocation() );
+							case '"':
+								if( !triple )
+									return new Token( TokenType.STRING, location, result.toString() );
+								in.mark();
+								if( in.read() == '"' && in.read() == '"' )
+								{
+									while( in.read() == '"' )
+										result.append( '"' );
+									in.rewind();
+									return new Token( TokenType.STRING, location, result.toString() );
+								}
+								in.reset();
+								break;
+//							case '\n': throw new SourceException( "Unexpected LF", in.getLocation() );
+//							case '\r': throw new SourceException( "Unexpected CR", in.getLocation() );
 							case '\\':
 								switch( ch = in.read() )
 								{
@@ -223,7 +236,7 @@ public class ScriptTokenizer
 									case 'r': ch = '\r'; break;
 									case 't': ch = '\t'; break;
 									case '"':
-									case '\'':
+//									case '\'':
 									case '\\': break;
 									case 'u': // TODO Actually, these escapes should be active through the entire script, like Java and Scala do. Maybe disabled by default. Or removed and optional for String literals.
 										char[] codePoint = new char[ 4 ];
@@ -236,25 +249,52 @@ public class ScriptTokenizer
 										ch = Integer.valueOf( new String( codePoint ), 16 );
 										break;
 									default:
-										throw new SourceException( "Illegal escape sequence: \\" + ( ch >= 0 ? (char)ch : "" ), in.getLastLocation() );
+										throw new SourceException( "Illegal escape sequence: \\" + ( ch >= 0 ? (char)ch : "EOF" ), in.getLastLocation() );
 								}
 							// TODO Scala's octal escape for characters between 0 and 255: /12 is 0x10
 						}
 						result.append( (char)ch );
 					}
 
-				// TODO Scala's multiline string: """ every character except 3 double quotes """, none of the escapes
-
 				// Character
 				case '\'':
-					// FIXME '\n' and the other escapes do not work yet
-					ch = in.read();
-					if( ch == -1 ) throw new SourceException( "Unexpected EOF", in.getLocation() );
+					switch( ch = in.read() )
+					{
+						case -1: throw new SourceException( "Unexpected EOF", in.getLocation() );
+						case '\'': throw new SourceException( "Unexpected '", in.getLocation() );
+						case '\\':
+							switch( ch = in.read() )
+							{
+								case 'b': ch = '\b'; break;
+								case 'f': ch = '\f'; break;
+								case 'n': ch = '\n'; break;
+								case 'r': ch = '\r'; break;
+								case 't': ch = '\t'; break;
+//								case '"':
+								case '\'':
+								case '\\': break;
+								case 'u': // TODO Actually, these escapes should be active through the entire script, like Java and Scala do. Maybe disabled by default. Or removed and optional for String literals.
+									char[] codePoint = new char[ 4 ];
+									for( int i = 0; i < 4; i++ )
+									{
+										codePoint[ i ] = Character.toUpperCase( (char)( ch = in.read() ) );
+										if( !( ch >= '0' && ch <= '9' || ch >= 'A' && ch <= 'F' ) )
+											throw new SourceException( "Illegal escape sequence: \\u" + new String( codePoint, 0, i + 1 ), in.getLastLocation() );
+									}
+									ch = Integer.valueOf( new String( codePoint ), 16 );
+									break;
+								default:
+									throw new SourceException( "Illegal escape sequence: \\" + ( ch >= 0 ? (char)ch : "EOF" ), in.getLastLocation() );
+							}
+						// TODO Scala's octal escape for characters between 0 and 255: /12 is 0x10
+					}
+
 					int ch2 = in.read();
-					// TODO Add escaping
 					if( ch2 == '\'' )
 						return new Token( TokenType.CHAR, location, String.valueOf( (char)ch ) );
+
 					in.rewind();
+					// TODO Or use Closure's : for keywords?
 					if( !( ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch == '$' || ch == '_' ) )
 						throw new SourceException( "Unexpected character '" + (char)ch + "'", in.getLocation() ); // TODO What about non-printable characters
 					do

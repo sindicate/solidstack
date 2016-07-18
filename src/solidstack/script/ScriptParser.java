@@ -396,10 +396,9 @@ public class ScriptParser
 	 */
 	static public Expression parsePString( Token token, SourceReader in )
 	{
-		if( !token.eq( "s" ) )
-			throw new SourceException( "Only 's' is currently allowed", token.getLocation() );
-		ProcessedStringTokenizer t = new ProcessedStringTokenizer( in, true );
-		return parsePString( t, token.getLocation() );
+		if( token.eq( "s" ) )
+			return parsePString( new ProcessedStringTokenizer( in, true ), token.getLocation() );
+		throw new SourceException( "Only 's' is currently allowed", token.getLocation() );
 	}
 
 	static private Expression parsePString( ProcessedStringTokenizer t, SourceLocation location )
@@ -412,7 +411,7 @@ public class ScriptParser
 		Fragment fragment = t.getFragment(); // TODO Fragment object not needed anymore
 		if( fragment.length() != 0 )
 			result.appendFragment( fragment.getValue() );
-		while( t.foundExpression() )
+		while( t.foundLogic() )
 		{
 			Expression expression = parser.parse();
 			Token token = t.next();

@@ -417,6 +417,14 @@ public class ScriptTests extends Util
 	}
 
 	@Test
+	static public void characters()
+	{
+		test( "'x'", 'x' );
+		test( "'\n'", '\n' );
+		test( "'\\n'", '\n' );
+	}
+
+	@Test
 	static public void pStrings()
 	{
 		test( "a = 1; s\"a = ${a}\".toString()", "a = 1" );
@@ -433,6 +441,19 @@ public class ScriptTests extends Util
 		failParse( "\"${\"x\"}\"", "Unexpected token 'x'" );
 		test( "s\"\\\"${1}\\\"\".toString()", "\"1\"" );
 		test( "s\"\\\"${\"X\"}\\\"\".toString()", "\"X\"" );
+	}
+
+	// Only difference between " and """ is less \" escaping needed
+	@Test
+	static public void tripleQuoted()
+	{
+		test( "\"\"\"x\"\"\"", "x" );
+		test( "\"\"\"x\"x\"\"\"", "x\"x" );
+		test( "\"\"\"x\nx\"\"\"", "x\nx" );
+		test( "\"\"\"\"x\"\"\"\"", "\"x\"" );
+		test( "\"\"\"\"\"x\"\"\"\"\"", "\"\"x\"\"" );
+		test( "\"\"\"\"x\"\"\"\"\"\"\"\"\"", "\"x\"\"\"\"\"\"" );
+		test( "\"\"\"\"x\"\"\"\"+\"\\\"x\\\"\"", "\"x\"\"x\"" );
 	}
 
 	@Test
@@ -893,6 +914,13 @@ public class ScriptTests extends Util
 	static public void sql() throws IOException
 	{
 		String script = readFile( "SqlTests.funny" );
+		eval( script );
+	}
+
+	@Test
+	static public void template() throws IOException
+	{
+		String script = readFile( "template.funny" );
 		eval( script );
 	}
 

@@ -19,6 +19,7 @@ package solidstack.script;
 import solidstack.io.SourceException;
 import solidstack.io.SourceLocation;
 import solidstack.io.SourceReader;
+import solidstack.lang.SystemException;
 
 
 /**
@@ -41,8 +42,11 @@ alphaid      ::=  upper idrest
 // TODO Include 'raw' and 'f'
 public class ProcessedStringTokenizer extends ScriptTokenizer
 {
+	private boolean first = true;
 	private boolean found;
+	private boolean foundScriptlet;
 	private boolean doubleQuoted;
+	private boolean tripleQuoted;
 
 
 	/**
@@ -64,15 +68,32 @@ public class ProcessedStringTokenizer extends ScriptTokenizer
 	// TODO """ processed string
 	public Fragment getFragment()
 	{
+		SourceReader in = getIn();
+		int ch;
+
+		if( this.first )
+		{
+			if( this.doubleQuoted )
+			{
+				if( ( ch = in.read() ) != '"' )
+					throw new SystemException( "Unexpected char: " + ch );
+				in.mark();
+				boolean triple = in.read() == '"' && in.read() == '"';
+				if( !triple )
+					in.reset();
+				else
+					this.tripleQuoted = true;
+			}
+			this.first = false;
+		}
+
 		this.found = false;
 		StringBuilder result = clearBuffer();
-		SourceReader in = getIn();
 		SourceLocation location = in.getLocation();
 
 		while( true )
 		{
-			int ch = in.read();
-			switch( ch )
+			switch( ch = in.read() )
 			{
 				case -1:
 					if( this.doubleQuoted )
@@ -80,8 +101,17 @@ public class ProcessedStringTokenizer extends ScriptTokenizer
 					return new Fragment( location, result.toString() ); // end-of-input: we're done
 
 				case '"':
-					if( this.doubleQuoted )
+					if( !this.tripleQuoted )
 						return new Fragment( location, result.toString() ); // end-of-string: we're done
+					in.mark();
+					if( in.read() == '"' && in.read() == '"' )
+					{
+						while( in.read() == '"' )
+							result.append( '"' );
+						in.rewind();
+						return new Fragment( location, result.toString() ); // end-of-string: we're done
+					}
+					in.reset();
 					break;
 
 				case '$':
@@ -91,21 +121,33 @@ public class ProcessedStringTokenizer extends ScriptTokenizer
 						this.found = true;
 						return new Fragment( location, result.toString() );
 					}
-					if( ch2 != '$' )
+					if( ch2 != '$' ) // TODO Or just \$ ?
 						throw new SourceException( "$ must start an escape like ${...} or $$", in.getLocation() );
 					break;
 
+				case '<':
+					ch2 = in.read();
+					if( ch2 == '%' )
+					{
+						this.foundScriptlet = true;
+						return new Fragment( location, result.toString() );
+					}
+					in.rewind();
+					break;
+
 				// TODO This Tokenizer should not process escapes, that should be done in the specific implementations
+				// TODO Escape <
 				case '\\':
 					switch( ch = in.read() )
 					{
+						case '\n': continue; // Skip newline
 						case 'b': ch = '\b'; break;
 						case 'f': ch = '\f'; break;
 						case 'n': ch = '\n'; break;
 						case 'r': ch = '\r'; break;
 						case 't': ch = '\t'; break;
 						case '"': // TODO And what if not double quoted?
-						case '\'':
+//						case '\'':
 						case '\\': break;
 						case 'u': // TODO Actually, these escapes should be active through the entire script, like Java and Scala do. Maybe disabled by default. Or removed and optional for String literals.
 							char[] codePoint = new char[ 4 ];
@@ -133,6 +175,16 @@ public class ProcessedStringTokenizer extends ScriptTokenizer
 	public boolean foundExpression()
 	{
 		return this.found;
+	}
+
+	public boolean foundScriptlet()
+	{
+		return this.foundScriptlet;
+	}
+
+	public boolean foundLogic()
+	{
+		return this.found || this.foundScriptlet;
 	}
 
 	/**
