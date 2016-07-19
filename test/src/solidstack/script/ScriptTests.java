@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import funny.Symbol;
@@ -140,17 +139,17 @@ public class ScriptTests extends Util
 		DefaultScope scope = new DefaultScope();
 
 		test( "a = 1", scope, 1 );
-		Assert.assertEquals( (int)(Integer)scope.get( Symbol.apply( "a" ) ), 1 );
+		assertThat( (Integer)scope.get( Symbol.apply( "a" ) ) ).isEqualTo( 1 );
 
 		test( "a = b = 1", scope, 1 );
-		Assert.assertEquals( (int)(Integer)scope.get( Symbol.apply( "a" ) ), 1 );
-		Assert.assertEquals( (int)(Integer)scope.get( Symbol.apply( "b" ) ), 1 );
+		assertThat( (int)(Integer)scope.get( Symbol.apply( "a" ) ) ).isEqualTo( 1 );
+		assertThat( (int)(Integer)scope.get( Symbol.apply( "b" ) ) ).isEqualTo( 1 );
 
 		test( "1 + ( a = 1 )", scope, 2 );
-		Assert.assertEquals( (int)(Integer)scope.get( Symbol.apply( "a" ) ), 1 );
+		assertThat( (int)(Integer)scope.get( Symbol.apply( "a" ) ) ).isEqualTo( 1 );
 
 		test( "1 + ( a = 1 ) + a", scope, 3 );
-		Assert.assertEquals( (int)(Integer)scope.get( Symbol.apply( "a" ) ), 1 );
+		assertThat( (int)(Integer)scope.get( Symbol.apply( "a" ) ) ).isEqualTo( 1 );
 	}
 
 	@Test
@@ -488,13 +487,13 @@ public class ScriptTests extends Util
 		assert Object[].class.isAssignableFrom( test.getClass() );
 
 		ClassLoader loader = ScriptTests.class.getClassLoader();
-		Assert.assertEquals( Java.forName( "java.lang.Object", loader ), Object.class );
-		Assert.assertEquals( Java.forName( "java.lang.Object[]", loader ), Object[].class );
-		Assert.assertEquals( Java.forName( "java.lang.Object[][]", loader ), Object[][].class );
-		Assert.assertEquals( Java.forName( "int", loader ), int.class );
-		Assert.assertEquals( Java.forName( "int[]", loader ), int[].class );
-		Assert.assertEquals( Java.forName( "int[][][][]", loader ), int[][][][].class );
-		Assert.assertEquals( Java.forName( "int[][]", loader ), int[][].class );
+		assertThat( Java.forName( "java.lang.Object", loader ) ).isEqualTo( Object.class );
+		assertThat( Java.forName( "java.lang.Object[]", loader ) ).isEqualTo( Object[].class );
+		assertThat( Java.forName( "java.lang.Object[][]", loader ) ).isEqualTo( Object[][].class );
+		assertThat( Java.forName( "int", loader ) ).isEqualTo( int.class );
+		assertThat( Java.forName( "int[]", loader ) ).isEqualTo( int[].class );
+		assertThat( Java.forName( "int[][][][]", loader ) ).isEqualTo( int[][][][].class );
+		assertThat( Java.forName( "int[][]", loader ) ).isEqualTo( int[][].class );
 
 		// TODO Add Array: IntArray = Java.forName("int[]"); IntArray(1,2,3)
 		test( "list = List( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ); list( 3 )", 4 );
