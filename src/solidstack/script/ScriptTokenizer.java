@@ -27,7 +27,7 @@ import solidstack.util.WindowBuffer;
 
 
 /**
- * This is a tokenizer for CSV. It maintains the current line number, and it ignores whitespace.
+ * This is a tokenizer for a script. It maintains the current line number, and it ignores whitespace.
  *
  * @author René M. de Bloois
  */
