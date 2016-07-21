@@ -39,7 +39,7 @@ public class Script
 
 	static public Script compile( SourceReader reader )
 	{
-		Expression expression = new ScriptParser( new ScriptTokenizer( reader ) ).parse();
+		Expression expression = new ScriptParser( new ScriptScanner( reader ) ).parse();
 		if( expression != null ) expression = expression.compile();
 		return new Script( expression );
 	}

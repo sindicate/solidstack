@@ -31,7 +31,7 @@ import solidstack.util.WindowBuffer;
  *
  * @author René M. de Bloois
  */
-public class ScriptTokenizer
+public class ScriptScanner
 {
 	/**
 	 * Reserved words.
@@ -100,7 +100,7 @@ public class ScriptTokenizer
 	 *
 	 * @param in The input.
 	 */
-	public ScriptTokenizer( SourceReader in )
+	public ScriptScanner( SourceReader in )
 	{
 		this.in = in;
 	}

@@ -169,4 +169,10 @@ public class RandomAccessSourceReader implements SourceReader
 			if( readLine() == null )
 				throw new IllegalArgumentException( "lineNumber " + lineNumber + " not found" );
 	}
+
+	@Override
+	public boolean dontEnd( boolean dontEnd )
+	{
+		return this.reader.dontEnd( dontEnd );
+	}
 }

@@ -59,6 +59,8 @@ public class ReaderSourceReader implements SourceReader
 	 */
 	private String encoding;
 
+	private boolean dontEnd;
+
 
 	/**
 	 * @param reader The reader to read from.
@@ -175,6 +177,8 @@ public class ReaderSourceReader implements SourceReader
 			switch( result )
 			{
 				case -1:
+					if( this.dontEnd )
+						throw new SourceException( "Unexpected EOF", this.lastLocation );
 					return result;
 				case '\r':
 					this.location = this.location.nextLine();
@@ -279,5 +283,13 @@ public class ReaderSourceReader implements SourceReader
 		if( this.buffer.hasRemaining() )
 			throw new IllegalStateException( "Last location is not valid, pushed back a character" );
 		return this.lastLocation;
+	}
+
+	@Override
+	public boolean dontEnd( boolean dontEnd )
+	{
+		boolean old = this.dontEnd;
+		this.dontEnd = dontEnd;
+		return old;
 	}
 }

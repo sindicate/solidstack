@@ -199,10 +199,10 @@ public class TemplateCompiler
 	 *
 	 * @param context The compilation context.
 	 */
-	protected void parse( TemplateCompilerContext context )
+	public void parse( TemplateCompilerContext context )
 	{
 		// Parse and collect directives
-		JSPLikeTemplateParser parser = new JSPLikeTemplateParser( context.getReader() );
+		JSPLikeTemplateParser parser = new JSPLikeTemplateParser( context.getReader(), context.isEmbedded() );
 		List< ParseEvent > events = new ArrayList< ParseEvent >();
 		ParseEvent event = parser.next();
 		while( event.getEvent() != EVENT.EOF )
@@ -213,7 +213,7 @@ public class TemplateCompiler
 		context.setEvents( events );
 	}
 
-	protected void consolidateWhitespace( TemplateCompilerContext context )
+	public void consolidateWhitespace( TemplateCompilerContext context )
 	{
 		List<ParseEvent> events = context.getEvents();
 		List<ParseEvent> result = new ArrayList<ParseEvent>();
@@ -296,7 +296,7 @@ public class TemplateCompiler
 	 *
 	 * @param context The compilation context.
 	 */
-	protected void collectDirectives( TemplateCompilerContext context )
+	public void collectDirectives( TemplateCompilerContext context )
 	{
 		List<Directive> directives = new ArrayList<Directive>();
 		for( ParseEvent event : context.getEvents() )
@@ -310,7 +310,7 @@ public class TemplateCompiler
 	 *
 	 * @param context The compilation context.
 	 */
-	protected void processDirectives( TemplateCompilerContext context )
+	public void processDirectives( TemplateCompilerContext context )
 	{
 		List< String > imports = new ArrayList< String >();
 		String lang = null;

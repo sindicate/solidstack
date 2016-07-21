@@ -111,4 +111,6 @@ public interface SourceReader
 	 * @return The character encoding of the source.
 	 */
 	String getEncoding();
+
+	boolean dontEnd( boolean dontEnd );
 }

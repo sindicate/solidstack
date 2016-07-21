@@ -19,14 +19,17 @@ package solidstack.script;
 import java.math.BigDecimal;
 
 import funny.Symbol;
+import solidstack.io.MarkedEndingSourceReader;
 import solidstack.io.SourceException;
 import solidstack.io.SourceLocation;
 import solidstack.io.SourceReader;
 import solidstack.io.SourceReaders;
+import solidstack.io.StringSourceReader;
 import solidstack.lang.Assert;
-import solidstack.script.ProcessedStringTokenizer.Fragment;
-import solidstack.script.ScriptTokenizer.Token;
-import solidstack.script.ScriptTokenizer.TokenType;
+import solidstack.lang.SystemException;
+import solidstack.script.ProcessedStringScanner.Fragment;
+import solidstack.script.ScriptScanner.Token;
+import solidstack.script.ScriptScanner.TokenType;
 import solidstack.script.expressions.Block;
 import solidstack.script.expressions.BooleanLiteral;
 import solidstack.script.expressions.CharLiteral;
@@ -46,8 +49,13 @@ import solidstack.script.expressions.Throw;
 import solidstack.script.expressions.Var;
 import solidstack.script.expressions.While;
 import solidstack.script.expressions.With;
+import solidstack.script.objects.Template;
 import solidstack.script.operators.Operator;
 import solidstack.script.operators.Spread;
+import solidstack.template.Loggers;
+import solidstack.template.TemplateCompiler;
+import solidstack.template.TemplateCompilerContext;
+import solidstack.template.funny.FunnyTemplateCompiler;
 
 
 /**
@@ -58,17 +66,17 @@ import solidstack.script.operators.Spread;
  */
 public class ScriptParser
 {
-	private ScriptTokenizer tokenizer;
+	private ScriptScanner tokenizer;
 	private TokenType stop;
 	private boolean expectElse;
 
 
 	/**
-	 * @param tokenizer The script tokenizer.
+	 * @param scanner The script tokenizer.
 	 */
-	public ScriptParser( ScriptTokenizer tokenizer )
+	public ScriptParser( ScriptScanner scanner )
 	{
-		this.tokenizer = tokenizer;
+		this.tokenizer = scanner;
 	}
 
 	/**
@@ -383,7 +391,7 @@ public class ScriptParser
 	static public Expression parseString( String s, SourceLocation location )
 	{
 		SourceReader in = SourceReaders.forString( s, location );
-		ProcessedStringTokenizer t = new ProcessedStringTokenizer( in, false );
+		ProcessedStringScanner t = new ProcessedStringScanner( in, false );
 		return parsePString( t, location );
 	}
 
@@ -397,11 +405,13 @@ public class ScriptParser
 	static public Expression parsePString( Token token, SourceReader in )
 	{
 		if( token.eq( "s" ) )
-			return parsePString( new ProcessedStringTokenizer( in, true ), token.getLocation() );
-		throw new SourceException( "Only 's' is currently allowed, not " + token, token.getLocation() );
+			return parsePString( new ProcessedStringScanner( in, true ), token.getLocation() );
+		if( token.eq( "t" ) )
+			return parseTemplate( in );
+		throw new SourceException( "Only 's' or 't' is currently allowed, not " + token, token.getLocation() );
 	}
 
-	static private Expression parsePString( ProcessedStringTokenizer t, SourceLocation location )
+	static private Expression parsePString( ProcessedStringScanner t, SourceLocation location )
 	{
 		ScriptParser parser = new ScriptParser( t );
 		parser.swapStops( TokenType.BRACE_CLOSE );
@@ -411,7 +421,7 @@ public class ScriptParser
 		Fragment fragment = t.getFragment(); // TODO Fragment object not needed anymore
 		if( fragment.length() != 0 )
 			result.appendFragment( fragment.getValue() );
-		while( t.foundLogic() )
+		while( t.foundExpression() )
 		{
 			Expression expression = parser.parse();
 			Token token = t.next();
@@ -425,6 +435,46 @@ public class ScriptParser
 		}
 
 		return result;
+	}
+
+	static private Expression parseTemplate( SourceReader reader )
+	{
+		SourceLocation location = reader.getLocation();
+
+		int ch;
+		if( ( ch = reader.read() ) != '"' )
+			throw new SystemException( "Unexpected char: " + ch );
+
+		reader.mark();
+		boolean triple = reader.read() == '"' && reader.read() == '"';
+		if( !triple )
+		{
+			reader.reset();
+			reader = new MarkedEndingSourceReader( reader, "\"" );
+		}
+		else
+			reader = new TripleQuoteEndingSourceReader( reader );
+
+		TemplateCompilerContext context = new TemplateCompilerContext();
+		context.setReader( reader );
+		context.setEmbedded( true );
+
+		TemplateCompiler compiler = new TemplateCompiler( null );
+		compiler.parse( context );
+		compiler.consolidateWhitespace( context );
+		compiler.collectDirectives( context );
+		compiler.processDirectives( context );
+
+		// TODO language directive is forbidden
+		FunnyTemplateCompiler compiler2 = new FunnyTemplateCompiler();
+		compiler2.generateScript( context );
+		Loggers.compiler.trace( "Generated FunnyScript:\n{}", context.getScript() );
+
+		ScriptScanner scanner = new ScriptScanner( new StringSourceReader( context.getScript().toString(), location ) );
+		ScriptParser parser = new ScriptParser( scanner );
+
+		Expression expression = parser.parse();
+		return new Template( expression );
 	}
 
 	private TokenType swapStops( TokenType stop )

@@ -30,6 +30,7 @@ public class TemplateCompilerContext
 	private String path;
 	private Resource resource;
 	private SourceReader reader;
+	private boolean embedded;
 	private List<ParseEvent> events;
 	private List<Directive> directives;
 	private List<String> imports;
@@ -174,5 +175,15 @@ public class TemplateCompilerContext
 	public void setClassName( String className )
 	{
 		this.className = className;
+	}
+
+	public boolean isEmbedded()
+	{
+		return this.embedded;
+	}
+
+	public void setEmbedded( boolean embedded )
+	{
+		this.embedded = embedded;
 	}
 }

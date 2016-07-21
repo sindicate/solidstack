@@ -53,6 +53,8 @@ public class StringSourceReader implements SourceReader
 	 */
 	private int recorder = -1;
 
+	private boolean dontEnd;
+
 
 	/**
 	 * @param reader The reader to read from.
@@ -135,6 +137,8 @@ public class StringSourceReader implements SourceReader
 		if( this.pos >= this.string.length() )
 		{
 			this.pos++;
+			if( this.dontEnd )
+				throw new SourceException( "Unexpected EOF", this.lastLocation );
 			return -1;
 		}
 
@@ -227,5 +231,13 @@ public class StringSourceReader implements SourceReader
 //		if( this.buffer.hasRemaining() )
 //			throw new IllegalStateException( "Last location is not valid, pushed back a character" );
 		return this.lastLocation;
+	}
+
+	@Override
+	public boolean dontEnd( boolean dontEnd )
+	{
+		boolean old = this.dontEnd;
+		this.dontEnd = dontEnd;
+		return old;
 	}
 }

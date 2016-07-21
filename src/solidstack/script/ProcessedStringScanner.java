@@ -40,11 +40,11 @@ alphaid      ::=  upper idrest
               |  varid
  */
 // TODO Include 'raw' and 'f'
-public class ProcessedStringTokenizer extends ScriptTokenizer
+public class ProcessedStringScanner extends ScriptScanner
 {
 	private boolean first = true;
 	private boolean found;
-	private boolean foundScriptlet;
+//	private boolean foundScriptlet;
 	private boolean doubleQuoted;
 	private boolean tripleQuoted;
 
@@ -52,7 +52,7 @@ public class ProcessedStringTokenizer extends ScriptTokenizer
 	/**
 	 * @param in The source reader.
 	 */
-	public ProcessedStringTokenizer( SourceReader in, boolean doubleQuoted )
+	public ProcessedStringScanner( SourceReader in, boolean doubleQuoted )
 	{
 		super( in );
 		this.doubleQuoted = doubleQuoted;
@@ -125,15 +125,15 @@ public class ProcessedStringTokenizer extends ScriptTokenizer
 						throw new SourceException( "$ must start an escape like ${...} or $$", in.getLocation() );
 					break;
 
-				case '<':
-					ch2 = in.read();
-					if( ch2 == '%' )
-					{
-						this.foundScriptlet = true;
-						return new Fragment( location, result.toString() );
-					}
-					in.rewind();
-					break;
+//				case '<':
+//					ch2 = in.read();
+//					if( ch2 == '%' )
+//					{
+//						this.foundScriptlet = true;
+//						return new Fragment( location, result.toString() );
+//					}
+//					in.rewind();
+//					break;
 
 				// TODO This Tokenizer should not process escapes, that should be done in the specific implementations
 				// TODO Escape <
@@ -177,15 +177,15 @@ public class ProcessedStringTokenizer extends ScriptTokenizer
 		return this.found;
 	}
 
-	public boolean foundScriptlet()
-	{
-		return this.foundScriptlet;
-	}
-
-	public boolean foundLogic()
-	{
-		return this.found || this.foundScriptlet;
-	}
+//	public boolean foundScriptlet()
+//	{
+//		return this.foundScriptlet;
+//	}
+//
+//	public boolean foundLogic()
+//	{
+//		return this.found || this.foundScriptlet;
+//	}
 
 	/**
 	 * A fragment.

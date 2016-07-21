@@ -184,7 +184,7 @@ public class Basic
 		for( int i = 0; i < 1000; i++ )
 			buffer.append( "<%@template version=\"1.0\"%>abcdefghijklmnopqrstuvwxyz" );
 
-		JSPLikeTemplateParser parser = new JSPLikeTemplateParser( SourceReaders.forString( buffer.toString() ) );
+		JSPLikeTemplateParser parser = new JSPLikeTemplateParser( SourceReaders.forString( buffer.toString() ), false );
 		ParseEvent event = parser.next();
 		while( event.getEvent() != EVENT.EOF )
 		{

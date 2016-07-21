@@ -105,9 +105,10 @@ public class JSPLikeTemplateParser
 	 *
 	 * @param reader The reader from which to read the source of the template.
 	 */
-	public JSPLikeTemplateParser( SourceReader reader )
+	public JSPLikeTemplateParser( SourceReader reader, boolean embedded )
 	{
 		this.reader = reader;
+		this.firstRead = embedded;
 	}
 
 	/**
@@ -117,26 +118,31 @@ public class JSPLikeTemplateParser
 	 */
 	public ParseEvent next()
 	{
-		ParseEvent event = next0();
-		if( this.firstRead )
+		if( !this.firstRead )
+		{
+			// Get first event which must be a <%@ template version="1.0" %>
+			this.reader.dontEnd( false );
+
+			ParseEvent event = next0();
+
+			if( event.getEvent() != EVENT.DIRECTIVE )
+				throw new ParseException( "Template must start with a 'template' directive on the first character of the first line", this.reader.getLocation() );
+
+			Directive version = Template.getDirective( event.getDirectives(), "template", "version" );
+			if( version == null )
+				throw new ParseException( "Template must start with a 'template' directive that has a 'version' attribute", this.reader.getLocation() );
+
+			String versionString = version.getValue();
+			if( !versionString.equals( "1.0" ) )
+				throw new ParseException( "Version '" + versionString + "' is not supported", this.reader.getLocation() );
+
+			this.reader.dontEnd( true );
+
+			this.firstRead = true;
 			return event;
+		}
 
-		// Get first event which must be a <%@ template version="1.0" %>
-
-		if( event.getEvent() != EVENT.DIRECTIVE )
-			throw new ParseException( "Template must start with a 'template' directive on the first character of the first line", this.reader.getLocation() );
-
-		Directive version = Template.getDirective( event.getDirectives(), "template", "version" );
-		if( version == null )
-			throw new ParseException( "Template must start with a 'template' directive that has a 'version' attribute", this.reader.getLocation() );
-
-		String versionString = version.getValue();
-		if( !versionString.equals( "1.0" ) )
-			throw new ParseException( "Version '" + versionString + "' is not supported", this.reader.getLocation() );
-
-		this.firstRead = true;
-
-		return event;
+		return next0();
 	}
 
 	/**
@@ -161,17 +167,26 @@ public class JSPLikeTemplateParser
 
 				case '\\':
 					textFound = true;
-					switch( c = reader.read() )
+					boolean oldEnd = reader.dontEnd( false );
+					try
 					{
-						case '$':
-						case '\\':
-						case '<':
-							buffer.append( (char)c );
-							if( buffer.length() >= 0x1000 )
-								return new ParseEvent( EVENT.TEXT, popBuffer() );
-							continue;
-						default:
-							throw new ParseException( "Only <, $ or \\ can be escaped", reader.getLocation() );
+						switch( c = reader.read() )
+						{
+							// TODO Escape \n? And others?
+							case '$':
+							case '\\':
+							case '<':
+								buffer.append( (char)c );
+								if( buffer.length() >= 0x1000 )
+									return new ParseEvent( EVENT.TEXT, popBuffer() );
+								continue;
+							default:
+								throw new ParseException( "Only <, $ or \\ can be escaped", reader.getLocation() );
+						}
+					}
+					finally
+					{
+						reader.dontEnd( oldEnd );
 					}
 
 				case '<':
@@ -243,21 +258,30 @@ public class JSPLikeTemplateParser
 	 */
 	private ParseEvent readMarkup()
 	{
-		this.reader.mark();
-		int c = this.reader.read();
-		switch( c )
+		SourceReader reader = this.reader;
+		boolean oldEnd = reader.dontEnd( false );
+		try
 		{
-			case '=':
-				return readScript( EVENT.EXPRESSION );
-			case '@':
-				return readDirective();
-			case '-':
-				if( this.reader.read() == '-' )
-					return readComment();
-				//$FALL-THROUGH$
-			default:
-				this.reader.reset();
-				return readScript( EVENT.SCRIPT );
+			reader.mark();
+			int c = reader.read();
+			switch( c )
+			{
+				case '=':
+					return readScript( EVENT.EXPRESSION );
+				case '@':
+					return readDirective();
+				case '-':
+					if( reader.read() == '-' )
+						return readComment();
+					//$FALL-THROUGH$
+				default:
+					reader.reset();
+					return readScript( EVENT.SCRIPT );
+			}
+		}
+		finally
+		{
+			reader.dontEnd( oldEnd );
 		}
 	}
 
@@ -272,8 +296,16 @@ public class JSPLikeTemplateParser
 		int c = this.reader.read();
 		if( c != '{' )
 			throw new ParseException( "Expecting an { after the $", this.reader.getLocation() );
-		readGStringExpression( true );
-		return new ParseEvent( EVENT.EXPRESSION2, popBuffer() );
+		boolean oldEnd = this.reader.dontEnd( false );
+		try
+		{
+			readGStringExpression( true );
+			return new ParseEvent( EVENT.EXPRESSION2, popBuffer() );
+		}
+		finally
+		{
+			this.reader.dontEnd( oldEnd );
+		}
 	}
 
 	/**
@@ -288,7 +320,6 @@ public class JSPLikeTemplateParser
 		// Skip whitespace
 		int ch;
 		loop: while( true )
-		{
 			switch( ch = reader.read() )
 			{
 				default:
@@ -299,7 +330,6 @@ public class JSPLikeTemplateParser
 				case '\t':
 				case '\r':
 			}
-		}
 
 		switch( ch )
 		{
@@ -310,21 +340,30 @@ public class JSPLikeTemplateParser
 				// Read a string enclosed by ' or "
 				StringBuilder result = new StringBuilder( 32 );
 				int quote = ch;
-				while( true )
+				boolean oldEnd = reader.dontEnd( false );
+				try
 				{
-					result.append( (char)ch );
-
-					ch = reader.read();
-					if( ch == -1 || ch == '\n' )
-						throw new ParseException( "Unclosed string", reader.getLocation() );
-					if( ch == quote )
+					while( true )
 					{
 						result.append( (char)ch );
-						return result.toString();
+
+						ch = reader.read();
+						if( ch == -1 || ch == '\n' )
+							throw new ParseException( "Unclosed string", reader.getLocation() );
+						if( ch == quote )
+						{
+							result.append( (char)ch );
+							return result.toString();
+						}
 					}
+				}
+				finally
+				{
+					reader.dontEnd( oldEnd );
 				}
 			case '%':
 				// Read %>
+				// TODO This should not expect an >
 				ch = reader.read();
 				if( ch != '>' )
 					throw new ParseException( "Expecting > after an %", reader.getLocation() );
