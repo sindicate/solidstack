@@ -42,7 +42,7 @@ public class TripleQuoteEndingSourceReader implements SourceReader
 
 		int ch = this.in.read();
 		if( ch == -1 )
-			throw new SourceException( "Unexpected EOF", this.in.getLastLocation() );
+			throw new SourceException( "Unexpected end of input", this.in.getLastLocation() );
 
 		if( this.dontEnd || ch != '"' )
 			return ch;

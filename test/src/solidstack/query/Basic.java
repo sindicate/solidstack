@@ -32,9 +32,9 @@ import org.testng.annotations.Test;
 
 import solidstack.io.Resource;
 import solidstack.io.Resources;
+import solidstack.io.SourceException;
 import solidstack.io.SourceReaders;
 import solidstack.query.Query.PreparedSQL;
-import solidstack.template.ParseException;
 import solidstack.template.Template;
 import solidstack.template.TemplateCompiler;
 import solidstack.template.TemplateCompilerContext;
@@ -425,7 +425,7 @@ public class Basic
 //			System.out.println( template.getSource() );
 			assert false;
 		}
-		catch( ParseException e )
+		catch( SourceException e )
 		{
 			Assert.assertTrue( e.getMessage().contains( "Unexpected end of " ), e.toString() );
 		}

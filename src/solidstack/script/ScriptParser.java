@@ -52,7 +52,6 @@ import solidstack.script.expressions.With;
 import solidstack.script.objects.Template;
 import solidstack.script.operators.Operator;
 import solidstack.script.operators.Spread;
-import solidstack.template.Loggers;
 import solidstack.template.TemplateCompiler;
 import solidstack.template.TemplateCompilerContext;
 import solidstack.template.funny.FunnyTemplateCompiler;
@@ -468,7 +467,7 @@ public class ScriptParser
 		// TODO language directive is forbidden
 		FunnyTemplateCompiler compiler2 = new FunnyTemplateCompiler();
 		compiler2.generateScript( context );
-		Loggers.compiler.trace( "Generated FunnyScript:\n{}", context.getScript() );
+//		Loggers.compiler.trace( "Generated FunnyScript:\n{}", context.getScript() );
 
 		ScriptScanner scanner = new ScriptScanner( new StringSourceReader( context.getScript().toString(), location ) );
 		ScriptParser parser = new ScriptParser( scanner );

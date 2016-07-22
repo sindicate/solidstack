@@ -40,7 +40,7 @@ public class MarkedEndingSourceReader implements SourceReader
 		if( this.dontEnd )
 		{
 			if( ch == -1 )
-				throw new SourceException( "Unexpected EOF", this.in.getLastLocation() );
+				throw new SourceException( "Unexpected end of input", this.in.getLastLocation() );
 			return ch;
 		}
 		if( ch == this.marker[ 0 ] )

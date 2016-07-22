@@ -20,10 +20,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import org.assertj.core.api.Assertions;
 import org.testng.annotations.Test;
+
+import solidstack.script.java.Java;
+import solidstack.script.java.MissingMethodException;
 
 
 public class JavacTests
@@ -31,7 +33,7 @@ public class JavacTests
 	private CompilerClassLoader compiler = new CompilerClassLoader( Thread.currentThread().getContextClassLoader() );
 
 	@Test
-	public void basicTest() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, IOException
+	public void basicTest() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, IOException, MissingMethodException
 	{
 		String source = readFile( "HelloWorld.avaj" );
 
@@ -40,16 +42,14 @@ public class JavacTests
 		Assertions.assertThat( cls ).isNotNull();
 		Assertions.assertThat( cls.getDeclaredMethods() ).hasSize( 1 );
 
-		Object instance = cls.newInstance();
-		Method sayHello = cls.getMethod( "sayHello" );
-		Object result = sayHello.invoke( instance );
+		Object result = Java.invoke( Java.construct( cls ), "sayHello" );
 
 		Assertions.assertThat( result ).isExactlyInstanceOf( String.class );
 		Assertions.assertThat( (String)result ).isEqualTo( "Hello World!" );
 	}
 
 	@Test(dependsOnMethods="basicTest")
-	public void dependentTest() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, IOException
+	public void dependentTest() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, IOException, MissingMethodException
 	{
 		String source = readFile( "HelloWorld2.avaj" );
 
@@ -58,9 +58,7 @@ public class JavacTests
 		Assertions.assertThat( cls ).isNotNull();
 		Assertions.assertThat( cls.getDeclaredMethods() ).hasSize( 1 );
 
-		Object instance = cls.newInstance();
-		Method sayHello = cls.getMethod( "sayHello" );
-		Object result = sayHello.invoke( instance );
+		Object result = Java.invoke( Java.construct( cls ), "sayHello" );
 
 		Assertions.assertThat( result ).isExactlyInstanceOf( String.class );
 		Assertions.assertThat( (String)result ).isEqualTo( "Hello World!" );

@@ -66,7 +66,7 @@ public class HttpHeaderTokenizer
 			{
 				int ch = this.in.read();
 				if( ch == -1 )
-					throw new HttpException( "Unexpected end of file" );
+					throw new HttpException( "Unexpected end of input" );
 				if( ch == '\r' )
 					continue;
 				if( ch == '\n' )

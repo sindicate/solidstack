@@ -107,7 +107,7 @@ public class CBORScanner
 			while( read < remaining )
 			{
 				if( read < 0 )
-					throw new SourceException( "Unexpected EOF", in.getLocation() );
+					throw new SourceException( "Unexpected end of input", in.getLocation() );
 				if( read == 0 )
 					throw new SourceException( "Zero bytes read", in.getLocation() );
 				remaining -= read;
@@ -170,7 +170,7 @@ public class CBORScanner
 	{
 		int result = in.read();
 		if( result == -1 )
-			throw new SourceException( "Unexpected EOF", in.getLocation() );
+			throw new SourceException( "Unexpected end of input", in.getLocation() );
 		return result;
 	}
 

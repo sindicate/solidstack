@@ -121,7 +121,7 @@ public class JSPLikeTemplateParser
 		if( !this.firstRead )
 		{
 			// Get first event which must be a <%@ template version="1.0" %>
-			this.reader.dontEnd( false );
+			this.reader.dontEnd( true );
 
 			ParseEvent event = next0();
 
@@ -136,7 +136,7 @@ public class JSPLikeTemplateParser
 			if( !versionString.equals( "1.0" ) )
 				throw new ParseException( "Version '" + versionString + "' is not supported", this.reader.getLocation() );
 
-			this.reader.dontEnd( true );
+			this.reader.dontEnd( false );
 
 			this.firstRead = true;
 			return event;
@@ -167,7 +167,7 @@ public class JSPLikeTemplateParser
 
 				case '\\':
 					textFound = true;
-					boolean oldEnd = reader.dontEnd( false );
+					boolean oldEnd = reader.dontEnd( true );
 					try
 					{
 						switch( c = reader.read() )
@@ -259,7 +259,7 @@ public class JSPLikeTemplateParser
 	private ParseEvent readMarkup()
 	{
 		SourceReader reader = this.reader;
-		boolean oldEnd = reader.dontEnd( false );
+		boolean oldEnd = reader.dontEnd( true );
 		try
 		{
 			reader.mark();
@@ -296,7 +296,7 @@ public class JSPLikeTemplateParser
 		int c = this.reader.read();
 		if( c != '{' )
 			throw new ParseException( "Expecting an { after the $", this.reader.getLocation() );
-		boolean oldEnd = this.reader.dontEnd( false );
+		boolean oldEnd = this.reader.dontEnd( true );
 		try
 		{
 			readGStringExpression( true );
@@ -340,7 +340,7 @@ public class JSPLikeTemplateParser
 				// Read a string enclosed by ' or "
 				StringBuilder result = new StringBuilder( 32 );
 				int quote = ch;
-				boolean oldEnd = reader.dontEnd( false );
+				boolean oldEnd = reader.dontEnd( true );
 				try
 				{
 					while( true )
@@ -422,7 +422,7 @@ public class JSPLikeTemplateParser
 			token = getToken();
 		}
 
-		throw new ParseException( "Unexpected end of file", reader.getLocation() );
+		throw new ParseException( "Unexpected end of input", reader.getLocation() );
 	}
 
 	private ParseEvent readScript( EVENT event )
@@ -440,7 +440,7 @@ public class JSPLikeTemplateParser
 			switch( c )
 			{
 				case -1:
-					throw new ParseException( "Unexpected end of file", reader.getLocation() );
+					throw new ParseException( "Unexpected end of input", reader.getLocation() );
 
 				case '"':
 				case '\'':
@@ -487,7 +487,7 @@ public class JSPLikeTemplateParser
 			switch( c = reader.read() )
 			{
 				case -1:
-					throw new ParseException( "Unexpected end of file", reader.getLocation() );
+					throw new ParseException( "Unexpected end of input", reader.getLocation() );
 				case '\n':
 					if( !multiline )
 						throw new ParseException( "Unexpected end of line", reader.getLocation() );
@@ -570,7 +570,7 @@ public class JSPLikeTemplateParser
 			switch( c = reader.read() )
 			{
 				case -1:
-					throw new ParseException( "Unexpected end of file", reader.getLocation() );
+					throw new ParseException( "Unexpected end of input", reader.getLocation() );
 				case '}':
 					return;
 				case '"':
@@ -604,7 +604,7 @@ public class JSPLikeTemplateParser
 			switch( c = reader.read() )
 			{
 				case -1:
-					throw new ParseException( "Unexpected end of file", reader.getLocation() );
+					throw new ParseException( "Unexpected end of input", reader.getLocation() );
 				case '}':
 					buffer.append( '}' );
 					return;
@@ -637,7 +637,7 @@ public class JSPLikeTemplateParser
 			switch( reader.read() )
 			{
 				case -1:
-					throw new ParseException( "Unexpected end of file", reader.getLocation() );
+					throw new ParseException( "Unexpected end of input", reader.getLocation() );
 				case '-':
 					reader.mark();
 					if( reader.read() == '-' && reader.read() == '%' && reader.read() == '>' )

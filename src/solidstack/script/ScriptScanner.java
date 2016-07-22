@@ -255,7 +255,7 @@ public class ScriptScanner
 				case '\'':
 					switch( ch = in.read() )
 					{
-						case -1: throw new SourceException( "Unexpected EOF", in.getLocation() );
+						case -1: throw new SourceException( "Unexpected end of input", in.getLocation() );
 						case '\'': throw new SourceException( "Unexpected '", in.getLocation() );
 						case '\\':
 							switch( ch = in.read() )

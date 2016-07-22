@@ -138,7 +138,7 @@ public class StringSourceReader implements SourceReader
 		{
 			this.pos++;
 			if( this.dontEnd )
-				throw new SourceException( "Unexpected EOF", this.lastLocation );
+				throw new SourceException( "Unexpected end of input", this.lastLocation );
 			return -1;
 		}
 

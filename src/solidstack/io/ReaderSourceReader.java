@@ -178,7 +178,7 @@ public class ReaderSourceReader implements SourceReader
 			{
 				case -1:
 					if( this.dontEnd )
-						throw new SourceException( "Unexpected EOF", this.lastLocation );
+						throw new SourceException( "Unexpected end of input", this.lastLocation );
 					return result;
 				case '\r':
 					this.location = this.location.nextLine();

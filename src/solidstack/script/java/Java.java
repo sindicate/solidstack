@@ -45,6 +45,7 @@ public class Java
 	 * @throws InvocationTargetException Wraps the exception thrown by the underlying method.
 	 * @throws MissingMethodException
 	 */
+	// TODO Make generic
 	static public Object invoke( Object object, String name, Object... args ) throws InvocationTargetException, MissingMethodException
 	{
 		CallResolutionContext context = CallResolutionContext.forMethodCall( object, name, args );
