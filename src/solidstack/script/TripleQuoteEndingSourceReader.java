@@ -51,7 +51,10 @@ public class TripleQuoteEndingSourceReader implements SourceReader
 		if( this.in.read() == '"' )
 			if( this.in.read() == '"' )
 				if( this.in.read() != '"' )
+				{
+					this.in.rewind();
 					return -1;
+				}
 
 		this.in.reset();
 		return ch;

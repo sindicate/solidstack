@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.testng.Assert;
@@ -921,7 +922,15 @@ public class ScriptTests extends Util
 	static public void template() throws IOException
 	{
 		String script = readFile( "template.funny" );
-		eval( script );
+		List result = (List)eval( script );
+//		System.out.println( result );
+		assertThat( result.get( 0 ) ).isEqualTo( "i is now: 0\n"
+				+ "i is now: 1\n"
+				+ "i is now: 2\n" );
+		assertThat( result.get( 1 ) ).isEqualTo( "Now as lambda\n"
+				+ "i is now: 0\n"
+				+ "i is now: 1\n"
+				+ "i is now: 2\n" );
 	}
 
 	// DONE Calls with named parameters
