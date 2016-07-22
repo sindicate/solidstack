@@ -153,6 +153,28 @@ public class Basic
 				);
 	}
 
+	// TODO import="java.io.*" --> io Package
+	@Test
+	public void testEscapedNewline() throws Exception
+	{
+		SourceReader reader = SourceReaders.forString( "<%@ template version=\"1.0\" language=\"funny\" %>\n" +
+				"TEST\n"
+				+ "TEST\\\n"
+				+ "TEST" );
+
+		TemplateCompilerContext context = new TemplateCompilerContext();
+		context.setReader( reader );
+		context.setPath( "p/c" );
+		new TemplateCompiler( null ).compile( context );
+
+//		System.out.println( groovy.replaceAll( "\t", "\\\\t" ).replaceAll( " ", "#" ) );
+//		System.out.println( groovy );
+		Assert.assertEquals( context.getScript().toString(), "\n"
+				+ "out.write(s\"TEST\n"
+				+ "TEST\");\n"
+				+ ";out.write(s\"TEST\");" );
+	}
+
 	@Test
 	public void testNulls()
 	{

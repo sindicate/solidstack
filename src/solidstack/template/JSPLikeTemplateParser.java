@@ -174,14 +174,24 @@ public class JSPLikeTemplateParser
 						{
 							// TODO Escape \n? And others?
 							case '$':
-							case '\\':
+							case '\\': // TODO Maybe just accept every character
 							case '<':
 								buffer.append( (char)c );
 								if( buffer.length() >= 0x1000 )
 									return new ParseEvent( EVENT.TEXT, popBuffer() );
 								continue;
+							case '\n':
+								if( buffer.length() > 0 )
+								{
+									reader.rewind();
+									reader.rewind();
+									ParseEvent result = new ParseEvent( textFound ? EVENT.TEXT : EVENT.WHITESPACE, popBuffer() );
+									textFound = false;
+									return result;
+								}
+								return new ParseEvent( EVENT.SCRIPT, "\n" );
 							default:
-								throw new ParseException( "Only <, $ or \\ can be escaped", reader.getLocation() );
+								throw new ParseException( "Only <, $, \\ or \n can be escaped", reader.getLocation() );
 						}
 					}
 					finally

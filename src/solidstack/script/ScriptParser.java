@@ -473,7 +473,7 @@ public class ScriptParser
 		ScriptParser parser = new ScriptParser( scanner );
 
 		Expression expression = parser.parse();
-		return new Template( expression );
+		return new Template( expression, location );
 	}
 
 	private TokenType swapStops( TokenType stop )

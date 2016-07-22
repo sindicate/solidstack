@@ -34,11 +34,13 @@ import solidstack.template.funny.FunnyConvertingWriter;
 public class Template implements Expression
 {
 	private Expression expression;
+	private SourceLocation location;
 
 
-	public Template( Expression expression )
+	public Template( Expression expression, SourceLocation location )
 	{
 		this.expression = expression;
+		this.location = location;
 	}
 
 	@Override
@@ -79,7 +81,7 @@ public class Template implements Expression
 	@Override
 	public SourceLocation getLocation()
 	{
-		throw new UnsupportedOperationException();
+		return this.location;
 	}
 
 	@Override

@@ -1,14 +1,16 @@
-var result1 = t"<% var i = 0; while( i < 3 ) ( %>
+var result1 = t"\
+<% var i = 0; while( i < 3 ) ( %>
 i is now: <%= i %>
 <% i = i + 1 ) %>
 ";
 
 var text = "i is now";
 
-var template = ( count, par ) => t"""<%= par %>
-<% var i = 0; while( i < count ) ( %>
-${text}: ${i}
-<% i = i + 1 ) %>
-""";
+var template = ( count, par ) => t"""\
+	|<%= par %>
+	<% var i = 0; while( i < count ) ( %>
+	|${text}: ${i}
+	<% i = i + 1 ) %>
+""".stripMargin();
 
 ( result1, template( 3, "Now as lambda" ) )
