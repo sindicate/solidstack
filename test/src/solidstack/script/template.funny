@@ -13,4 +13,20 @@ var template = ( count, par ) => t"""\
 	<% i = i + 1 ) %>
 """.stripMargin();
 
+var pageTemplate = ( body ) => t"""\
+	<html>
+		<body>
+			<%= body() %>
+		</body>
+	</html>
+""";
+
+var page = ( name ) => t"""\
+	<% pageTemplate( () => ( %>
+		<p>Hello ${name}!</p>
+	<% ) ); %>
+""";
+
+println( page( "René" ) );
+
 ( result1, template( 3, "Now as lambda" ) )
