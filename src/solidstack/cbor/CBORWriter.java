@@ -413,7 +413,9 @@ public class CBORWriter extends OutputStream
 
 	public void write( Object object )
 	{
-		if( object instanceof String )
+		if( object == null )
+			writeNull();
+		else if( object instanceof String )
 			writeText( (String)object );
 		else if( object instanceof Integer )
 			writeInt( (Integer)object );
