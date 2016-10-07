@@ -16,12 +16,16 @@
 
 package solidstack.io;
 
+import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URL;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 
 /**
@@ -78,7 +82,27 @@ public class Resource
 	 * @return A new InputStream to read from the resource.
 	 * @throws FileNotFoundException If the resource is not found.
 	 */
-	public InputStream newInputStream() throws FileNotFoundException
+	final public InputStream newInputStream() throws FileNotFoundException
+	{
+		try
+		{
+			InputStream result = newInputStreamInternal();
+			// TODO Also for outputstream
+			if( isGZip() )
+				return new GZIPInputStream( result );
+			return result;
+		}
+		catch( FileNotFoundException e )
+		{
+			throw e;
+		}
+		catch( IOException e )
+		{
+			throw new FatalIOException( e );
+		}
+	}
+
+	protected InputStream newInputStreamInternal() throws IOException
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -104,8 +128,22 @@ public class Resource
 	/**
 	 * @return An OutputStream to write to the resource.
 	 */
-	// TODO Rename to newOutputStream?
-	public OutputStream getOutputStream()
+	final public OutputStream newOutputStream()
+	{
+		try
+		{
+			OutputStream result = newOutputStreamInternal();
+			if( isGZip() )
+				return new BufferedOutputStream( new GZIPOutputStream( result, 0x1000 ), 0x1000 );
+			return result;
+		}
+		catch( IOException e )
+		{
+			throw new FatalIOException( e );
+		}
+	}
+
+	protected OutputStream newOutputStreamInternal() throws IOException
 	{
 		throw new UnsupportedOperationException();
 	}

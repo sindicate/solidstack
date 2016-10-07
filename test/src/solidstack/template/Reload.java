@@ -89,7 +89,7 @@ public class Reload
 		Template template = templates.getTemplate( "dummy" );
 
 		Resource resource = Resources.getResource( "classpath:/solidstack/template/dummy.slt" );
-		OutputStream out = resource.unwrap().getOutputStream();
+		OutputStream out = resource.unwrap().newOutputStream();
 		out.write( "<%@template version=\"1.0\"%>test".getBytes() );
 		out.close();
 

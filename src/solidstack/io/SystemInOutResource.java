@@ -38,7 +38,7 @@ public class SystemInOutResource extends Resource
 
 
 	@Override
-	public InputStream newInputStream()
+	protected InputStream newInputStreamInternal()
 	{
 		if( this.in == null )
 			throw new IllegalStateException( "inputStream has been accessed already" );
@@ -48,7 +48,7 @@ public class SystemInOutResource extends Resource
 	}
 
 	@Override
-	public OutputStream getOutputStream()
+	protected OutputStream newOutputStreamInternal()
 	{
 		return new NonClosingOutputStream( this.out );
 	}

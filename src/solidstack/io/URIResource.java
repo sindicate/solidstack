@@ -24,7 +24,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.zip.GZIPInputStream;
 
 import solidstack.util.Objects;
 import solidstack.util.Strings;
@@ -117,23 +116,9 @@ public class URIResource extends Resource
 	}
 
 	@Override
-	public InputStream newInputStream() throws FileNotFoundException
+	protected InputStream newInputStreamInternal() throws IOException
 	{
-		try
-		{
-			InputStream result = this.uri.toURL().openStream();
-			if( isGZip() )
-				result = new GZIPInputStream( result );
-			return result;
-		}
-		catch( FileNotFoundException e )
-		{
-			throw e;
-		}
-		catch( IOException e )
-		{
-			throw new FatalIOException( e );
-		}
+		return this.uri.toURL().openStream();
 	}
 
 	@Override

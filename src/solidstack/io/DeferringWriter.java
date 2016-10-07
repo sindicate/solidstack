@@ -60,7 +60,7 @@ public class DeferringWriter extends Writer
 	{
 		try
 		{
-			this.writer = new OutputStreamWriter( this.resource.getOutputStream(), this.encoding );
+			this.writer = new OutputStreamWriter( this.resource.newOutputStream(), this.encoding );
 		}
 		catch( UnsupportedEncodingException e )
 		{

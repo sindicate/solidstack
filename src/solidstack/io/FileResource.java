@@ -16,6 +16,7 @@
 
 package solidstack.io;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,7 +27,6 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.zip.GZIPInputStream;
 
 
 /**
@@ -100,36 +100,18 @@ public class FileResource extends Resource
 	}
 
 	@Override
-	public InputStream newInputStream() throws FileNotFoundException
+	protected InputStream newInputStreamInternal() throws FileNotFoundException
 	{
-		InputStream result = new FileInputStream( this.file );
-		if( isGZip() ) // TODO Also for outputstream, and the other resources.
-			try
-			{
-				result = new GZIPInputStream( result );
-			}
-			catch( IOException e )
-			{
-				throw new FatalIOException( e );
-			}
-		return result;
+		return new FileInputStream( this.file );
 	}
 
-	// TODO What about GZip?
 	@Override
-	public OutputStream getOutputStream()
+	protected OutputStream newOutputStreamInternal() throws FileNotFoundException
 	{
 		File parent = this.file.getParentFile();
 		if( parent != null )
 			parent.mkdirs();
-		try
-		{
-			return new FileOutputStream( this.file );
-		}
-		catch( FileNotFoundException e )
-		{
-			throw new FatalIOException( e );
-		}
+		return new BufferedOutputStream( new FileOutputStream( this.file ), 0x1000 );
 	}
 
 	@Override

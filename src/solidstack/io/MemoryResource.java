@@ -70,13 +70,13 @@ public class MemoryResource extends Resource
 
 	// TODO supportsURL does not indicate that this one is re-iterable
 	@Override
-	public InputStream newInputStream()
+	protected InputStream newInputStreamInternal()
 	{
 		return new ByteMatrixInputStream( this.buffer.toByteMatrix() );
 	}
 
 	@Override
-	public OutputStream getOutputStream()
+	protected OutputStream newOutputStreamInternal()
 	{
 		// TODO Should we implement this?
 		throw new UnsupportedOperationException();

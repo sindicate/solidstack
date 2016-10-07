@@ -45,7 +45,7 @@ public class JSONWriter
 
 	public JSONWriter( Resource resource )
 	{
-		this( resource.getOutputStream() );
+		this( resource.newOutputStream() );
 	}
 
 	public JSONWriter( OutputStream out )

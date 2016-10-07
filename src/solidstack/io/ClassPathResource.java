@@ -120,19 +120,12 @@ public class ClassPathResource extends Resource
 	}
 
 	@Override
-	public InputStream newInputStream() throws FileNotFoundException
+	protected InputStream newInputStreamInternal() throws IOException
 	{
 		URL result = getResource();
 		if( result == null )
 			throw new FileNotFoundException( "File " + toString() + " not found" );
-		try
-		{
-			return result.openStream();
-		}
-		catch( IOException e )
-		{
-			throw new FatalIOException( e );
-		}
+		return result.openStream();
 	}
 
 	// TODO Need test for this
