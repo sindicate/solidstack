@@ -24,7 +24,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.zip.GZIPInputStream;
 
+import solidstack.util.Objects;
 import solidstack.util.Strings;
 
 
@@ -119,7 +121,10 @@ public class URIResource extends Resource
 	{
 		try
 		{
-			return this.uri.toURL().openStream();
+			InputStream result = this.uri.toURL().openStream();
+			if( isGZip() )
+				result = new GZIPInputStream( result );
+			return result;
 		}
 		catch( FileNotFoundException e )
 		{
@@ -228,7 +233,7 @@ public class URIResource extends Resource
 			return child;
 		if( base.isOpaque() )
 			return child;
-		if( !Strings.equals( base.getScheme(), child.getScheme() ) )
+		if( !Objects.equals( base.getScheme(), child.getScheme() ) )
 			return child;
 		if( !Strings.equalsIgnoreCase( base.getAuthority(), child.getAuthority() ) )
 			return child;

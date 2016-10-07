@@ -115,6 +115,7 @@ public class FileResource extends Resource
 		return result;
 	}
 
+	// TODO What about GZip?
 	@Override
 	public OutputStream getOutputStream()
 	{

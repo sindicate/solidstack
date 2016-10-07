@@ -43,8 +43,9 @@ public final class Resources
 		if( path.equals( "-" ) )
 			return new SystemInOutResource();
 		URI uri = URI.create( path );
-		if( uri.getScheme() == null || uri.getScheme().length() == 1 || "file".equals( uri.getScheme() ) )
-			return new FileResource( path );
+		String scheme = uri.getScheme();
+		if( scheme == null || scheme.length() == 1 || scheme.equals( "file" ) && uri.getAuthority() == null )
+			return new FileResource( path ); // The path, not the uri: enables relative paths
 		return getResource( uri );
 	}
 
@@ -63,9 +64,10 @@ public final class Resources
 	 */
 	static public Resource getResource( URI uri )
 	{
-		if( uri.getScheme() == null || uri.getScheme().length() == 1 || "file".equals( uri.getScheme() ) )
+		String scheme = uri.getScheme();
+		if( scheme == null || scheme.length() == 1 || scheme.equals( "file" ) && uri.getAuthority() == null )
 			return new FileResource( uri );
-		if( "classpath".equals( uri.getScheme() ) )
+		if( scheme.equals( "classpath" ) )
 			return new ClassPathResource( uri );
 		return new URIResource( uri );
 	}
@@ -118,8 +120,12 @@ public final class Resources
 		no.set( '*' );
 		no.set( '/' );
 		no.set( '\\' );
+		no.set( ':' );
+		no.set( '(' );
+		no.set( ')' );
 	}
 
+	// TODO Is this according to some kind of spec?
 	static public String path2uri( String path )
 	{
 		byte[] bytes = path.getBytes( UTF8 );
