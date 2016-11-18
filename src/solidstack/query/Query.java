@@ -200,6 +200,16 @@ public class Query
 		}
 	}
 
+	public Object[] singleArray( Connection connection, Object args )
+	{
+		List<Object[]> list = listOfArrays( connection, args );
+		if( list.isEmpty() )
+			return null;
+		if( list.size() == 1 )
+			return list.get( 0 );
+		throw new QueryException( "Expecting 0 or 1 results, not " + list.size() );
+	}
+
 	static private void close( ResultSet resultSet )
 	{
 		try
@@ -255,7 +265,6 @@ public class Query
 				}
 			}
 			else
-			{
 				while( resultSet.next() )
 				{
 					Object[] line = new Object[ columnCount ];
@@ -266,7 +275,6 @@ public class Query
 					}
 					result.add( line );
 				}
-			}
 
 			return result;
 		}
@@ -294,6 +302,16 @@ public class Query
 		{
 			close( resultSet );
 		}
+	}
+
+	public Map<String, Object> singleMap( Connection connection, Object args )
+	{
+		List<Map<String, Object>> list = listOfMaps( connection, args );
+		if( list.isEmpty() )
+			return null;
+		if( list.size() == 1 )
+			return list.get( 0 );
+		throw new QueryException( "Expecting 0 or 1 results, not " + list.size() );
 	}
 
 	/**
@@ -386,7 +404,6 @@ public class Query
 			PreparedStatement statement = connection.prepareStatement( preparedSql.getSQL() );
 			int i = 0;
 			for( Object par : pars )
-			{
 				if( par == null )
 					statement.setNull( ++i, Types.NULL ); // Tested in Oracle with an INSERT
 				else if( par instanceof InputStream )
@@ -399,7 +416,6 @@ public class Query
 					Assert.isFalse( par.getClass().isArray() && !( par instanceof byte[] ) );
 					statement.setObject( ++i, par );
 				}
-			}
 			return statement;
 		}
 		catch( SQLException e )
