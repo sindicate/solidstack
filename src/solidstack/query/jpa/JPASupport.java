@@ -66,9 +66,8 @@ public class JPASupport
 	static public <T> List< T > getResultList( Query query, EntityManager entityManager, Object args )
 	{
 		List<T> result = createQuery( query, entityManager, args ).getResultList();
-		if( query.getLanguage() == Language.SQL && query.isFlyWeight() )
-			if( !result.isEmpty() && result.get( 0 ) instanceof Object[] )
-				reduceWeight( (List<Object[]>)result );
+		if( query.isFlyWeight() && !result.isEmpty() && result.get( 0 ) instanceof Object[] )
+			reduceWeight( (List<Object[]>)result );
 		return result;
 	}
 

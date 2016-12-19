@@ -36,6 +36,11 @@ public class Pars extends HashMap< String, Object >
 	static public final Map< String, Object > EMPTY = Collections.emptyMap();
 
 
+	static Pars map( Object... nameValue )
+	{
+		return new Pars( nameValue );
+	}
+
 	/**
 	 * @param name The name of the parameter.
 	 * @param value The value of the parameter.

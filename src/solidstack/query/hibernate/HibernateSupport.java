@@ -60,6 +60,7 @@ public class HibernateSupport
 
 		session.doWork( new Work()
 		{
+			@Override
 			public void execute( Connection connection ) throws SQLException
 			{
 				try
@@ -92,6 +93,7 @@ public class HibernateSupport
 
 		session.doWork( new Work()
 		{
+			@Override
 			public void execute( Connection connection ) throws SQLException
 			{
 				try
@@ -124,6 +126,7 @@ public class HibernateSupport
 
 		session.doWork( new Work()
 		{
+			@Override
 			public void execute( Connection connection ) throws SQLException
 			{
 				try
@@ -156,6 +159,7 @@ public class HibernateSupport
 
 		session.doWork( new Work()
 		{
+			@Override
 			public void execute( Connection connection ) throws SQLException
 			{
 				result.set( query.updateChecked( connection, args ) );
@@ -177,9 +181,8 @@ public class HibernateSupport
 	static public <T> List<T> list( Query query, Session session, Object args )
 	{
 		List<T> result = createQuery( query, session, args ).list();
-		if( query.getLanguage() == Language.SQL && query.isFlyWeight() )
-			if( !result.isEmpty() && result.get( 0 ) instanceof Object[] )
-				JPASupport.reduceWeight( (List<Object[]>)result );
+		if( query.isFlyWeight() && !result.isEmpty() && result.get( 0 ) instanceof Object[] )
+			JPASupport.reduceWeight( (List<Object[]>)result );
 		return result;
 	}
 
