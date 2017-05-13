@@ -16,8 +16,13 @@
 
 package solidstack.javac;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class HelloWorld
 {
+	static private final Logger log = LoggerFactory.getLogger( HelloWorld.class );
+
 	public String sayHello()
 	{
 		return "Hello " + new Helper().who() + "!";
