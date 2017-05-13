@@ -40,6 +40,9 @@ import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import solidstack.io.ByteMatrixInputStream;
 import solidstack.io.ByteMatrixOutputStream;
 import solidstack.lang.Assert;
@@ -50,7 +53,7 @@ import solidstack.lang.SystemException;
 // Inspired by: https://github.com/OpenHFT/Java-Runtime-Compiler
 public class CompilerClassLoader extends DynamicClassLoader
 {
-//	static private final Logger log = LoggerFactory.getLogger( CompilerClassLoader.class );
+	static private final Logger log = LoggerFactory.getLogger( CompilerClassLoader.class );
 
 	static private JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 	static private JavaFileManager standardFileManager = compiler.getStandardFileManager( null, null, null );
@@ -60,6 +63,7 @@ public class CompilerClassLoader extends DynamicClassLoader
 	public CompilerClassLoader( ClassLoader parent )
 	{
 		super( parent );
+		System.out.println( standardFileManager.getClass() );
 	}
 
 	public Class<?> compile( String className, CharSequence source )
@@ -112,7 +116,7 @@ public class CompilerClassLoader extends DynamicClassLoader
 			ClassFile result = new ClassFile( className );
 			this.classFiles.put( className, result );
 			this.newClasses.add( result );
-//			log.debug( "getJavaFileForOutput {} {} {} {} -> {}", location, className, kind, sibling, result );
+			log.debug( "getJavaFileForOutput {} {} {} {} -> {}", location, className, kind, sibling, result );
 			return result;
 		}
 
@@ -120,110 +124,119 @@ public class CompilerClassLoader extends DynamicClassLoader
 		public Iterable<JavaFileObject> list( Location location, String packageName, Set<Kind> kinds, boolean recurse )
 				throws IOException
 		{
+			log.debug( "list {} {} {} {}", location, packageName, kinds, recurse );
 			if( location == StandardLocation.CLASS_PATH && kinds.contains( Kind.CLASS ) )
 			{
 				Assert.isFalse( recurse );
 
 				List<JavaFileObject> classes = new ArrayList<JavaFileObject>();
 				packageName = packageName + ".";
+				int len = packageName.length();
 				for( Entry<String, JavaFileObject> entry : this.classFiles.entrySet() )
-					if( entry.getKey().startsWith( packageName ) )
+				{
+					String name = entry.getKey();
+					if( name.substring( 0, len ).equals( packageName ) && name.substring( len ).indexOf( '.' ) < 0)
 						classes.add( entry.getValue() );
+				}
 
 				if( !classes.isEmpty() )
 					return new ClassIterable( super.list( location, packageName, kinds, recurse ).iterator(), classes.iterator() );
 			}
 
-			return super.list( location, packageName, kinds, recurse );
+			return new ClassIterable( super.list( location, packageName, kinds, recurse ).iterator(), null );
 		}
 
 		@Override
 		public String inferBinaryName( Location location, JavaFileObject file )
 		{
+			String result;
 			if( file instanceof ClassFile )
-				return ( (ClassFile)file ).getName();
-			return super.inferBinaryName( location, file );
+				result = ( (ClassFile)file ).getName();
+			else
+				result = super.inferBinaryName( location, file );
+			log.debug( "inferBinaryName {} {} -> {}", location, file, result );
+			return result;
 		}
 
-//		@Override
-//		public ClassLoader getClassLoader( Location location )
-//		{
-//			ClassLoader result = super.getClassLoader( location );
-//			log.debug( "getClassLoader {} -> {}", location, result );
-//			return result;
-//		}
-//
-//		@Override
-//		public boolean isSameFile( FileObject a, FileObject b )
-//		{
-//			boolean result = super.isSameFile( a, b );
-//			log.debug( "isSameFile {} {} -> {}", a, b, result );
-//			return result;
-//		}
-//
-//		@Override
-//		public boolean handleOption( String current, Iterator<String> remaining )
-//		{
-//			boolean result = super.handleOption( current, remaining );
-//			log.debug( "handleOption {} {} -> {}", current, remaining, result );
-//			return result;
-//		}
-//
-//		@Override
-//		public boolean hasLocation( Location location )
-//		{
-//			boolean result = super.hasLocation( location );
-//			log.debug( "hasLocation {} -> {}", location, result );
-//			return result;
-//		}
-//
-//		@Override
-//		public int isSupportedOption( String option )
-//		{
-//			int result = super.isSupportedOption( option );
-//			log.debug( "isSupportedOption {} -> {}", option, result );
-//			return result;
-//		}
-//
-//		@Override
-//		public JavaFileObject getJavaFileForInput( Location location, String className, Kind kind ) throws IOException
-//		{
-//			JavaFileObject result = super.getJavaFileForInput( location, className, kind );
-//			log.debug( "getJavaFileForInput {} {} {} -> {}", location, className, kind, result );
-//			return result;
-//		}
-//
-//		@Override
-//		public FileObject getFileForInput( Location location, String packageName, String relativeName )
-//				throws IOException
-//		{
-//			FileObject result = super.getFileForInput( location, packageName, relativeName );
-//			log.debug( "getFileForInput {} {} {} -> {}", location, packageName, relativeName, result );
-//			return result;
-//		}
-//
-//		@Override
-//		public FileObject getFileForOutput( Location location, String packageName, String relativeName,
-//				FileObject sibling ) throws IOException
-//		{
-//			FileObject result = super.getFileForOutput( location, packageName, relativeName, sibling );
-//			log.debug( "getFileForOutput {} {} {} {} -> {}", location, packageName, relativeName, sibling, result );
-//			return result;
-//		}
-//
-//		@Override
-//		public void flush() throws IOException
-//		{
-//			log.debug( "flush" );
-//			super.flush();
-//		}
-//
-//		@Override
-//		public void close() throws IOException
-//		{
-//			log.debug( "close" );
-//			super.close();
-//		}
+		@Override
+		public ClassLoader getClassLoader( Location location )
+		{
+			ClassLoader result = super.getClassLoader( location );
+			log.debug( "getClassLoader {} -> {}", location, result );
+			return result;
+		}
+
+		@Override
+		public boolean isSameFile( FileObject a, FileObject b )
+		{
+			boolean result = super.isSameFile( a, b );
+			log.debug( "isSameFile {} {} -> {}", a, b, result );
+			return result;
+		}
+
+		@Override
+		public boolean handleOption( String current, Iterator<String> remaining )
+		{
+			boolean result = super.handleOption( current, remaining );
+			log.debug( "handleOption {} {} -> {}", current, remaining, result );
+			return result;
+		}
+
+		@Override
+		public boolean hasLocation( Location location )
+		{
+			boolean result = super.hasLocation( location );
+			log.debug( "hasLocation {} -> {}", location, result );
+			return result;
+		}
+
+		@Override
+		public int isSupportedOption( String option )
+		{
+			int result = super.isSupportedOption( option );
+			log.debug( "isSupportedOption {} -> {}", option, result );
+			return result;
+		}
+
+		@Override
+		public JavaFileObject getJavaFileForInput( Location location, String className, Kind kind ) throws IOException
+		{
+			JavaFileObject result = super.getJavaFileForInput( location, className, kind );
+			log.debug( "getJavaFileForInput {} {} {} -> {}", location, className, kind, result );
+			return result;
+		}
+
+		@Override
+		public FileObject getFileForInput( Location location, String packageName, String relativeName )
+				throws IOException
+		{
+			FileObject result = super.getFileForInput( location, packageName, relativeName );
+			log.debug( "getFileForInput {} {} {} -> {}", location, packageName, relativeName, result );
+			return result;
+		}
+
+		@Override
+		public FileObject getFileForOutput( Location location, String packageName, String relativeName,
+				FileObject sibling ) throws IOException
+		{
+			FileObject result = super.getFileForOutput( location, packageName, relativeName, sibling );
+			log.debug( "getFileForOutput {} {} {} {} -> {}", location, packageName, relativeName, sibling, result );
+			return result;
+		}
+
+		@Override
+		public void flush() throws IOException
+		{
+			log.debug( "flush" );
+			super.flush();
+		}
+
+		@Override
+		public void close() throws IOException
+		{
+			log.debug( "close" );
+			super.close();
+		}
 	}
 
 	static class SourceFile extends SimpleJavaFileObject
@@ -289,15 +302,19 @@ public class CompilerClassLoader extends DynamicClassLoader
 				@Override
 				public boolean hasNext()
 				{
-					return ClassIterable.this.parent.hasNext() || ClassIterable.this.myclasses.hasNext();
+					return ClassIterable.this.parent.hasNext() || ClassIterable.this.myclasses != null && ClassIterable.this.myclasses.hasNext();
 				}
 
 				@Override
 				public JavaFileObject next()
 				{
+					JavaFileObject result;
 					if( ClassIterable.this.parent.hasNext() )
-						return ClassIterable.this.parent.next();
-					return ClassIterable.this.myclasses.next();
+						result = ClassIterable.this.parent.next();
+					else
+						result = ClassIterable.this.myclasses.next();
+					log.debug( "next -> {}", result );
+					return result;
 				}
 
 				@Override

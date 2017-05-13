@@ -97,7 +97,7 @@ public class QueryLoader
 	private void checkLock()
 	{
 		if( this.locked )
-			throw new IllegalStateException( "The TemplateLoader must be configured directly." );
+			throw new IllegalStateException( "Configure the TemplateLoader instead." );
 	}
 
 	// TODO Missing defineTemplate()

@@ -131,7 +131,7 @@ public class CBORReader
 				//$FALL-THROUGH$
 			case NINT:
 				if( t.hasTag( 0x01 ) ) // TODO And also float major 7:25/26/27
-					return new Date( t.longValue() );
+					return new Date( t.longValue() * 1000 );
 				return t.longValue();
 
 			case DFLOAT:
