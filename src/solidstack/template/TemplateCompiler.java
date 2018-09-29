@@ -203,7 +203,7 @@ public class TemplateCompiler
 	{
 		// Parse and collect directives
 		JSPLikeTemplateParser parser = new JSPLikeTemplateParser( context.getReader() );
-		List< ParseEvent > events = new ArrayList< ParseEvent >();
+		List< ParseEvent > events = new ArrayList<>();
 		ParseEvent event = parser.next();
 		while( event.getEvent() != EVENT.EOF )
 		{
@@ -216,7 +216,7 @@ public class TemplateCompiler
 	protected void consolidateWhitespace( TemplateCompilerContext context )
 	{
 		List<ParseEvent> events = context.getEvents();
-		List<ParseEvent> result = new ArrayList<ParseEvent>();
+		List<ParseEvent> result = new ArrayList<>();
 		int len = events.size();
 		int start = 0;
 		boolean hasText = false;
@@ -298,7 +298,7 @@ public class TemplateCompiler
 	 */
 	protected void collectDirectives( TemplateCompilerContext context )
 	{
-		List<Directive> directives = new ArrayList<Directive>();
+		List<Directive> directives = new ArrayList<>();
 		for( ParseEvent event : context.getEvents() )
 			if( event.getEvent() == EVENT.DIRECTIVE )
 				directives.addAll( event.getDirectives() );
@@ -312,7 +312,7 @@ public class TemplateCompiler
 	 */
 	protected void processDirectives( TemplateCompilerContext context )
 	{
-		List< String > imports = new ArrayList< String >();
+		List< String > imports = new ArrayList<>();
 		String lang = null;
 		String contentType = null;
 		if( context.getDirectives() != null )

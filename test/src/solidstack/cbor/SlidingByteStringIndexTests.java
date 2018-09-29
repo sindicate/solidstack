@@ -93,7 +93,7 @@ public class SlidingByteStringIndexTests
 
 		SlidingByteStringIndex tree = new SlidingByteStringIndex( 1000, Integer.MAX_VALUE );
 
-		List<ByteString> index = new ArrayList<ByteString>();
+		List<ByteString> index = new ArrayList<>();
 
 		Random rnd = new Random( 0 ); // Always generates the same sequence
 		for( int i = 0; i < count; i++ )

@@ -26,7 +26,7 @@ import solidstack.httpserver.HttpException;
 
 public class DataSource
 {
-	static private LinkedList< Connection > queue = new LinkedList< Connection >();
+	static private LinkedList< Connection > queue = new LinkedList<>();
 
 	static
 	{

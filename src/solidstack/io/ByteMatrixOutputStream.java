@@ -30,7 +30,7 @@ import java.util.List;
 public class ByteMatrixOutputStream extends OutputStream
 {
 	private int blockSize;
-	private List< byte[] > buffer = new ArrayList< byte[] >();
+	private List< byte[] > buffer = new ArrayList<>();
 	private byte[] last;
 	private int lastPos;
 

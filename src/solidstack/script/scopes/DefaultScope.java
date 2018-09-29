@@ -27,7 +27,7 @@ public class DefaultScope implements Scope
 	static public final Symbol THIS = Symbol.apply( "this" );
 
 	Scope parent;
-	private ValueMap<Value<?>> values = new ValueMap<Value<?>>();
+	private ValueMap<Value<?>> values = new ValueMap<>();
 
 
 	public DefaultScope()
@@ -84,13 +84,13 @@ public class DefaultScope implements Scope
 	@Override
 	public <T> void var( Symbol symbol, T value )
 	{
-		this.values.put( new Variable<T>( symbol, value ) );
+		this.values.put( new Variable<>( symbol, value ) );
 	}
 
 	@Override
 	public <T> void val( Symbol symbol, T value )
 	{
-		this.values.put( new Value<T>( symbol, value ) );
+		this.values.put( new Value<>( symbol, value ) );
 	}
 
 	@Override

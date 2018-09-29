@@ -34,6 +34,7 @@ abstract public class LocalizedExpression implements Expression
 		this.location = location;
 	}
 
+	@Override
 	public SourceLocation getLocation()
 	{
 		return this.location;

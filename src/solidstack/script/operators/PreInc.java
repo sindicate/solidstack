@@ -35,6 +35,7 @@ public class PreInc extends Operator
 		this.location = location;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		Assert.isNull( this.left );

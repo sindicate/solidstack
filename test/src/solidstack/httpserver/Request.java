@@ -29,9 +29,9 @@ public class Request
 	protected String method;
 	protected String url;
 	protected String query;
-	protected Map< String, List< String > > headers = new HashMap< String, List<String> >();
-	protected Map< String, String > cookies = new HashMap< String, String >();
-	protected Map< String, Object > parameters = new HashMap< String, Object >();
+	protected Map< String, List< String > > headers = new HashMap<>();
+	protected Map< String, String > cookies = new HashMap<>();
+	protected Map< String, Object > parameters = new HashMap<>();
 	protected String fragment;
 
 	public void setMethod( String method )
@@ -69,7 +69,7 @@ public class Request
 			( (List<String>)elem ).add( value );
 		else
 		{
-			List< String > values = new ArrayList<String>();
+			List< String > values = new ArrayList<>();
 			values.add( (String)elem );
 			values.add( value );
 			this.parameters.put( name, values );
@@ -80,7 +80,7 @@ public class Request
 	{
 		List<String> values = this.headers.get( name );
 		if( values == null )
-			this.headers.put( name, values = new ArrayList< String >() );
+			this.headers.put( name, values = new ArrayList<>() );
 		values.add( value );
 	}
 

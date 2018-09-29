@@ -33,13 +33,13 @@ import solidstack.io.SourceLocation;
 
 public class CBORParser
 {
-	static private enum STATE { IBYTES, ITEXT, IARRAYMAP, BYTES, TEXT, ARRAYMAP };
+	static private enum STATE { IBYTES, ITEXT, IARRAYMAP, BYTES, TEXT, ARRAYMAP }
 
 	CBORScanner in;
 
 	private ReverseByteStringIndex index;
 	private STATE state;
-	private Stack<StateItem> states = new Stack<StateItem>();
+	private Stack<StateItem> states = new Stack<>();
 
 	private long remaining;
 
@@ -85,14 +85,14 @@ public class CBORParser
 		if( !t.isTag() )
 			return t;
 
-		List<Tag> tags = new ArrayList<Tag>();
+		List<Tag> tags = new ArrayList<>();
 		while( t.isTag() )
 		{
 			long value = t.value;
 			Tag tag = new Tag( value );
 			if( value == 0x102 )
 			{
-				List<Token> parameters = new ArrayList<Token>();
+				List<Token> parameters = new ArrayList<>();
 				SourceLocation loc = in.getLocation();
 				t = in.get();
 				if( t.type != TYPE.UINT )

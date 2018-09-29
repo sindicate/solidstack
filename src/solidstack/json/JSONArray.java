@@ -23,13 +23,14 @@ import java.util.ListIterator;
 
 public class JSONArray implements Iterable< Object >
 {
-	protected List< Object > values = new ArrayList< Object >();
+	protected List< Object > values = new ArrayList<>();
 
 	public void add( Object value )
 	{
 		this.values.add( value );
 	}
 
+	@Override
 	public ListIterator< Object > iterator()
 	{
 		return this.values.listIterator();

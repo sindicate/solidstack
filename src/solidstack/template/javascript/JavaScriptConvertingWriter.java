@@ -44,6 +44,7 @@ public class JavaScriptConvertingWriter implements ConvertingWriter
 		this.writer = writer;
 	}
 
+	@Override
 	public void write( Object o ) throws IOException
 	{
 		if( o == null )
@@ -52,6 +53,7 @@ public class JavaScriptConvertingWriter implements ConvertingWriter
 			this.writer.write( o.toString() );
 	}
 
+	@Override
 	public void writeEncoded( Object o ) throws IOException
 	{
 		if( o == null )
@@ -65,6 +67,7 @@ public class JavaScriptConvertingWriter implements ConvertingWriter
 		}
 	}
 
+	@Override
 	public void flush() throws IOException
 	{
 		this.writer.flush();

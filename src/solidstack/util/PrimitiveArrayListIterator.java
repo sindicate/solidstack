@@ -49,21 +49,25 @@ public class PrimitiveArrayListIterator implements ListIterator<Object>
 		this.lastpos = -1;
 	}
 
+	@Override
 	public void add( Object o )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean hasNext()
 	{
 		return this.pos < this.size;
 	}
 
+	@Override
 	public boolean hasPrevious()
 	{
 		return this.pos > 0;
 	}
 
+	@Override
 	public Object next()
 	{
 		if( this.pos >= this.size )
@@ -72,11 +76,13 @@ public class PrimitiveArrayListIterator implements ListIterator<Object>
 		return Array.get( this.array, this.pos++ );
 	}
 
+	@Override
 	public int nextIndex()
 	{
 		return this.pos;
 	}
 
+	@Override
 	public Object previous()
 	{
 		if( this.pos <= 0 )
@@ -85,16 +91,19 @@ public class PrimitiveArrayListIterator implements ListIterator<Object>
 		return Array.get( this.array, --this.pos );
 	}
 
+	@Override
 	public int previousIndex()
 	{
 		return this.pos - 1;
 	}
 
+	@Override
 	public void remove()
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void set( Object value )
 	{
 		if( this.lastpos < 0 )

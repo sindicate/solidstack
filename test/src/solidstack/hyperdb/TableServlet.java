@@ -29,6 +29,7 @@ import solidstack.util.Pars;
 
 public class TableServlet implements Servlet
 {
+	@Override
 	public void call( RequestContext context )
 	{
 		String database = context.getRequest().getParameter( "database" );

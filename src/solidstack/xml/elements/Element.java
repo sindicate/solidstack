@@ -138,7 +138,7 @@ public class Element
 		if( this.children == null )
 			return Collections.emptyList();
 
-		List< Element > result = new ArrayList< Element >();
+		List< Element > result = new ArrayList<>();
 
 		for( Object object : this.children )
 			if( object instanceof Element )
@@ -167,7 +167,7 @@ public class Element
 	public void addChild( Element child )
 	{
 		if( this.children == null )
-			this.children = new ArrayList< Object >();
+			this.children = new ArrayList<>();
 		this.children.add( child );
 	}
 
@@ -179,7 +179,7 @@ public class Element
 	public void addText( String text )
 	{
 		if( this.children == null )
-			this.children = new ArrayList< Object >();
+			this.children = new ArrayList<>();
 		this.children.add( text );
 	}
 
@@ -192,7 +192,7 @@ public class Element
 	public void addAttribute( String name, String value )
 	{
 		if( this.attributes == null )
-			this.attributes = new HashMap< String, String >();
+			this.attributes = new HashMap<>();
 		this.attributes.put( name, value );
 	}
 }

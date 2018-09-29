@@ -23,6 +23,7 @@ import solidstack.httpserver.Session;
 
 public class ConnectServlet implements Servlet
 {
+	@Override
 	public void call( RequestContext context )
 	{
 		Request request = context.getRequest();

@@ -39,7 +39,7 @@ public class StandardByteStringIndex implements ByteStringIndex
 	 */
 	static public int MEMORY_OVERHEAD = 64;
 
-	private Map<ByteString, Integer> map = new HashMap<ByteString, Integer>();
+	private Map<ByteString, Integer> map = new HashMap<>();
 	private int memoryUsage;
 
 

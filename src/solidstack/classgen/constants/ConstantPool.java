@@ -21,7 +21,7 @@ import java.util.List;
 
 public class ConstantPool
 {
-	List<Constant> constants = new ArrayList<Constant>();
+	List<Constant> constants = new ArrayList<>();
 
 	public <T extends Constant> T add( T constant )
 	{

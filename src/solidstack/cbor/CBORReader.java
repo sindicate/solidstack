@@ -30,7 +30,7 @@ import solidstack.json.JSONObject;
 
 public class CBORReader
 {
-	static private enum STATE { IBYTES, ITEXT, ARRAYMAP };
+	static private enum STATE { IBYTES, ITEXT, ARRAYMAP }
 
 	private CBORParser in;
 

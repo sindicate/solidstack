@@ -31,16 +31,19 @@ public class IntegerLiteral extends LocalizedExpression
 		this.value = value;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		return this;
 	}
 
+	@Override
 	public Integer evaluate( ThreadContext thread )
 	{
 		return this.value;
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( this.value );

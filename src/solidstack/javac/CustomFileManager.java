@@ -28,10 +28,10 @@ import solidstack.lang.SystemException;
 
 public class CustomFileManager extends ForwardingJavaFileManager<JavaFileManager>
 {
-	private final Map<String, JavaFileObject> classFiles = new HashMap<String, JavaFileObject>();
-	private final List<ClassFile> newClasses = new ArrayList<ClassFile>();
+	private final Map<String, JavaFileObject> classFiles = new HashMap<>();
+	private final List<ClassFile> newClasses = new ArrayList<>();
 
-	private Map<URI, ZipFile> openZipFiles = new HashMap<URI, ZipFile>();
+	private Map<URI, ZipFile> openZipFiles = new HashMap<>();
 
 	protected CustomFileManager( JavaFileManager fileManager )
 	{
@@ -75,7 +75,7 @@ public class CustomFileManager extends ForwardingJavaFileManager<JavaFileManager
 
 	private Iterable<JavaFileObject> listClassPath( String packageName, Set<Kind> kinds ) throws IOException
 	{
-		Map<String, JavaFileObject> result = new HashMap<String, JavaFileObject>();
+		Map<String, JavaFileObject> result = new HashMap<>();
 
 		// Previously compiled classes
 		if( kinds.contains( Kind.CLASS ) )

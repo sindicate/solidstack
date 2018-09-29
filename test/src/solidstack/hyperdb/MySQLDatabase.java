@@ -63,7 +63,7 @@ public class MySQLDatabase extends Database
 
 		Query query = queries.getQuery( "selectSchemas.sql" );
 
-		Map< String, Schema > schemas = new LinkedHashMap< String, Schema >();
+		Map< String, Schema > schemas = new LinkedHashMap<>();
 //		Connection connection = DataSource.getConnection();
 //		try
 //		{
@@ -90,7 +90,7 @@ public class MySQLDatabase extends Database
 	{
 		String sql = "SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES ORDER BY TABLE_NAME";
 
-		List< Table > tables = new ArrayList< Table >();
+		List< Table > tables = new ArrayList<>();
 		try
 		{
 			PreparedStatement statement = connection.prepareStatement( sql );
@@ -119,7 +119,7 @@ public class MySQLDatabase extends Database
 	{
 		String sql = "SELECT VIEW_NAME FROM ALL_VIEWS WHERE OWNER = ? ORDER BY VIEW_NAME";
 
-		List< View > views = new ArrayList< View >();
+		List< View > views = new ArrayList<>();
 		try
 		{
 			PreparedStatement statement = connection.prepareStatement( sql );

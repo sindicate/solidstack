@@ -55,7 +55,7 @@ public class StringSourceReader implements SourceReader
 
 
 	/**
-	 * @param reader The reader to read from.
+	 * @param string The string to read from.
 	 */
 	public StringSourceReader( String string )
 	{
@@ -63,7 +63,7 @@ public class StringSourceReader implements SourceReader
 	}
 
 	/**
-	 * @param reader The reader to read from.
+	 * @param string The string to read from.
 	 * @param location The location.
 	 */
 	public StringSourceReader( String string, SourceLocation location )
@@ -78,6 +78,7 @@ public class StringSourceReader implements SourceReader
 	@Override
 	public void close()
 	{
+		// Nothing to do
 	}
 
 	@Override

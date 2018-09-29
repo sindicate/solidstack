@@ -33,7 +33,7 @@ public class Response
 
 	private InputStream in;
 	private HttpBodyInputStream bodyIn;
-	private Map<String, String> headers = new HashMap<String, String>();
+	private Map<String, String> headers = new HashMap<>();
 	// TODO Multivalued headers
 
 	public Response()

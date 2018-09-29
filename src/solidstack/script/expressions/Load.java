@@ -28,21 +28,25 @@ public class Load implements Expression
 		this.index = index;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		return thread.load( this.index );
 	}
 
+	@Override
 	public SourceLocation getLocation()
 	{
 		throw new UnsupportedOperationException(); // TODO Are there others where we could just throw this?
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( "$LOAD$(" ).append( this.index ).append( ')' );

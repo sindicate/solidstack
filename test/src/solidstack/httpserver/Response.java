@@ -36,7 +36,7 @@ public class Response
 	protected ResponseOutputStream out;
 	protected ResponseWriter writer;
 	protected PrintWriter printWriter;
-	protected Map< String, List< String > > headers = new HashMap< String, List<String> >();
+	protected Map< String, List< String > > headers = new HashMap<>();
 	protected int statusCode = 200;
 	protected String statusMessage = "OK";
 	protected String contentType;
@@ -94,7 +94,7 @@ public class Response
 
 	protected void setHeader0( String name, String value )
 	{
-		List< String > values = new ArrayList< String >();
+		List< String > values = new ArrayList<>();
 		values.add( value );
 		this.headers.put( name, values );
 	}

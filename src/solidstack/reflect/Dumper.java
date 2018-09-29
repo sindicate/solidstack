@@ -47,14 +47,14 @@ import solidstack.script.java.Java;
 
 public class Dumper
 {
-	private IdentityHashMap<Object, Integer> visited = new IdentityHashMap<Object, Integer>();
+	private IdentityHashMap<Object, Integer> visited = new IdentityHashMap<>();
 	private int id;
 
 	private boolean hideTransients;
 	private boolean singleLine;
 	private boolean hideIds;
 
-	private Set<String> skip = new HashSet<String>();
+	private Set<String> skip = new HashSet<>();
 	private String[] skipDefault = new String[]
 	{
 		"org.hibernate.internal.SessionImpl",
@@ -65,7 +65,7 @@ public class Dumper
 		"org.h2.engine.Session"
 	};
 
-	private Set<String> overriddenCollection = new HashSet<String>();
+	private Set<String> overriddenCollection = new HashSet<>();
 
 	public Dumper()
 	{
@@ -360,7 +360,7 @@ public class Dumper
 			}
 			else
 			{
-				ArrayList<Field> fields = new ArrayList<Field>();
+				ArrayList<Field> fields = new ArrayList<>();
 				while( cls != Object.class )
 				{
 					Field[] fs = cls.getDeclaredFields();
@@ -371,6 +371,7 @@ public class Dumper
 
 				Collections.sort( fields, new Comparator<Field>()
 				{
+					@Override
 					public int compare( Field left, Field right )
 					{
 						return left.getName().compareTo( right.getName() );

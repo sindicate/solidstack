@@ -36,6 +36,7 @@ public class Parenthesis extends LocalizedExpression
 		return this.expression;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		if( this.expression == null )
@@ -43,6 +44,7 @@ public class Parenthesis extends LocalizedExpression
 		return this.expression.compile(); // Remove Parenthesis from the hierarchy
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		if( this.expression != null )
@@ -50,6 +52,7 @@ public class Parenthesis extends LocalizedExpression
 		return null;
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( '(' );

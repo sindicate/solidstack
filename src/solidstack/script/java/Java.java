@@ -246,7 +246,7 @@ public class Java
 		return (T)exception;
 	}
 
-	static private Map<String, java.lang.Class<?>> primitiveCache = new HashMap<String, java.lang.Class<?>>();
+	static private Map<String, java.lang.Class<?>> primitiveCache = new HashMap<>();
 
 	static
 	{

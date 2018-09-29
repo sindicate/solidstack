@@ -41,7 +41,7 @@ public class ThreadContext
 	}
 
 	private Scope scope;
-	private Deque<SourceLocation> stack = new ArrayDeque<SourceLocation>();
+	private Deque<SourceLocation> stack = new ArrayDeque<>();
 	private Tuple saved;
 
 	private ThreadContext()

@@ -42,7 +42,7 @@ abstract public class Operator implements Expression
 		|
 		^
 		&
-		< >
+		<>
 		= !
 		:
 		+ -
@@ -52,7 +52,7 @@ abstract public class Operator implements Expression
 
 	static
 	{
-		precedences = new HashMap<String, Integer>();
+		precedences = new HashMap<>();
 
 		precedences.put( "[", 1 ); // array index
 		precedences.put( "(", 1 ); // method call
@@ -262,6 +262,7 @@ abstract public class Operator implements Expression
 		return null;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		if( this.left != null ) this.left = this.left.compile();
@@ -573,6 +574,7 @@ abstract public class Operator implements Expression
 		this.right = expression;
 	}
 
+	@Override
 	public SourceLocation getLocation()
 	{
 		if( this.left == null )
@@ -580,6 +582,7 @@ abstract public class Operator implements Expression
 		return this.left.getLocation();
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		if( this.left != null )

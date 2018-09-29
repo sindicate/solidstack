@@ -47,16 +47,19 @@ public class ValuesMap implements Map< String, Object >, Serializable
 		this.values = values;
 	}
 
+	@Override
 	public int size()
 	{
 		return this.values.length;
 	}
 
+	@Override
 	public boolean isEmpty()
 	{
 		return this.values.length == 0;
 	}
 
+	@Override
 	public boolean containsKey( Object key )
 	{
 		if( !( key instanceof String ) )
@@ -65,6 +68,7 @@ public class ValuesMap implements Map< String, Object >, Serializable
 		return this.names.containsKey( k );
 	}
 
+	@Override
 	public Object get( Object key )
 	{
 		if( !( key instanceof String ) )
@@ -76,41 +80,49 @@ public class ValuesMap implements Map< String, Object >, Serializable
 		return this.values[ index ];
 	}
 
+	@Override
 	public Set< String > keySet()
 	{
 		return this.names.keySet();
 	}
 
+	@Override
 	public Collection< Object > values()
 	{
 		return new ObjectArrayList( this.values );
 	}
 
+	@Override
 	public boolean containsValue( Object value )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Object put( String key, Object value )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Object remove( Object key )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void putAll( Map< ? extends String, ? extends Object > m )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void clear()
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Set< java.util.Map.Entry< String, Object >> entrySet()
 	{
 		throw new UnsupportedOperationException();

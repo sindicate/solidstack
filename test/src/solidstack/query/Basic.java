@@ -183,7 +183,7 @@ public class Basic
 		QueryLoader queries = new QueryLoader();
 		queries.setTemplatePath( "classpath:/solidstack/query" );
 
-		Map< String, Object > params = new HashMap< String, Object >();
+		Map< String, Object > params = new HashMap<>();
 		params.put( "prefix", "SYST" );
 		params.put( "names", new String[] { "SYSTABLES", "SYSCOLUMNS" } );
 		Query query = queries.getQuery( "test.sql" );
@@ -241,7 +241,7 @@ public class Basic
 
 		QueryLoader queries = new QueryLoader( loader );
 
-		Map< String, Object > params = new HashMap< String, Object >();
+		Map< String, Object > params = new HashMap<>();
 		params.put( "prefix", "SYST" );
 		params.put( "name", null );
 		params.put( "names", new String[] { "SYSTABLES", "SYSCOLUMNS" } );
@@ -300,7 +300,7 @@ public class Basic
 
 		QueryLoader queries = new QueryLoader( loader );
 
-		Map< String, Object > params = new HashMap< String, Object >();
+		Map< String, Object > params = new HashMap<>();
 		params.put( "prefix", "SYST" );
 		params.put( "name", null );
 		params.put( "names", new String[] { "SYSTABLES", "SYSCOLUMNS" } );
@@ -326,7 +326,7 @@ public class Basic
 		QueryLoader queries = new QueryLoader();
 		queries.setTemplatePath( "classpath:/solidstack/query" );
 
-		Map< String, Object > params = new HashMap< String, Object >();
+		Map< String, Object > params = new HashMap<>();
 		params.put( "names", Arrays.asList( new String[] { "SYSTABLES", "SYSCOLUMNS", "SYSTABLES", "SYSCOLUMNS", "SYSTABLES",
 				"SYSCOLUMNS", "SYSTABLES", "SYSCOLUMNS", "SYSTABLES", "SYSCOLUMNS",
 				"SYSTABLES", "SYSCOLUMNS", "SYSTABLES", "SYSCOLUMNS", "SYSTABLES",
@@ -368,7 +368,7 @@ public class Basic
 	private String end = "}}}";
 	private Map<String, Object> parameters;
 	{
-		this.parameters = new HashMap<String, Object>();
+		this.parameters = new HashMap<>();
 		this.parameters.put( "key", "value" );
 	}
 

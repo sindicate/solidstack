@@ -25,9 +25,9 @@ import java.util.regex.Pattern;
 
 public class ApplicationContext
 {
-	protected List< ServletMapping > mappings = new ArrayList< ServletMapping >();
-	protected List< FilterMapping > filterMappings = new ArrayList< FilterMapping >();
-	protected Map< String, Class< Servlet > > jspCache = new HashMap< String, Class< Servlet > >();
+	protected List< ServletMapping > mappings = new ArrayList<>();
+	protected List< FilterMapping > filterMappings = new ArrayList<>();
+	protected Map< String, Class< Servlet > > jspCache = new HashMap<>();
 
 	public void registerServlet( String pattern, Servlet servlet )
 	{

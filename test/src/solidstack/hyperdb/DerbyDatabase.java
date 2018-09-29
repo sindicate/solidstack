@@ -54,7 +54,7 @@ public class DerbyDatabase extends Database
 	{
 		Query query = queries.getQuery( "selectSchemas.sql" );
 
-		Map< String, Schema > result = new LinkedHashMap< String, Schema >();
+		Map< String, Schema > result = new LinkedHashMap<>();
 		List<Object[]> schemas = query.listOfArrays( connection, Pars.EMPTY );
 		for( Object[] schema : schemas )
 		{
@@ -70,7 +70,7 @@ public class DerbyDatabase extends Database
 	{
 		Query query = queries.getQuery( "selectTables.sql" );
 
-		List< Table > result = new ArrayList< Table >();
+		List< Table > result = new ArrayList<>();
 		List<Object[]> users = query.listOfArrays( connection, new Pars( "schemaName", schemaName ) );
 		for( Object[] user : users )
 		{
@@ -86,7 +86,7 @@ public class DerbyDatabase extends Database
 	{
 		String sql = "SELECT VIEW_NAME FROM ALL_VIEWS WHERE OWNER = ? ORDER BY VIEW_NAME";
 
-		List< View > views = new ArrayList< View >();
+		List< View > views = new ArrayList<>();
 		try
 		{
 			PreparedStatement statement = connection.prepareStatement( sql );

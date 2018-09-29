@@ -33,9 +33,9 @@ import solidstack.json.JSONScanner.Token.TYPE;
  */
 public class JSONParser
 {
-	static public enum EVENT { BEGIN_OBJECT, END_OBJECT, BEGIN_ARRAY, END_ARRAY, NAME, VALUE, EOF };
-	static protected enum STATE { BEFOREVALUE, BEFORENAME, AFTERVALUE };
-	static protected enum STRUCT { NONE, OBJECT, ARRAY };
+	static public enum EVENT { BEGIN_OBJECT, END_OBJECT, BEGIN_ARRAY, END_ARRAY, NAME, VALUE, EOF }
+	static protected enum STATE { BEFOREVALUE, BEFORENAME, AFTERVALUE }
+	static protected enum STRUCT { NONE, OBJECT, ARRAY }
 
 	private SourceReader reader;
 
@@ -47,7 +47,7 @@ public class JSONParser
 	// Parsing state
 	protected STATE state = STATE.BEFOREVALUE;
 	protected STRUCT currentStruct = STRUCT.NONE;
-	protected Stack< STRUCT > pastStructs = new Stack< STRUCT >();
+	protected Stack< STRUCT > pastStructs = new Stack<>();
 
 	// Parsed names and values
 	protected String name;

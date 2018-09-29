@@ -30,7 +30,7 @@ public class Request
 
 	// TODO GET or POST
 	private String path;
-	private Map< String, List< String > > headers = new HashMap< String, List<String> >();
+	private Map< String, List< String > > headers = new HashMap<>();
 
 	public Request( String path )
 	{
@@ -49,7 +49,7 @@ public class Request
 
 	public void setHeader( String name, String value )
 	{
-		List< String > values = new ArrayList< String >();
+		List< String > values = new ArrayList<>();
 		values.add( value );
 		getHeaders().put( name, values );
 	}

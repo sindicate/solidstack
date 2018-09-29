@@ -62,22 +62,26 @@ public class NoEncodingWriter implements EncodingWriter
 		}
 	}
 
+	@Override
 	public void write( String s )
 	{
 		if( s != null )
 			write( s.toCharArray(), 0, s.length() );
 	}
 
+	@Override
 	public void writeEncoded( Object o )
 	{
 		write( (String)o );
 	}
 
+	@Override
 	public boolean stringsOnly()
 	{
 		return true;
 	}
 
+	@Override
 	public void flush()
 	{
 		try

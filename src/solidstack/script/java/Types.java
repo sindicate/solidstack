@@ -52,7 +52,7 @@ public class Types
     // Fill the map
     static
     {
-    	TYPES = new IdentityHashMap<Class, Integer>();
+    	TYPES = new IdentityHashMap<>();
     	for( int i = 0; i < PRIMITIVES.length; i++ )
     		TYPES.put( PRIMITIVES[ i ], i );
     }

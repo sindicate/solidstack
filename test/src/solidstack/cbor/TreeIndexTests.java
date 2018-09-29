@@ -21,7 +21,7 @@ public class TreeIndexTests
 
 		TreeIndex tree = new TreeIndex();
 
-		List<Node> nodes = new ArrayList<Node>();
+		List<Node> nodes = new ArrayList<>();
 
 		for( int i = 0; i < count; i++ )
 		{
@@ -67,8 +67,8 @@ public class TreeIndexTests
 
 		TreeIndex tree = new TreeIndex();
 
-		List<String> index = new ArrayList<String>();
-		List<Node<String>> index2 = new ArrayList<Node<String>>();
+		List<String> index = new ArrayList<>();
+		List<Node<String>> index2 = new ArrayList<>();
 
 		Random rnd = new Random( 0 ); // Always generates the same sequence
 		for( int i = 0; i < count; i++ )

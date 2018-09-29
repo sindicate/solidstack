@@ -695,7 +695,7 @@ public class JSPLikeTemplateParser
 		void addDirective( String name, String attribute, String value, SourceLocation location )
 		{
 			if( this.directives == null )
-				this.directives = new ArrayList< Directive >();
+				this.directives = new ArrayList<>();
 			this.directives.add( new Directive( name, attribute, value, location ) );
 		}
 

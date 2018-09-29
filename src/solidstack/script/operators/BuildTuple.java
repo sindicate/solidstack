@@ -28,7 +28,7 @@ import solidstack.script.objects.Tuple;
 
 public class BuildTuple extends Operator
 {
-	private List<Expression> expressions = new ArrayList<Expression>();
+	private List<Expression> expressions = new ArrayList<>();
 
 	public BuildTuple( String name, Expression left, Expression right )
 	{
@@ -61,6 +61,7 @@ public class BuildTuple extends Operator
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		Tuple result = new Tuple();

@@ -76,6 +76,6 @@ public class Generics
 		if( array ) {
 			return (List<T>)new ArrayList<Object[]>();
 		}
-		return (List<T>)new ArrayList<Object>();
+		return (List<T>)new ArrayList<>();
 	}
 }

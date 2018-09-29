@@ -236,13 +236,13 @@ public class Query
 			ResultSetMetaData metaData = resultSet.getMetaData();
 			int columnCount = metaData.getColumnCount();
 
-			ArrayList< Object[] > result = new ArrayList< Object[] >();
+			ArrayList< Object[] > result = new ArrayList<>();
 
 			if( flyWeight )
 			{
 				// THIS CAN REDUCE MEMORY USAGE WITH 90 TO 95 PERCENT, PERFORMANCE IMPACT IS ONLY 5 PERCENT
 
-				Map< Object, Object > dictionary = new HashMap< Object, Object >();
+				Map< Object, Object > dictionary = new HashMap<>();
 				while( resultSet.next() )
 				{
 					Object[] line = new Object[ columnCount ];
@@ -343,7 +343,7 @@ public class Query
 		{
 			int columnCount = metaData.getColumnCount();
 
-			Map< String, Integer > names = new HashMap< String, Integer >();
+			Map< String, Integer > names = new HashMap<>();
 			for( int col = 0; col < columnCount; col++ )
 				names.put( metaData.getColumnLabel( col + 1 ).toLowerCase( Locale.ENGLISH ), col );
 
@@ -461,7 +461,7 @@ public class Query
 		QueryEncodingWriter gsql = new QueryEncodingWriter();
 		this.template.apply( args, gsql );
 
-		List< Object > pars = new ArrayList< Object >();
+		List< Object > pars = new ArrayList<>();
 		StringBuilder result = new StringBuilder();
 
 		List< Object > values = gsql.getValues();

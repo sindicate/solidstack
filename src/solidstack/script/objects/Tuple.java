@@ -28,7 +28,7 @@ public class Tuple
 		return new Tuple( values );
 	}
 
-	private List<Object> values = new ArrayList<Object>(); // TODO Should be array
+	private List<Object> values = new ArrayList<>(); // TODO Should be array
 
 	public Tuple()
 	{

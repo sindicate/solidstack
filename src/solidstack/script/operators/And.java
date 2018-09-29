@@ -29,6 +29,7 @@ public class And extends Operator
 		super( name, left, right );
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		try

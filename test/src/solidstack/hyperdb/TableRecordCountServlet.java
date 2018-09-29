@@ -29,6 +29,7 @@ import solidstack.lang.Assert;
 
 public class TableRecordCountServlet implements Servlet
 {
+	@Override
 	public void call( RequestContext context )
 	{
 		boolean complete = false;

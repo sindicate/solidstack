@@ -38,12 +38,14 @@ public class Block extends LocalizedExpression // TODO Is this localized needed?
 		return this.expression;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		this.expression = this.expression.compile();
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		Scope old = thread.swapScope( new DefaultScope( thread.getScope() ) );
@@ -57,6 +59,7 @@ public class Block extends LocalizedExpression // TODO Is this localized needed?
 		}
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( '{' );

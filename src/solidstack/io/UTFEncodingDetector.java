@@ -40,6 +40,7 @@ public class UTFEncodingDetector implements EncodingDetector
 		// This is a singleton
 	}
 
+	@Override
 	public String detect( byte[] bytes )
 	{
 		// TODO When UTF-8, test that the JVM skips the optional byte order mark. Also for UTF-16BE/LE.

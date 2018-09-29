@@ -27,6 +27,7 @@ public class Equals extends Operator
 		super( name, left, right );
 	}
 
+	@Override
 	public Boolean evaluate( ThreadContext thread )
 	{
 		Object left = this.left.evaluate( thread );

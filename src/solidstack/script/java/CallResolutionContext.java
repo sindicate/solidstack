@@ -39,7 +39,7 @@ public class CallResolutionContext
 
 	// Dynamic stuff
 
-	private List< MethodCall > candidates = new ArrayList<MethodCall>();
+	private List< MethodCall > candidates = new ArrayList<>();
 	private Set< Class > interfacesDone = new HashSet();
 
 

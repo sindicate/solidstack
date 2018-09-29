@@ -30,6 +30,7 @@ public class PostDecr extends Operator
 		super( name, left, right );
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		Assert.isNull( this.right );

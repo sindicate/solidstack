@@ -75,7 +75,7 @@ public class SimpleCache
 	/**
 	 * The cache.
 	 */
-	private Map<String, CacheEntry> cache = new HashMap<String, CacheEntry>();
+	private Map<String, CacheEntry> cache = new HashMap<>();
 
 	/**
 	 * Current expiration interval.
@@ -245,7 +245,7 @@ public class SimpleCache
 
 		long then = now - this.purgeAgeMillis;
 		boolean debug = log.isDebugEnabled();
-		List<String> keys = new ArrayList<String>();
+		List<String> keys = new ArrayList<>();
 
 		synchronized( this.cache )
 		{

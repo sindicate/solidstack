@@ -26,7 +26,7 @@ import solidstack.script.ThreadContext;
 
 public class Expressions implements Expression
 {
-	private List<Expression> expressions = new ArrayList<Expression>();
+	private List<Expression> expressions = new ArrayList<>();
 
 	public Expressions( Expression... expressions )
 	{
@@ -44,9 +44,10 @@ public class Expressions implements Expression
 		return this.expressions;
 	}
 
+	@Override
 	public Expression compile()
 	{
-		List<Expression> result = new ArrayList<Expression>();
+		List<Expression> result = new ArrayList<>();
 
 		for( Expression expression : this.expressions )
 			if( expression != null )
@@ -68,6 +69,7 @@ public class Expressions implements Expression
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		Object result = null;
@@ -98,12 +100,14 @@ public class Expressions implements Expression
 		return this.expressions.remove( 0 );
 	}
 
+	@Override
 	public SourceLocation getLocation()
 	{
 		Assert.isTrue( !this.expressions.isEmpty() );
 		return this.expressions.get( 0 ).getLocation();
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		for( Expression expression : this.expressions )

@@ -58,7 +58,7 @@ public class OracleDatabase extends Database
 
 		Query query = queries.getQuery( "selectUsers.sql" );
 
-		Map< String, Schema > schemas = new LinkedHashMap< String, Schema >();
+		Map< String, Schema > schemas = new LinkedHashMap<>();
 //		Connection connection = DataSource.getConnection();
 //		try
 //		{
@@ -85,7 +85,7 @@ public class OracleDatabase extends Database
 	{
 		String sql = "SELECT TABLE_NAME, NUM_ROWS FROM ALL_TABLES WHERE OWNER = ? ORDER BY TABLE_NAME";
 
-		List< Table > tables = new ArrayList< Table >();
+		List< Table > tables = new ArrayList<>();
 		try
 		{
 			PreparedStatement statement = connection.prepareStatement( sql );
@@ -114,7 +114,7 @@ public class OracleDatabase extends Database
 	{
 		String sql = "SELECT VIEW_NAME FROM ALL_VIEWS WHERE OWNER = ? ORDER BY VIEW_NAME";
 
-		List< View > views = new ArrayList< View >();
+		List< View > views = new ArrayList<>();
 		try
 		{
 			PreparedStatement statement = connection.prepareStatement( sql );

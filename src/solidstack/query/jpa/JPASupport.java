@@ -200,7 +200,7 @@ public class JPASupport
 	{
 		// THIS CAN REDUCE MEMORY USAGE WITH 90 TO 95 PERCENT, PERFORMANCE IMPACT IS ONLY 5 PERCENT
 
-		Map< Object, Object > dictionary = new HashMap< Object, Object >();
+		Map< Object, Object > dictionary = new HashMap<>();
 		for( Object[] objects : list )
 			if( objects != null )
 				for( int len = objects.length, i = 0; i < len; i++ )

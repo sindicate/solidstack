@@ -24,7 +24,7 @@ import solidstack.lang.Assert;
 
 public class FilterChain
 {
-	protected List< Filter > filters = new ArrayList< Filter >();
+	protected List< Filter > filters = new ArrayList<>();
 	protected Servlet servlet;
 
 	public void add( Filter filter )

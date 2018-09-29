@@ -23,6 +23,7 @@ import java.io.OutputStream;
 
 public class DefaultServlet implements Servlet
 {
+	@Override
 	public void call( RequestContext context )
 	{
 		Response response = context.getResponse();

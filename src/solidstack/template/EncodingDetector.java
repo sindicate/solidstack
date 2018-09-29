@@ -47,6 +47,7 @@ public class EncodingDetector implements solidstack.io.EncodingDetector
 		// This is a singleton
 	}
 
+	@Override
 	public String detect( byte[] bytes )
 	{
 		String result = CHARSET_UTF; // Default

@@ -40,7 +40,7 @@ public class CallResolver
 //	CallSignature -> Classes
 //	MethodHandle -> Method, ExtensionMethod or Constructor
 //	ExtensionMethod -> Method (from DefaultClassExtensions), Classes (from java.xxx)
-	static private final Map<CallSignature, MethodHandle> cache = new HashMap<CallSignature, MethodHandle>();
+	static private final Map<CallSignature, MethodHandle> cache = new HashMap<>();
 
 
 	static public MethodCall resolveMethodCall( CallResolutionContext context )
@@ -121,13 +121,11 @@ public class CallResolver
 
 		Class[] interfaces = cls.getInterfaces();
 		for( Class iface : interfaces )
-		{
 			if( !context.isInterfaceDone( iface ) )
 			{
 				collectMethods( iface, context );
 				context.interfaceDone( iface );
 			}
-		}
 
 		if( OBJECT_ARRAY_CLASS.isAssignableFrom( cls ) && cls != OBJECT_ARRAY_CLASS )
 			collectMethods( Object[].class, context ); // Makes Object[] the virtual super class of all arrays
@@ -196,11 +194,8 @@ public class CallResolver
 				if( argTypes[ argCount - 1 ] == types[ lastType ] )
 					vararg = false;
 		}
-		else
-		{
-			if( argCount != typeCount )
-				return null;
-		}
+		else if( argCount != typeCount )
+			return null;
 
 		if( !vararg )
 		{
@@ -237,10 +232,10 @@ public class CallResolver
 
 		// Filter out no-vararg candidates
 
-		ArrayList<MethodCall> best2 = new ArrayList( best );
-		for( Iterator iterator = best2.iterator(); iterator.hasNext(); )
+		ArrayList<MethodCall> best2 = new ArrayList<>( best );
+		for( Iterator<MethodCall> iterator = best2.iterator(); iterator.hasNext(); )
 		{
-			MethodCall candidate = (MethodCall)iterator.next();
+			MethodCall candidate = iterator.next();
 			if( candidate.isVarargCall )
 				iterator.remove();
 		}
@@ -266,17 +261,14 @@ public class CallResolver
 				else
 					best2.remove( index + 1 );
 			}
-			else
+			else if( moreSpecificThan( candidate2.getParameterTypes(), candidate2.isVararg(), candidate1.getParameterTypes(), candidate1.isVararg() ) )
 			{
-				if( moreSpecificThan( candidate2.getParameterTypes(), candidate2.isVararg(), candidate1.getParameterTypes(), candidate1.isVararg() ) )
-				{
-					best2.remove( index );
-					if( index > 0 )
-						index--;
-				}
-				else
-					index ++;
+				best2.remove( index );
+				if( index > 0 )
+					index--;
 			}
+			else
+				index ++;
 		}
 
 		if( best2.size() == 1 )
@@ -348,7 +340,6 @@ public class CallResolver
 			}
 		}
 		else if( vararg )
-		{
 			if( otherVararg )
 			{
 				Class type = types[ lastArg ].getComponentType();
@@ -358,7 +349,6 @@ public class CallResolver
 			}
 			else
 				return false;
-		}
 
 		return true;
 	}

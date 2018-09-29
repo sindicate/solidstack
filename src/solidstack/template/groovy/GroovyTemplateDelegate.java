@@ -68,26 +68,31 @@ public class GroovyTemplateDelegate implements GroovyObject
 		template.apply( pars, this.writer );
 	}
 
+	@Override
 	public Object getProperty( String property )
 	{
 		return InvokerHelper.getProperty( this.parameters, property );
 	}
 
+	@Override
 	public Object invokeMethod( String name, Object args )
 	{
 		return InvokerHelper.invokeMethod( this.parameters, name, args );
 	}
 
+	@Override
 	public void setProperty( String property, Object newValue )
 	{
 		InvokerHelper.setProperty( this.parameters, property, newValue );
 	}
 
+	@Override
 	public MetaClass getMetaClass()
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void setMetaClass( MetaClass metaClass )
 	{
 		throw new UnsupportedOperationException();

@@ -34,6 +34,7 @@ public class While extends LocalizedExpression
 		this.left = left;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		this.condition = this.condition.compile();
@@ -41,6 +42,7 @@ public class While extends LocalizedExpression
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		Object result = null;
@@ -50,6 +52,7 @@ public class While extends LocalizedExpression
 		return result;
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( "while(" );

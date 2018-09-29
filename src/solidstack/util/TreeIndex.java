@@ -72,12 +72,12 @@ public class TreeIndex<T>
 	{
 		Node<T> parent = this.root;
 		if( parent == null )
-			return this.root = new Node<T>( null );
+			return this.root = new Node<>( null );
 
 		Node<T> t;
 		while( ( t = parent.right ) != null )
 			parent = t;
-		Node<T> result = parent.right = new Node<T>( parent );
+		Node<T> result = parent.right = new Node<>( parent );
 
 		while( parent != null )
 		{
@@ -111,12 +111,12 @@ public class TreeIndex<T>
 	{
 		Node<T> parent = this.root;
 		if( parent == null )
-			return this.root = new Node<T>( null );
+			return this.root = new Node<>( null );
 
 		Node<T> t;
 		while( ( t = parent.left ) != null )
 			parent = t;
-		Node<T> result = parent.left = new Node<T>( parent );
+		Node<T> result = parent.left = new Node<>( parent );
 
 		while( parent != null )
 		{

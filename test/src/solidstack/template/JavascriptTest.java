@@ -42,7 +42,7 @@ import solidstack.io.Resources;
 import solidstack.template.Basic.ParameterObject;
 
 
-@SuppressWarnings( { "javadoc", "restriction" } )
+@SuppressWarnings( { "javadoc" } )
 public class JavascriptTest
 {
 	static public final String CONSTANT = "CONSTANT";
@@ -143,7 +143,7 @@ public class JavascriptTest
 		TemplateLoader queries = new TemplateLoader();
 		queries.setTemplatePath( "classpath:/solidstack/template" );
 
-		Map< String, Object > params = new HashMap< String, Object >();
+		Map< String, Object > params = new HashMap<>();
 		params.put( "prefix", "SYST" );
 		params.put( "name", null );
 		params.put( "names", null );

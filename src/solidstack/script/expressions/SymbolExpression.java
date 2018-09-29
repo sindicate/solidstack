@@ -33,16 +33,19 @@ public class SymbolExpression extends LocalizedExpression
 		this.symbol = symbol;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		return this.symbol;
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( '\'' );

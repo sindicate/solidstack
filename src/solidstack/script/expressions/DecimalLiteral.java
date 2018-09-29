@@ -33,16 +33,19 @@ public class DecimalLiteral extends LocalizedExpression
 		this.value = value;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		return this;
 	}
 
+	@Override
 	public BigDecimal evaluate( ThreadContext thread )
 	{
 		return this.value;
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( this.value );

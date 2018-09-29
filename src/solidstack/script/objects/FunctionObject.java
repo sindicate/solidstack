@@ -60,6 +60,7 @@ public class FunctionObject implements solidstack.script.java.Function
 		return this.assigned;
 	}
 
+	@Override
 	public Object[] getParameters()
 	{
 		return this.function.getParameters();
@@ -70,6 +71,7 @@ public class FunctionObject implements solidstack.script.java.Function
 		return this.function;
 	}
 
+	@Override
 	public Object call( Object... args )
 	{
 		return call( ThreadContext.get(), args );
@@ -274,7 +276,7 @@ public class FunctionObject implements solidstack.script.java.Function
 
 		public List<Object> rest()
 		{
-			List<Object> result = new ArrayList<Object>();
+			List<Object> result = new ArrayList<>();
 			while( hasNext() )
 				result.add( get() );
 			return result;

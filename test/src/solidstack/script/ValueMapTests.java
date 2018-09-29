@@ -31,7 +31,7 @@ public class ValueMapTests
 	{
 		int COUNT = 100;
 
-		ValueMap<TestEntry> values = new ValueMap<TestEntry>();
+		ValueMap<TestEntry> values = new ValueMap<>();
 
 		for( int i = 0; i < COUNT; i++ )
 		{

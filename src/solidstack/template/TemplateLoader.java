@@ -42,8 +42,8 @@ public class TemplateLoader
 	private boolean reloading;
 	private String defaultLanguage;
 
-	private Map< String, Template > templates = new HashMap< String, Template >();
-	private Map< String, Object > mimeTypeMap = new HashMap< String, Object >();
+	private Map< String, Template > templates = new HashMap<>();
+	private Map< String, Object > mimeTypeMap = new HashMap<>();
 
 
 	/**

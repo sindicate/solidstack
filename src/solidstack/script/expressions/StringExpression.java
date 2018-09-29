@@ -28,8 +28,8 @@ import solidstack.script.objects.PString;
 
 public class StringExpression extends LocalizedExpression
 {
-	private List<Expression> expressions = new ArrayList<Expression>();
-	private List<String> fragments = new ArrayList<String>();
+	private List<Expression> expressions = new ArrayList<>();
+	private List<String> fragments = new ArrayList<>();
 
 
 	public StringExpression( SourceLocation location )
@@ -37,6 +37,7 @@ public class StringExpression extends LocalizedExpression
 		super( location );
 	}
 
+	@Override
 	public Expression compile()
 	{
 		if( this.fragments.size() == 0 )
@@ -51,10 +52,11 @@ public class StringExpression extends LocalizedExpression
 		return this;
 	}
 
+	@Override
 	public PString evaluate( ThreadContext thread )
 	{
-		List<String> fragments = new ArrayList<String>(); // TODO Or LinkedList?
-		List<Object> values = new ArrayList<Object>();
+		List<String> fragments = new ArrayList<>(); // TODO Or LinkedList?
+		List<Object> values = new ArrayList<>();
 		int i = 0;
 		for( String fragment : this.fragments )
 		{
@@ -81,6 +83,7 @@ public class StringExpression extends LocalizedExpression
 		this.fragments.add( null );
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		for( Expression expression : this.expressions )

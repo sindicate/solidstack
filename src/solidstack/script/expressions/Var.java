@@ -31,11 +31,13 @@ public class Var extends LocalizedExpression
 		this.identifier = identifier;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		thread.getScope().var( this.identifier.getSymbol(), null );
@@ -48,6 +50,7 @@ public class Var extends LocalizedExpression
 		return value;
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( "var " );

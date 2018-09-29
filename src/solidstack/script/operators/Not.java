@@ -34,6 +34,7 @@ public class Not extends Operator
 		this.location = location;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		Assert.isNull( this.left );

@@ -22,7 +22,7 @@ import java.util.List;
 
 public class StandardReverseByteStringIndex implements ReverseByteStringIndex
 {
-	private List<ByteString> list = new ArrayList<ByteString>();
+	private List<ByteString> list = new ArrayList<>();
 
 
 	@Override

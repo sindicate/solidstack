@@ -48,111 +48,133 @@ public class ResultList implements List< Map< String, Object > >, Serializable
 		this.names = names;
 	}
 
+	@Override
 	public Map< String, Object > get( int index )
 	{
 		return new ValuesMap( this.names, this.list.get( index ) );
 	}
 
+	@Override
 	public boolean isEmpty()
 	{
 		return this.list.isEmpty();
 	}
 
+	@Override
 	public Iterator< Map< String, Object >> iterator()
 	{
 		return new ResultListIterator( this.list.listIterator(), this.names );
 	}
 
+	@Override
 	public ListIterator< Map< String, Object >> listIterator()
 	{
 		return new ResultListIterator( this.list.listIterator(), this.names );
 	}
 
+	@Override
 	public ListIterator< Map< String, Object >> listIterator( int index )
 	{
 		return new ResultListIterator( this.list.listIterator( index ), this.names );
 	}
 
+	@Override
 	public int size()
 	{
 		return this.list.size();
 	}
 
+	@Override
 	public boolean add( Map< String, Object > arg0 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void add( int arg0, Map< String, Object > arg1 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean addAll( Collection< ? extends Map< String, Object >> arg0 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean addAll( int arg0, Collection< ? extends Map< String, Object >> arg1 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void clear()
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean contains( Object arg0 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean containsAll( Collection< ? > arg0 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public int indexOf( Object arg0 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public int lastIndexOf( Object arg0 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean remove( Object arg0 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Map< String, Object > remove( int arg0 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean removeAll( Collection< ? > arg0 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean retainAll( Collection< ? > arg0 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Map< String, Object > set( int arg0, Map< String, Object > arg1 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public List< Map< String, Object >> subList( int arg0, int arg1 )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Map<String,Object>[] toArray()
 	{
 		throw new UnsupportedOperationException();
@@ -165,6 +187,7 @@ public class ResultList implements List< Map< String, Object > >, Serializable
 //		return result;
 	}
 
+	@Override
 	public < T > T[] toArray( T[] arg0 )
 	{
 		throw new UnsupportedOperationException();

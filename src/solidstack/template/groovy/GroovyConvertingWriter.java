@@ -50,6 +50,7 @@ public class GroovyConvertingWriter implements ConvertingWriter
 		this.writer = writer;
 	}
 
+	@Override
 	public void write( Object o ) throws IOException
 	{
 		if( o == null )
@@ -83,6 +84,7 @@ public class GroovyConvertingWriter implements ConvertingWriter
 			this.writer.write( (String)InvokerHelper.invokeMethod( o, "asType", String.class ) );
 	}
 
+	@Override
 	public void writeEncoded( Object o ) throws IOException
 	{
 		if( o == null )
@@ -108,6 +110,7 @@ public class GroovyConvertingWriter implements ConvertingWriter
 		}
 	}
 
+	@Override
 	public void flush() throws IOException
 	{
 		this.writer.flush();

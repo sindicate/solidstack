@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class JSONObject implements Iterable< Map.Entry< String, Object > >
 {
-	protected Map< String, Object > values = new LinkedHashMap< String, Object >();
+	protected Map< String, Object > values = new LinkedHashMap<>();
 
 	public JSONObject( Object... values )
 	{

@@ -28,16 +28,19 @@ public class NullLiteral extends LocalizedExpression
 		super( location );
 	}
 
+	@Override
 	public Expression compile()
 	{
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		return null;
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( "null" );

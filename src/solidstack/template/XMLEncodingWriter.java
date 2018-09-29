@@ -33,6 +33,7 @@ public class XMLEncodingWriter extends NoEncodingWriter
 	static public final EncodingWriterFactory FACTORY = new EncodingWriterFactory()
 	{
 		//@Override
+		@Override
 		public NoEncodingWriter createWriter( Writer writer )
 		{
 			return new XMLEncodingWriter( writer );

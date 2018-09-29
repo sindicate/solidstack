@@ -32,7 +32,7 @@ public class Closures
 		TemplateLoader templates = new TemplateLoader();
 		templates.setTemplatePath( "classpath:/solidstack/template" );
 
-		Map< String, Object > params = new HashMap< String, Object >();
+		Map< String, Object > params = new HashMap<>();
 		Template template = templates.getTemplate( "closures.xml" );
 		String result = template.apply( params );
 		System.out.println( result );

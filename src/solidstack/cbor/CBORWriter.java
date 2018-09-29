@@ -35,7 +35,7 @@ public class CBORWriter extends OutputStream
 {
 //	static public final int MAX_STRINGREF_LENGTH = 64;
 
-	static private enum STATE { ARRAYMAP, IARRAYMAP, IBYTES, ITEXT,  };
+	static private enum STATE { ARRAYMAP, IARRAYMAP, IBYTES, ITEXT,  }
 
 	static final Charset UTF8 = Charset.forName( "UTF-8" );
 
@@ -49,7 +49,7 @@ public class CBORWriter extends OutputStream
 	private int startNewSlidingNameSpaceItemLimit;
 
 	private STATE state;
-	private Stack<StateItem> stateStack = new Stack<StateItem>();
+	private Stack<StateItem> stateStack = new Stack<>();
 
 
 	public CBORWriter( OutputStream out )

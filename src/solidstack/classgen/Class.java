@@ -28,8 +28,8 @@ public class Class
 	private CClass info;
 	private CClass superInfo;
 	private CClass[] interfacesInfo;
-	private List<Field> fields = new ArrayList<Field>();
-	private List<Method> methods = new ArrayList<Method>();
+	private List<Field> fields = new ArrayList<>();
+	private List<Method> methods = new ArrayList<>();
 
 
 	public Class( CClass info )

@@ -49,7 +49,7 @@ public class TemplateWriterTests
 
 		Template template = templates.getTemplate( "test.xml" );
 		template.setContentType( null );
-		Map< String, Object > pars = new HashMap< String, Object >();
+		Map< String, Object > pars = new HashMap<>();
 		pars.put( "test", "&<>\"'" );
 
 		String result = template.apply( pars );
@@ -63,7 +63,7 @@ public class TemplateWriterTests
 		templates.setTemplatePath( "classpath:/solidstack/template" );
 
 		Template template = templates.getTemplate( "test.xml" );
-		Map< String, Object > pars = new HashMap< String, Object >();
+		Map< String, Object > pars = new HashMap<>();
 		pars.put( "test", "&<>\"'" );
 
 		String result = template.apply( pars );

@@ -42,46 +42,55 @@ public class ResultListIterator implements ListIterator< Map< String, Object >>
 		this.names = names;
 	}
 
+	@Override
 	public boolean hasNext()
 	{
 		return this.iterator.hasNext();
 	}
 
+	@Override
 	public Map< String, Object > next()
 	{
 		return new ValuesMap( this.names, this.iterator.next() );
 	}
 
+	@Override
 	public boolean hasPrevious()
 	{
 		return this.iterator.hasPrevious();
 	}
 
+	@Override
 	public int nextIndex()
 	{
 		return this.iterator.nextIndex();
 	}
 
+	@Override
 	public Map< String, Object > previous()
 	{
 		return new ValuesMap( this.names, this.iterator.previous() );
 	}
 
+	@Override
 	public int previousIndex()
 	{
 		return this.iterator.previousIndex();
 	}
 
+	@Override
 	public void remove()
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void add( Map< String, Object > e )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void set( Map< String, Object > e )
 	{
 		throw new UnsupportedOperationException();

@@ -457,7 +457,7 @@ public class ScriptTests extends Util
 	static public void test17()
 	{
 		test( "loadClass( \"java.util.ArrayList\" );", ArrayList.class );
-		test( "new ArrayList();", new ArrayList<Object>() );
+		test( "new ArrayList();", new ArrayList<>() );
 		test( "l = new ArrayList(); l.add( \"sinterklaas\" ); l.toArray();", new Object[] { "sinterklaas" } );
 		test( "l = new ArrayList(); l.toArray();", new Object[ 0 ] );
 	}

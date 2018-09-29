@@ -74,6 +74,7 @@ public class CacheTests
 
 		final Loader<String> loader = new Loader<String>()
 		{
+			@Override
 			public String load()
 			{
 				try
@@ -95,8 +96,8 @@ public class CacheTests
 			}
 		};
 
-		List<AtomicLong> lifeSigns = new ArrayList<AtomicLong>();
-		List<Thread> threads = new ArrayList<Thread>();
+		List<AtomicLong> lifeSigns = new ArrayList<>();
+		List<Thread> threads = new ArrayList<>();
 		for( int i = 0; i < 40; i++ )
 		{
 			final AtomicLong lifeSign = new AtomicLong();

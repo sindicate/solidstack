@@ -43,6 +43,7 @@ public class Apply extends Operator
 		super( name, left, right );
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		if( this.left instanceof New )
@@ -93,7 +94,7 @@ public class Apply extends Operator
 
 		if( !vals.isEmpty() && vals.get( 0 ) instanceof Assign )
 		{
-			Map<Symbol, Object> args = new HashMap<Symbol, Object>();
+			Map<Symbol, Object> args = new HashMap<>();
 			for( Expression expression : vals )
 			{
 				if( !( expression instanceof Assign ) )

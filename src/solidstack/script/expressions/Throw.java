@@ -32,12 +32,14 @@ public class Throw extends LocalizedExpression
 		this.expression = expression;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		this.expression = this.expression.compile();
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		if( this.expression == null ) // TODO This could be moved to compile()
@@ -45,6 +47,7 @@ public class Throw extends LocalizedExpression
 		throw new ThrowException( this.expression.evaluate( thread ), thread.cloneStack() );
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( "throw " );

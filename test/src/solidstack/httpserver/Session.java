@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class Session
 {
-	private Map<String, Object> attributes = new HashMap<String, Object>();
+	private Map<String, Object> attributes = new HashMap<>();
 
 	public void setAttribute( String name, Object value )
 	{

@@ -38,6 +38,7 @@ public class If extends LocalizedExpression
 		this.right = right;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		this.condition = this.condition.compile();
@@ -46,6 +47,7 @@ public class If extends LocalizedExpression
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		if( Script.isTrue( thread, this.condition ) )
@@ -61,6 +63,7 @@ public class If extends LocalizedExpression
 		return null;
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( "if(" );

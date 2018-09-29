@@ -35,7 +35,7 @@ import solidstack.script.scopes.Scope;
 // TODO Not used yet
 public class GlobalFunctions
 {
-	private Map<String, Object> modules = new HashMap<String, Object>();
+	private Map<String, Object> modules = new HashMap<>();
 
 	public Object brake()
 	{

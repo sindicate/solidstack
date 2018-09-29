@@ -34,7 +34,7 @@ public class Method
 	private ClassFile cls;
 	private String name;
 
-	private List<Statement> statements = new ArrayList<Statement>();
+	private List<Statement> statements = new ArrayList<>();
 
 	private CMethodref methodref;
 

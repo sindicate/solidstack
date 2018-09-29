@@ -32,7 +32,7 @@ public class ClassExtension
 {
 	// TODO This weak map is not really needed when this class is defined in the app classloader
 	// TODO Can we create a new child classloader when instantiating a script engine, so that the caches exist in this child classloader?
-	static private Map<Class<?>, ClassExtension> extensions = new WeakHashMap<Class<?>, ClassExtension>();
+	static private Map<Class<?>, ClassExtension> extensions = new WeakHashMap<>();
 
 	static
 	{
@@ -86,14 +86,14 @@ public class ClassExtension
 
 	// ----------
 
-	private Map<String, List<ExtensionMethod>> methods = new HashMap<String, List<ExtensionMethod>>(); // TODO Optimise this data structure
-	private Map<String, List<ExtensionMethod>> staticMethods = new HashMap<String, List<ExtensionMethod>>();
+	private Map<String, List<ExtensionMethod>> methods = new HashMap<>(); // TODO Optimise this data structure
+	private Map<String, List<ExtensionMethod>> staticMethods = new HashMap<>();
 
 	private void addMethod( String name, Method method )
 	{
 		List<ExtensionMethod> methods = this.methods.get( name );
 		if( methods == null )
-			this.methods.put( name, methods = new ArrayList<ExtensionMethod>() );
+			this.methods.put( name, methods = new ArrayList<>() );
 		methods.add( new ExtensionMethod( method ) );
 	}
 
@@ -101,7 +101,7 @@ public class ClassExtension
 	{
 		List<ExtensionMethod> methods = this.staticMethods.get( name );
 		if( methods == null )
-			this.staticMethods.put( name, methods = new ArrayList<ExtensionMethod>() );
+			this.staticMethods.put( name, methods = new ArrayList<>() );
 		methods.add( new ExtensionMethod( method ) );
 	}
 

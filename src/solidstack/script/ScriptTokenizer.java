@@ -75,7 +75,7 @@ public class ScriptTokenizer
 
 	static
 	{
-		RESERVED_WORDS = new HashMap<String, TokenType>();
+		RESERVED_WORDS = new HashMap<>();
 		for( TokenType type : TokenType.values() )
 			if( type.reserved )
 				RESERVED_WORDS.put( type.word, type );
@@ -92,7 +92,7 @@ public class ScriptTokenizer
 	private StringBuilder buffer = new StringBuilder( 256 );
 
 	// A window that holds the last 3 tokens read
-	private WindowBuffer<Token> window = new WindowBuffer<Token>( 3 );
+	private WindowBuffer<Token> window = new WindowBuffer<>( 3 );
 
 
 	/**

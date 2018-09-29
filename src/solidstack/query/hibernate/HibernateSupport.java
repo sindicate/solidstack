@@ -56,7 +56,7 @@ public class HibernateSupport
 	 */
 	static public ResultSet resultSet( final Query query, Session session, final Object args )
 	{
-		final ResultHolder< ResultSet > result = new ResultHolder< ResultSet >();
+		final ResultHolder< ResultSet > result = new ResultHolder<>();
 
 		session.doWork( new Work()
 		{
@@ -89,7 +89,7 @@ public class HibernateSupport
 	 */
 	static public List< Object[] > listOfArrays( final Query query, final Session session, final Object args )
 	{
-		final ResultHolder< List< Object[] > > result = new ResultHolder< List< Object[] > >();
+		final ResultHolder< List< Object[] > > result = new ResultHolder<>();
 
 		session.doWork( new Work()
 		{
@@ -122,7 +122,7 @@ public class HibernateSupport
 	 */
 	static public List< Map< String, Object > > listOfMaps( final Query query, final Session session, final Object args )
 	{
-		final ResultHolder< List< Map< String, Object > > > result = new ResultHolder< List< Map< String, Object > > >();
+		final ResultHolder< List< Map< String, Object > > > result = new ResultHolder<>();
 
 		session.doWork( new Work()
 		{
@@ -155,7 +155,7 @@ public class HibernateSupport
 	 */
 	static public int update( final Query query, Session session, final Object args )
 	{
-		final ResultHolder< Integer > result = new ResultHolder< Integer >();
+		final ResultHolder< Integer > result = new ResultHolder<>();
 
 		session.doWork( new Work()
 		{

@@ -38,16 +38,19 @@ public class StringLiteral extends LocalizedExpression
 		return this.value;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		return this;
 	}
 
+	@Override
 	public String evaluate( ThreadContext thread )
 	{
 		return this.value;
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		// TODO Escape the string literal

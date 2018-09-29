@@ -28,11 +28,13 @@ public class Save implements Expression
 		this.expression = expression;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		Object result = this.expression.evaluate( thread );
@@ -40,11 +42,13 @@ public class Save implements Expression
 		return result;
 	}
 
+	@Override
 	public SourceLocation getLocation()
 	{
 		return this.expression.getLocation();
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( "$SAVE$(" );

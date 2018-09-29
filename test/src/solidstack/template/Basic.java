@@ -108,7 +108,7 @@ public class Basic
 		TemplateLoader queries = new TemplateLoader();
 		queries.setTemplatePath( "classpath:/solidstack/template" );
 
-		Map< String, Object > params = new HashMap< String, Object >();
+		Map< String, Object > params = new HashMap<>();
 		params.put( "prefix", "SYST" );
 		Template template = queries.getTemplate( "test.txt" );
 		String result = template.apply( params );
@@ -162,7 +162,7 @@ public class Basic
 
 		Template template = templates.getTemplate( "test2.xml" );
 //		System.out.println( template.getSource() );
-		Map< String, Object > pars = new HashMap< String, Object >();
+		Map< String, Object > pars = new HashMap<>();
 		String result = template.apply( pars );
 		Assert.assertEquals( result, "<!DOCTYPE html>\n" +
 				"<html>\n" +

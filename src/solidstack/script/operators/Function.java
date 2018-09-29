@@ -44,7 +44,7 @@ public class Function extends Operator
 		if( args instanceof Parenthesis )
 			args = ( (Parenthesis)args ).getExpression();
 
-		List<Expression> parameters = new ArrayList<Expression>();
+		List<Expression> parameters = new ArrayList<>();
 		if( args instanceof BuildTuple )
 		{
 			for( Expression par : ( (BuildTuple)args ).getExpressions() )
@@ -67,6 +67,7 @@ public class Function extends Operator
 		}
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		return new FunctionObject( this, thread.getScope() );

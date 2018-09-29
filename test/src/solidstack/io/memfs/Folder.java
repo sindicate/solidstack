@@ -25,7 +25,7 @@ import solidstack.io.SourceReaders;
 
 public class Folder
 {
-	private Map<String, Resource> files = new HashMap<String, Resource>();
+	private Map<String, Resource> files = new HashMap<>();
 
 	public Resource putFile( String name, String contents )
 	{

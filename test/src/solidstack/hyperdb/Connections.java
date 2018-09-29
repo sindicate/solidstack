@@ -26,7 +26,7 @@ import solidstack.lang.SystemException;
 
 public class Connections
 {
-	private Map<String, Map<String, ConnectionHolder>> connections = new HashMap<String, Map<String, ConnectionHolder>>();
+	private Map<String, Map<String, ConnectionHolder>> connections = new HashMap<>();
 
 	public void connect( Database database, String username, String password )
 	{
@@ -38,7 +38,7 @@ public class Connections
 			Map<String, ConnectionHolder> users = this.connections.get( database.getName() );
 			if( users == null )
 			{
-				users = new HashMap<String, ConnectionHolder>();
+				users = new HashMap<>();
 				this.connections.put( database.getName(), users );
 			}
 			users.put( username, holder );

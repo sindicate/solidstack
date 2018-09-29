@@ -25,7 +25,7 @@ public class Config
 
 	static
 	{
-		databases = new LinkedHashMap<String, Database>();
+		databases = new LinkedHashMap<>();
 		databases.put( "mem", new DerbyDatabase( "mem", "jdbc:derby:memory:hyperdb;create=true" ) );
 	}
 

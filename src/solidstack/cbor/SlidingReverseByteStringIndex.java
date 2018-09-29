@@ -24,8 +24,8 @@ import solidstack.util.TreeIndex.Node;
 
 public class SlidingReverseByteStringIndex implements ReverseByteStringIndex
 {
-	private Map<ByteString, Node<ByteString>> map = new HashMap<ByteString, Node<ByteString>>();
-	private TreeIndex<ByteString> index = new TreeIndex<ByteString>();
+	private Map<ByteString, Node<ByteString>> map = new HashMap<>();
+	private TreeIndex<ByteString> index = new TreeIndex<>();
 
 	private int capacity;
 	private int maxItemSize;

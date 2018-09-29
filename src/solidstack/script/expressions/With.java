@@ -39,6 +39,7 @@ public class With extends LocalizedExpression
 		this.expression = expression;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		this.object = this.object.compile();
@@ -46,6 +47,7 @@ public class With extends LocalizedExpression
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		Object object = this.object.evaluate( thread );
@@ -67,6 +69,7 @@ public class With extends LocalizedExpression
 		}
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( "with(" );

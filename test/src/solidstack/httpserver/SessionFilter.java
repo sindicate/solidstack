@@ -23,8 +23,9 @@ import java.util.Map;
 public class SessionFilter implements Filter
 {
 	private int sessionid;
-	private Map< String, Session > sessions = new HashMap<String, Session>();
+	private Map< String, Session > sessions = new HashMap<>();
 
+	@Override
 	public void call( RequestContext context, FilterChain chain )
 	{
 		// TODO Synchronization

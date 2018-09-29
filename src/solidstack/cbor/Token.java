@@ -19,7 +19,7 @@ package solidstack.cbor;
 
 public interface Token
 {
-	static public enum TYPE { UINT, NINT, BYTES, TEXT, ARRAY, MAP, IBYTES, ITEXT, IARRAY, IMAP, TAG, BOOL, NULL, UNDEF, HFLOAT, SFLOAT, DFLOAT, BREAK, EOF };
+	static public enum TYPE { UINT, NINT, BYTES, TEXT, ARRAY, MAP, IBYTES, ITEXT, IARRAY, IMAP, TAG, BOOL, NULL, UNDEF, HFLOAT, SFLOAT, DFLOAT, BREAK, EOF }
 
 	static public final SimpleToken EOF = new SimpleToken( TYPE.EOF );
 	static public final SimpleToken IBSTRING = new SimpleToken( TYPE.IBYTES );

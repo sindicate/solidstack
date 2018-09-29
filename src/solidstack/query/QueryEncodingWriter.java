@@ -30,10 +30,11 @@ import solidstack.template.EncodingWriter;
  */
 public class QueryEncodingWriter implements EncodingWriter
 {
-	private List< Object > values = new ArrayList< Object >();
+	private List< Object > values = new ArrayList<>();
 	private BitSet isValue = new BitSet();
 
 	//@Override
+	@Override
 	public void write( String s )
 	{
 		if( s != null && s.length() > 0 )
@@ -41,12 +42,14 @@ public class QueryEncodingWriter implements EncodingWriter
 	}
 
 	//@Override
+	@Override
 	public void writeEncoded( Object o )
 	{
 		this.isValue.set( this.values.size() );
 		this.values.add( o );
 	}
 
+	@Override
 	public boolean stringsOnly()
 	{
 		return false;
@@ -87,6 +90,7 @@ public class QueryEncodingWriter implements EncodingWriter
 		return result.toString();
 	}
 
+	@Override
 	public void flush()
 	{
 		// Nothing to flush

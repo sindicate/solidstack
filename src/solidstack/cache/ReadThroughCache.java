@@ -131,7 +131,7 @@ public class ReadThroughCache
 	/**
 	 * The cache.
 	 */
-	private final Map<String, CacheEntry> cache = new HashMap<String, CacheEntry>();
+	private final Map<String, CacheEntry> cache = new HashMap<>();
 
 	/**
 	 * Current expiration interval.
@@ -578,7 +578,7 @@ public class ReadThroughCache
 
 		long now = System.currentTimeMillis();
 		long then = now - this.purgeAgeMillis;
-		List<Map.Entry<String, CacheEntry>> purged = new ArrayList<Map.Entry<String, CacheEntry>>();
+		List<Map.Entry<String, CacheEntry>> purged = new ArrayList<>();
 
 		synchronized( this.cache )
 		{

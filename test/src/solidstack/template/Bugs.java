@@ -70,7 +70,7 @@ public class Bugs
 
 		Template template = templates.getTemplate( "car2.sql" );
 
-		ArrayList<Test2> records = new ArrayList<Test2>();
+		ArrayList<Test2> records = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
 			records.add( new Test2( "operator" + i, "segment" + i, "area" + i ) );
 		String result = template.apply( new Pars( "records", records ) );

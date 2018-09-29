@@ -18,6 +18,7 @@ package solidstack.httpserver;
 
 public class CompressionFilter implements Filter
 {
+	@Override
 	public void call( RequestContext context, FilterChain chain )
 	{
 		context.getResponse().setHeader( "Content-Encoding", "gzip" );

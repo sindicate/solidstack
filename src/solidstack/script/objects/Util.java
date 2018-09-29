@@ -38,7 +38,7 @@ public class Util
 
 	static public Object[] toJavaParameters( Object... pars )
 	{
-		List<Object> result = new ArrayList<Object>();
+		List<Object> result = new ArrayList<>();
 		ParWalker pw = new ParWalker( pars );
 		while( pw.hasNext() )
 			result.add( toJava( pw.get() ) );

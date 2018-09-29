@@ -40,7 +40,7 @@ import solidstack.script.objects.FunctionObject;
 
 public class Proxies
 {
-	static private final Map<Class<?>, Class<?>> boxes = new HashMap<Class<?>, Class<?>>();
+	static private final Map<Class<?>, Class<?>> boxes = new HashMap<>();
 
 	static
 	{

@@ -39,6 +39,7 @@ public class ValueMap<T extends ValueMap.Entry> implements Map<Symbol, T>
 	private int threshold = (int)( this.entries.length * LOAD_FACTOR );
 
 
+	@Override
 	public T get( Object key )
 	{
 		if( key == null )
@@ -61,6 +62,7 @@ public class ValueMap<T extends ValueMap.Entry> implements Map<Symbol, T>
 		return null;
 	}
 
+	@Override
 	public T put( Symbol key, T value )
 	{
 		if( key == null )
@@ -109,6 +111,7 @@ public class ValueMap<T extends ValueMap.Entry> implements Map<Symbol, T>
 		return null;
 	}
 
+	@Override
 	public T remove( Object key )
 	{
 		if( key == null )
@@ -144,6 +147,7 @@ public class ValueMap<T extends ValueMap.Entry> implements Map<Symbol, T>
 		return null;
 	}
 
+	@Override
 	public int size()
 	{
 		return this.size;
@@ -238,42 +242,50 @@ public class ValueMap<T extends ValueMap.Entry> implements Map<Symbol, T>
 		}
 	}
 
+	@Override
 	public void clear()
 	{
 		Arrays.fill( this.entries, null );
 		this.size = 0;
 	}
 
+	@Override
 	public boolean isEmpty()
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean containsKey( Object key )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean containsValue( Object value )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void putAll( Map<? extends Symbol, ? extends T> m )
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Set<Symbol> keySet()
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Collection<T> values()
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Set<java.util.Map.Entry<Symbol, T>> entrySet()
 	{
 		throw new UnsupportedOperationException();

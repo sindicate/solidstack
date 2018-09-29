@@ -33,12 +33,14 @@ public class Defined extends LocalizedExpression
 		this.expression = expression;
 	}
 
+	@Override
 	public Expression compile()
 	{
 		this.expression = this.expression.compile();
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		try
@@ -54,6 +56,7 @@ public class Defined extends LocalizedExpression
 		}
 	}
 
+	@Override
 	public void writeTo( StringBuilder out )
 	{
 		out.append( "defined(" );

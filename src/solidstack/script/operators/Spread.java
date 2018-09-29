@@ -36,6 +36,7 @@ public class Spread extends Operator
 		this.location = location;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		Object object = this.right.evaluate( thread );

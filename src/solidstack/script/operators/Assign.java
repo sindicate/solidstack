@@ -78,6 +78,7 @@ public class Assign extends Operator
 		return this;
 	}
 
+	@Override
 	public Object evaluate( ThreadContext thread )
 	{
 		Object right = this.right.evaluate( thread );

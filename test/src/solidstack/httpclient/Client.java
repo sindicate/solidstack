@@ -37,7 +37,7 @@ public class Client extends Thread
 {
 	private String hostname;
 	private Semaphore semaphore;
-	private List<Socket> sockets = new ArrayList<Socket>();
+	private List<Socket> sockets = new ArrayList<>();
 
 	public Client( String hostname ) throws IOException
 	{

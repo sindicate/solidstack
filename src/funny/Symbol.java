@@ -21,7 +21,7 @@ import java.util.WeakHashMap;
 
 public class Symbol
 {
-	static private WeakHashMap<String,WeakReference<Symbol>> symbols = new WeakHashMap<String,WeakReference<Symbol>>();
+	static private WeakHashMap<String,WeakReference<Symbol>> symbols = new WeakHashMap<>();
 
 	static public Symbol apply( String name )
 	{
@@ -40,7 +40,7 @@ public class Symbol
 			// else: Key is lost or never existed, which means that the symbol does not exist or never existed
 
 			result = new Symbol( name );
-			symbols.put( name, new WeakReference<Symbol>( result ) );
+			symbols.put( name, new WeakReference<>( result ) );
 			return result;
 		}
 	}
