@@ -159,6 +159,7 @@
 			<zipfileset dir="${build.home}/classes" />
 			<zipfileset dir="." includes="LICENSE.txt,NOTICE.txt,CHANGELOG.TXT" prefix="META-INF" />
 			<zipfileset src="lib/commons-primitives-1.0.jar" excludes="META-INF/**" />
+			<rule pattern="org.apache.commons.**" result="solidstack.commons.@1" />
 			<keep pattern="solidstack.**" />
 			<manifest>
 				<attribute name="Implementation-Title" value="SolidStack" />
@@ -200,13 +201,15 @@
 
 
 	<target name="instrument" depends="compile">
-		<cobertura-instrument todir="${build.home}/instrumentedclasses">
+		<delete file="cobertura.ser" />
+		<cobertura-instrument todir="${build.home}/instrumentedclasses" datafile="${build.home}/cobertura.ser">
 			<fileset dir="${build.home}/classes" includes="**/*.class" />
+			<auxClasspath refid="compile.classpath" />
 		</cobertura-instrument>
 	</target>
 
 
-	<target name="test" depends="buildtest,instrument" description="Run the tests">
+	<target name="checkDependencies">
 		<dependencyCheck failOnUnwantedDependencies="true">
 			<fileset dir="${build.home}/classes"><include name="**/*.class" /></fileset>
 			[query] = solidstack.query.* excluding solidstack.query.jpa.* solidstack.query.hibernate.*
@@ -224,19 +227,26 @@
 			check solidstack.util.*                dependentOnlyOn java.* javax.* solidstack.*
 			check solidstack.xml.*                 dependentOnlyOn java.* javax.* solidstack.*
 	    </dependencyCheck>
-		<delete file="cobertura.ser" />
+	</target>
+
+
+	<target name="test" depends="buildtest,checkDependencies,buildtest,instrument" description="Run the tests">
 		<testng classpathref="test.classpath" outputDir="${build.home}/testreports" haltOnFailure="true" verbose="2">
+			<sysproperty key="net.sourceforge.cobertura.datafile" file="${build.home}/cobertura.ser" />
 			<classfileset dir="${build.home}/testclasses" />
 			<reporter classname="solidstack.test.TestListener"/>
 		</testng>
 		<testng classpathref="test-hibernate3.classpath" outputDir="${build.home}/testreports-hibernate3" haltOnFailure="true" verbose="2">
+			<sysproperty key="net.sourceforge.cobertura.datafile" file="${build.home}/cobertura.ser" />
 			<classfileset dir="${build.home}/testclasses" includes="solidstack/query/hibernate/Hibernate3Tests.class" />
 			<reporter classname="solidstack.test.TestListener"/>
 		</testng>
 		<testng classpathref="test-jpa1.classpath" outputDir="${build.home}/testreports-jpa1" haltOnFailure="true" verbose="2">
+			<sysproperty key="net.sourceforge.cobertura.datafile" file="${build.home}/cobertura.ser" />
 			<classfileset dir="${build.home}/testclasses" includes="solidstack/query/jpa/JPA1Tests.class" />
 			<reporter classname="solidstack.test.TestListener"/>
 		</testng>
+		<cobertura-report datafile="${build.home}/cobertura.ser" srcdir="src" destdir="${build.home}/coveragereport"/>
 	</target>
 
 

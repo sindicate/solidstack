@@ -1,5 +1,5 @@
 SolidStack
-Copyright 2006-2010 René M. de Bloois
+Copyright 2006-2018 René M. de Bloois
 
 This product includes software developed by René M. de Bloois.
 
