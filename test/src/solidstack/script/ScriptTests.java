@@ -41,6 +41,8 @@ import solidstack.script.scopes.GlobalScope;
 import solidstack.script.scopes.Scope;
 
 
+// TODO ; optional
+// TODO Decide what to do with the string, Kotlin, Groovy, Scala, Clojure
 @SuppressWarnings( { "javadoc", "unchecked", "rawtypes" } )
 public class ScriptTests extends Util
 {
