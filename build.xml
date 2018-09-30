@@ -209,7 +209,7 @@
 	</target>
 
 
-	<target name="checkDependencies">
+	<target name="checkDependencies" depends="compile">
 		<dependencyCheck failOnUnwantedDependencies="true">
 			<fileset dir="${build.home}/classes"><include name="**/*.class" /></fileset>
 			[query] = solidstack.query.* excluding solidstack.query.jpa.* solidstack.query.hibernate.*
@@ -230,7 +230,7 @@
 	</target>
 
 
-	<target name="test" depends="buildtest,checkDependencies,buildtest,instrument" description="Run the tests">
+	<target name="test" depends="checkDependencies,buildtest" description="Run the tests">
 		<testng classpathref="test.classpath" outputDir="${build.home}/testreports" haltOnFailure="true" verbose="2">
 			<sysproperty key="net.sourceforge.cobertura.datafile" file="${build.home}/cobertura.ser" />
 			<classfileset dir="${build.home}/testclasses" />
@@ -246,7 +246,6 @@
 			<classfileset dir="${build.home}/testclasses" includes="solidstack/query/jpa/JPA1Tests.class" />
 			<reporter classname="solidstack.test.TestListener"/>
 		</testng>
-		<cobertura-report datafile="${build.home}/cobertura.ser" srcdir="src" destdir="${build.home}/coveragereport"/>
 	</target>
 
 
@@ -265,14 +264,12 @@
 	</target>
 
 
-	<target name="coberturareport" depends="test">
-		<cobertura-report format="xml" destdir="${build.home}/coberturareport">
-			<fileset dir="src" includes="**/*.java" />
-		</cobertura-report>
+	<target name="coverage" depends="instrument,test">
+		<cobertura-report datafile="${build.home}/cobertura.ser" srcdir="src" destdir="${build.home}/coveragereport"/>
 	</target>
 
 
-	<target name="sonar" depends="coberturareport,build">
+	<target name="sonar" depends="coverage,build">
 		<property name="sonar.sources" location="src" />
 		<property name="sonar.binaries" location="${build.home}/classes" />
 		<property name="sonar.cobertura.reportPath" location="${build.home}/coberturareport/coverage.xml" />
